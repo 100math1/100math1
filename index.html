@@ -64,7 +64,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.25 (2026-11-04 03:2x 비서: 학생 설문 「쌤이 알아 줬으면 하는 것(건강·사정)」 = 학부모 건강 동의(stu_ctx.consent.health) 있을 때만 — 없으면 질문 숨김·DB도 저장 안 함) · v0.24 (2026-11-04 02:4x 비서: 👪 첫 등록 동의서 v0.2 — 학부모 링크 첫 진입 때 5장(인사·필수·맡기는 곳·선택 3·끝), parent_consents 저장, par_ctx.consent 없으면 동의 먼저) · v0.23 (2026-11-04 01:46 원장: 학부모 성향 — 진도 위주/심화 위주를 로드맵 기본값에 반영 → 설문에 「진도와 심화 중 어느 쪽」) · v0.22 (2026-11-04 01:24 원장: 학부모 설문 "넣을 게 적어서 심심" → 15문항·묶음 제목·학년별 진학(초·중 고등학교 / 중·고 대학·계열)) · v0.21 (2026-11-03 23:46 원장: 교재가 너무 많이 나열 → 고른 책만 보이고 [🔄 책 바꾸기] 눌러야 목록) · v0.20 (2026-11-03 23:36 원장: 안내 화면의 「학생 코드 넣기」「학부모 코드 넣기」 링크 빼기 — 코드 맞추는 건 학원에서 쌤과 아이가) · v0.19 (2026-11-03 23:34 원장: 학부모가 윗줄 누를 때 안내 = 「여기는 학생용 메뉴입니다」만, 메뉴 설명 문단 빼기 — 학원에서 아이가 폰 많이 만지는 느낌) · v0.18 (2026-11-03 23:27 원장: 설문 진학 질문 학년별 — 중 = 가고 싶은 고등학교 + 대학교, 고 = 대학교만, 초 = 그대로) · v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.26 (2026-11-04 04:5x 비서: 📈 학습현황 개선안 — 오늘·시험대비·숙제 점·교재 진도·최근 수업 기록(수업+숙제)·학원 테스트, par_status v2) · v0.25 (2026-11-04 03:2x 비서: 학생 설문 「쌤이 알아 줬으면 하는 것(건강·사정)」 = 학부모 건강 동의(stu_ctx.consent.health) 있을 때만 — 없으면 질문 숨김·DB도 저장 안 함) · v0.24 (2026-11-04 02:4x 비서: 👪 첫 등록 동의서 v0.2 — 학부모 링크 첫 진입 때 5장(인사·필수·맡기는 곳·선택 3·끝), parent_consents 저장, par_ctx.consent 없으면 동의 먼저) · v0.23 (2026-11-04 01:46 원장: 학부모 성향 — 진도 위주/심화 위주를 로드맵 기본값에 반영 → 설문에 「진도와 심화 중 어느 쪽」) · v0.22 (2026-11-04 01:24 원장: 학부모 설문 "넣을 게 적어서 심심" → 15문항·묶음 제목·학년별 진학(초·중 고등학교 / 중·고 대학·계열)) · v0.21 (2026-11-03 23:46 원장: 교재가 너무 많이 나열 → 고른 책만 보이고 [🔄 책 바꾸기] 눌러야 목록) · v0.20 (2026-11-03 23:36 원장: 안내 화면의 「학생 코드 넣기」「학부모 코드 넣기」 링크 빼기 — 코드 맞추는 건 학원에서 쌤과 아이가) · v0.19 (2026-11-03 23:34 원장: 학부모가 윗줄 누를 때 안내 = 「여기는 학생용 메뉴입니다」만, 메뉴 설명 문단 빼기 — 학원에서 아이가 폰 많이 만지는 느낌) · v0.18 (2026-11-03 23:27 원장: 설문 진학 질문 학년별 — 중 = 가고 싶은 고등학교 + 대학교, 고 = 대학교만, 초 = 그대로) · v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
@@ -175,22 +175,58 @@ input.w{width:100%;max-width:520px}
       SB.rpc('par_consent',{p_code:PCUR,p_items:{version:'v0.2',required:true,health:PCN.health,photo:PCN.photo,promo:PCN.promo},p_relation:PCN.rel}).then(function(r){if(r.error||!r.data||r.data.err){sv.disabled=false;sv.textContent='동의 저장하기';toast('저장 실패 — 다시 눌러 주세요');return;}PCTX.consent=r.data.consent;pConsent(5);});};}
 
   function pSvDue(){var l=PCTX&&PCTX.psv_last;if(!l)return true;var d=(Date.now()-new Date(l).getTime())/864e5;if(d>120)return true;var t=new Date(),y=t.getFullYear(),st=[new Date(y,2,1),new Date(y,7,15)];return st.some(function(x){var a=(t-x)/864e5;return a>=0&&a<=30&&new Date(l)<x;});}
-  /* v0.17 📈 우리아이 학습현황 — par_status(학부모 코드). 사실(기록 숫자)만, 칭찬·약속 문구 없음 */
+  /* v0.26 (11-04 04:4x 비서, 원장 「그대로·순서 바꿀 것도 뺄 것도 없음」): 📈 학습현황 개선안 — 📍 오늘 · 🔥 시험대비(4주 전부터) · ✏️ 숙제 점 · 📚 교재 진도 · 📝 최근 수업 기록 · ✅ 출결 · 📝 학원 테스트 · 🏫 학교 점수. 사실(기록 숫자)만, 칭찬·약속 문구 없음. 수업 시간 = 시간표상(원장 04:06, 분 단위 실제 시각 X) */
   function pStat(){var box=document.getElementById('pStat');SB.rpc('par_status',{p_code:PCUR}).then(function(r){if(!box)return;if(r.error||!r.data||r.data.err){box.innerHTML='<div class="card">잠깐 문제가 있어요 — 다시 열어 주세요</div>';return;}
-    var d=r.data,C='style="margin:0 0 8px;font-size:17px;color:var(--navy)"',E=function(t){return '<div class="hint">'+t+'</div>';},W=['일','월','화','수','목','금','토'];
+    var d=r.data,C='style="margin:0 0 8px;font-size:17px;color:var(--navy)"',E=function(t){return '<div class="hint">'+t+'</div>';},W=['일','월','화','수','목','금','토'],OK='#1e7e45',BAD='#c0392b',MID='#d39e00';
     function md(x){if(!x)return '';var t=new Date(String(x).slice(0,10)+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()+'('+W[t.getDay()]+')';}
+    function items(a){return (Array.isArray(a)?a:[]).filter(function(i){return i&&i.book;}).map(function(i){return esc(i.book)+(i.range?' '+esc(i.range):'');}).join(' · ');}
+    function num(v){return v===null||v===undefined||v===''||isNaN(+v)?null:+v;}
+    /* 시간표(프로필 「🗓 수업 요일·시간」 글자) → 요일별 시간 */
+    var SM=null;(function(){var raw=String(d.sched||'').trim(),M={},any=false;if(raw){raw.split(/[,·\/\n;]+/).forEach(function(part){var ds=part.match(/[월화수목금토일]/g)||[],tm=part.match(/(\d{1,2})(?::(\d{2}))?\s*[~\-–]\s*(\d{1,2})(?::(\d{2}))?/),t='';if(tm){var h1=+tm[1],h2=+tm[3];if(h1<9)h1+=12;if(h2<9)h2+=12;t=h1+':'+(tm[2]||'00')+'~'+h2+':'+(tm[4]||'00');}ds.forEach(function(x){M[x]=t;any=true;});});}
+      if(!any&&Array.isArray(d.elem_days)&&d.elem_days.length){d.elem_days.forEach(function(x){M[x]='';});any=true;}SM=any?M:null;})();
+    var td=d.today,tw=W[new Date(String(td)+'T00:00:00').getDay()],onDay=SM?SM.hasOwnProperty(tw):null,clsT=SM&&onDay?SM[tw]:'';
     var h='';
-    var ex=d.exam;h+='<div class="card"><h2 '+C+'>🗓 다음 학교 시험</h2>'+(ex?'<div style="font-size:18px"><b>'+esc(ex.title)+'</b> · '+md(ex.d)+(ex.end&&ex.end!==ex.d?' ~ '+md(ex.end):'')+'</div><div style="margin-top:6px;font-size:26px;font-weight:800;color:'+(ex.dday<=14?'#c0392b':'var(--navy)')+'">'+(ex.dday>0?'D-'+ex.dday:ex.dday===0?'D-DAY':'시험 기간')+'</div>':E('등록된 학교 시험 일정이 아직 없습니다.'))+'</div>';
-    var SL=[['concept','개념서'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습']],sl=d.slots||{},rn=d.rm_now||{},rows='';
-    SL.forEach(function(p){var x=sl[p[0]],t='';if(x&&x.book)t='<b>'+esc(x.book)+'</b>'+(x.range?' · '+esc(x.range)+'까지':'')+' <span class="hint">'+md(x.d)+'</span>';else if(rn[p[0]])t='<b>'+esc(String(rn[p[0]]).split('｜').pop())+'</b> <span class="hint">계획</span>';
-      if(t)rows+='<tr><td style="padding:7px 8px 7px 0;white-space:nowrap;color:#666;font-size:14px">'+p[1]+'</td><td style="padding:7px 0;font-size:16px">'+t+'</td></tr>';});
-    h+='<div class="card"><h2 '+C+'>📚 지금 하고 있는 책</h2>'+(rows?'<table style="width:100%;border-collapse:collapse">'+rows+'</table>':E('아직 기록이 없습니다. 아이가 수업 끝에 폰으로 남기면 여기에 바로 보입니다.'))+'</div>';
-    var a=d.att||{},hw=d.hw||{};
-    h+='<div class="card"><h2 '+C+'>✅ 최근 4주</h2>'+(a.n?'<div style="display:flex;gap:8px;text-align:center">'+
-      [['수업',a.n+'회'],['출석',a.ok+'회'],['지각',(a.late||0)+'회'],['결석',(a.abs||0)+'회']].map(function(x){return '<div style="flex:1;background:#f6f7fb;border-radius:10px;padding:8px 2px"><div class="hint" style="font-size:12px">'+x[0]+'</div><div style="font-size:19px;font-weight:800;color:var(--navy)">'+x[1]+'</div></div>';}).join('')+'</div>'+
-      (hw.n?'<div style="margin-top:10px;font-size:16px">숙제 해 온 비율 평균 <b style="font-size:20px">'+hw.avg+'%</b> <span class="hint">(숙제 확인 '+hw.n+'번)</span></div>':'<div class="hint" style="margin-top:8px">숙제 확인 기록은 아직 없습니다.</div>'):E('최근 4주 수업 기록이 아직 없습니다.'))+'</div>';
-    var rc=d.recent||[];if(rc.length){h+='<div class="card"><h2 '+C+'>📝 최근 수업에서 나간 곳</h2>'+rc.map(function(n){var l=(n.learn||[]).filter(function(i){return i&&i.book;}).map(function(i){return esc(i.book)+(i.range?' '+esc(i.range):'');}).join(' · ');
-      return '<div style="padding:7px 0;border-bottom:1px solid #eee;font-size:15px"><span class="hint" style="display:inline-block;min-width:66px">'+md(n.d)+'</span>'+(l||'<span class="hint">'+esc(n.att||'기록')+'</span>')+'</div>';}).join('')+'</div>';}
+    /* 1. 📍 오늘 */
+    var tn=d.tn||null,bo=d.bo||null,oh='';
+    if(bo)oh+='<div style="background:#eef1fb;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:15px">🔁 '+(onDay===false?'오늘은 원래 수업 없는 날이지만 <b>보강</b>이 있어요':'오늘 <b>보강</b>이 있어요')+(bo.t?' · '+esc(bo.t):'')+' <span class="hint">('+md(bo.from)+' 결석분)</span></div>';
+    if(tn){var at=tn.src==='note'&&tn.att?'<b>✔ '+esc(tn.att)+'</b> <span class="hint">(담당 쌤 확인)</span>':'<span class="hint">출결은 담당 쌤 확인 전</span>';
+      var lt=items(tn.learn),ht=items(tn.hw);
+      oh+='<div style="font-size:16px">'+at+((clsT||(bo&&bo.t))?' · 수업 '+esc(bo&&bo.t?bo.t:clsT):'')+'</div>'+
+        (lt?'<div style="margin-top:8px;font-size:15px"><span class="hint">오늘 한 곳'+(tn.src==='phone'?' (아이가 폰으로 남긴 것)':'')+'</span><br>'+lt+'</div>':'')+
+        (ht?'<div style="margin-top:8px;background:#fff6dc;border-radius:10px;padding:8px 10px;font-size:15px">📌 <b>숙제</b> '+ht+'</div>':'');}
+    else if(onDay||bo)oh+='<div style="font-size:16px">오늘 수업'+((bo&&bo.t)||clsT?' '+esc(bo&&bo.t?bo.t:clsT):'')+'</div><div class="hint" style="margin-top:4px">수업이 끝나면 오늘 한 곳·숙제가 여기에 보입니다.</div>';
+    else if(!SM)oh+='<div class="hint">오늘 기록은 아직 없습니다.</div>';
+    else{var nx='';if(SM){for(var i=1;i<=7;i++){var x=new Date(String(td)+'T00:00:00');x.setDate(x.getDate()+i);var w=W[x.getDay()];if(SM.hasOwnProperty(w)){nx=(x.getMonth()+1)+'/'+x.getDate()+'('+w+')'+(SM[w]?' '+SM[w]:'');break;}}}
+      oh+='<div style="font-size:16px">오늘은 수업 없는 날이에요</div>'+(nx?'<div class="hint" style="margin-top:4px">다음 수업 '+esc(nx)+'</div>':'');}
+    h+='<div class="card" style="border:2px solid var(--navy)"><h2 '+C+'>📍 오늘 '+md(td)+'</h2>'+oh+'</div>';
+    /* 2. 🔥 시험대비 (4주 전부터) · 그 전엔 🗓 다음 학교 시험 */
+    var ex=d.exam,T=(d.tests||[]).filter(function(t){return num(t.sc)!==null;});
+    if(ex&&ex.dday<=28){var a28=new Date(String(ex.d)+'T00:00:00');a28.setDate(a28.getDate()-28);var a28s=a28.getFullYear()+'-'+('0'+(a28.getMonth()+1)).slice(-2)+'-'+('0'+a28.getDate()).slice(-2);
+      var pt=T.filter(function(t){return String(t.d)>=a28s;}),pav=pt.length?Math.round(pt.reduce(function(a,t){return a+(+t.sc);},0)/pt.length):null;
+      h+='<div class="card" style="background:#fdf1f0;border-color:#f0b9b3"><h2 '+C+'>🔥 시험대비 진행 <span style="color:'+BAD+'">'+(ex.dday>0?'D-'+ex.dday:ex.dday===0?'D-DAY':'시험 기간')+'</span></h2><div style="font-size:16px"><b>'+esc(ex.title)+'</b> · '+md(ex.d)+(ex.end&&ex.end!==ex.d?' ~ '+md(ex.end):'')+'</div>'+
+        (pt.length?'<div style="margin-top:8px;font-size:15px">시험대비 기간 학원 테스트 <b>'+pt.length+'번</b> · 평균 <b>'+pav+'점</b></div>':'<div class="hint" style="margin-top:8px">시험대비 기간 학원 테스트 기록은 아직 없습니다.</div>')+'</div>';}
+    else h+='<div class="card"><h2 '+C+'>🗓 다음 학교 시험</h2>'+(ex?'<div style="font-size:17px"><b>'+esc(ex.title)+'</b> · '+md(ex.d)+(ex.end&&ex.end!==ex.d?' ~ '+md(ex.end):'')+' <b style="color:var(--navy)">D-'+ex.dday+'</b></div><div class="hint" style="margin-top:4px">시험 4주 전부터 「🔥 시험대비 진행」으로 바뀝니다.</div>':E('등록된 학교 시험 일정이 아직 없습니다.'))+'</div>';
+    /* 3. ✏️ 숙제 점 */
+    var hh=d.hwh||[];if(hh.length){var vs=hh.filter(function(v){return v!==null;}),av=vs.length?Math.round(vs.reduce(function(a,b){return a+(+b);},0)/vs.length):null;
+      h+='<div class="card"><h2 '+C+'>✏️ 숙제 — 최근 '+hh.length+'번</h2><div style="margin:4px 0 8px;line-height:2">'+hh.map(function(v){var c=v===null?'#bbb':v>=90?OK:v>=50?MID:BAD;return '<span style="display:inline-block;min-width:26px;height:26px;border-radius:13px;margin:0 2px;background:'+c+';color:#fff;font-size:11px;line-height:26px;text-align:center;padding:0 3px">'+(v===null?'결':v)+'</span>';}).join('')+'</div><div class="hint">🟢 90% 이상 🟡 50~89% 🔴 50% 미만 · 회색 = 결석'+(av!==null?' · 평균 '+av+'%':'')+'</div></div>';}
+    /* 4. 📚 교재 진도 — 막대 = 책 전체 쪽수 아는 교재만, 나머지는 쪽까지 */
+    var g=String(d.grade||''),gn=(g.match(/\d/)||[''])[0],mo=new Date(String(td)+'T00:00:00').getMonth()+1,tm2=gn?gn+'-'+(mo>=8||mo<=1?'2':'1'):'';
+    function bmax(book){var L=(d.books||[]).filter(function(b){return b.brand===book&&b.maxp;});if(L.length>1)L=L.filter(function(b){return b.term===tm2;});return L.length===1?L[0].maxp:null;}
+    var SL=[['concept','개념서'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습']],sl=d.slots||{},rn=d.rm_now||{},bh='';
+    SL.forEach(function(p){var x=sl[p[0]];if(x&&x.book){var to=num(x.to),mx=bmax(x.book);
+        if(to!==null&&mx){var pc=Math.min(100,Math.round(to*100/mx));bh+='<div style="margin:8px 0 12px"><div style="font-size:15px"><b>'+esc(x.book)+'</b> <span class="hint">'+to+' / '+mx+'쪽 · '+md(x.d)+'</span></div><div style="height:10px;background:#e8ebf2;border-radius:6px;overflow:hidden;margin-top:4px"><i style="display:block;height:100%;width:'+pc+'%;background:var(--navy)"></i></div></div>';}
+        else bh+='<div style="margin:8px 0;font-size:15px"><b>'+esc(x.book)+'</b>'+(x.range?' · '+esc(x.range)+'까지':'')+' <span class="hint">'+md(x.d)+'</span></div>';}
+      else if(rn[p[0]])bh+='<div style="margin:8px 0;font-size:15px"><b>'+esc(String(rn[p[0]]).split('｜').pop())+'</b> <span class="hint">계획</span></div>';});
+    h+='<div class="card"><h2 '+C+'>📚 교재 진도</h2>'+(bh?bh+'<div class="hint">막대 = 책 전체 쪽 중 지금까지 (전체 쪽수를 아는 교재만)</div>':E('아직 기록이 없습니다. 아이가 수업 끝에 폰으로 남기면 여기에 바로 보입니다.'))+'</div>';
+    /* 5. 📝 최근 수업 기록 — 📖 수업 + ✏️ 숙제(다음 시간 확인한 해 옴 %) */
+    var rc=d.recent||[];if(rc.length)h+='<div class="card"><h2 '+C+'>📝 최근 수업 기록</h2>'+rc.map(function(n){var l=items(n.learn),w=items(n.hw),p=num(n.hwp);
+      var tg=p!==null?' <span style="display:inline-block;font-size:12px;border-radius:8px;padding:1px 7px;margin-left:4px;background:'+(p>=90?'#e5f4ea;color:'+OK:p>=50?'#fff3d6;color:#a77b00':'#fdeceb;color:'+BAD)+'">해 옴 '+p+'%</span>':'';
+      return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><div class="hint">'+md(n.d)+(n.att&&!/^출석/.test(n.att)?' · '+esc(n.att):'')+'</div>'+(l?'<div>📖 <b>수업</b> '+l+'</div>':'')+(w?'<div style="margin-top:2px">✏️ <b>숙제</b> '+w+tg+'</div>':'')+(!l&&!w&&(!n.att||/^출석/.test(n.att))?'<div class="hint">'+esc(n.att||'기록')+'</div>':'')+'</div>';}).join('')+'</div>';
+    /* 6. ✅ 최근 4주 출결 */
+    var a=d.att||{};h+='<div class="card"><h2 '+C+'>✅ 최근 4주 출결</h2>'+(a.n?'<div style="font-size:16px">수업 '+a.n+'회 · 출석 '+a.ok+' · 지각 '+(a.late||0)+' · <b style="color:'+(a.abs?BAD:'inherit')+'">결석 '+(a.abs||0)+'</b></div>':E('최근 4주 수업 기록이 아직 없습니다.'))+'</div>';
+    /* 7. 📝 학원 테스트 */
+    if(T.length)h+='<div class="card"><h2 '+C+'>📝 학원 테스트</h2>'+T.map(function(t){var s=+t.sc,c=s>=80?OK:s>=60?MID:BAD;return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:15px"><span class="hint" style="min-width:52px">'+md(t.d).replace(/\(.\)/,'')+'</span><span style="min-width:110px">'+esc(t.n)+'</span><div style="flex:1;height:10px;background:#e8ebf2;border-radius:6px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,s)+'%;background:'+c+'"></i></div><b style="min-width:30px;text-align:right">'+s+'</b></div>';}).join('')+'</div>';
+    /* 8. 🏫 학교 시험 점수 */
     var sc=d.scores||[];if(sc.length)h+='<div class="card"><h2 '+C+'>🏫 학교 시험 점수</h2>'+sc.map(function(x){return '<div style="padding:6px 0;font-size:16px">'+esc(x.y)+' '+esc(x.t)+'학기 '+esc(x.ex||'')+' '+esc(x.sub||'')+' <b>'+esc(x.sc)+'</b>'+(x.tot?' / '+esc(x.tot):'')+'</div>';}).join('')+'</div>';
     h+='<div class="hint" style="margin:4px 6px 0;line-height:1.7">궁금하신 점은 아랫줄 ✉️ 요청하기로 남겨 주세요.</div>';
     box.innerHTML=h;});}
