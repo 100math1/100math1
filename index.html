@@ -64,7 +64,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
@@ -124,10 +124,11 @@ input.w{width:100%;max-width:520px}
   function pMain(){var C='style="margin:0 0 6px;font-size:18px;color:var(--navy)"';
     var sw=PCODES.length>1?'<div class="pcts" style="margin-top:10px">'+PCODES.map(function(x){return '<button class="pc'+(x.c===PCUR?' on':'')+'" data-pc="'+esc(x.c)+'">'+esc(x.n||'아이')+'</button>';}).join('')+'</div>':'';
     var h='<div class="card"><div class="big">'+esc(PCTX.name)+' 학부모님</div>'+sw+'<div style="text-align:right;margin-top:6px"><button class="back" id="pAdd" style="font-size:12px;padding:5px 10px">＋ 다른 자녀 코드</button></div></div>';
-    if(QM==='preg'||QM==='pnote'){h+='<div class="card"><h2 '+C+'>'+(QM==='preg'?'👪 처음 등록·정보 동의':'📒 우리 아이 알림장')+'</h2><div class="hint">준비 중인 메뉴입니다. 열리면 이 메뉴에서 바로 보입니다.</div></div>';}
-    var due=pSvDue();
-    h+='<div class="pcts" style="margin:0 0 10px"><button class="pc'+(PTAB!=='req'?' on':'')+'" data-pt="sv" style="flex:1">📋 우리 아이 설문'+(due?' <small>— 해 주세요</small>':' ✅')+'</button><button class="pc'+(PTAB==='req'?' on':'')+'" data-pt="req" style="flex:1">✉️ 학원에 요청</button></div>';
-    if(PTAB==='req')h+=pReqHtml();else h+=pSvHtml(due);
+    /* v0.15 원장 22:58: 아랫줄 메뉴 3개가 다 같은 화면 → 메뉴마다 한 가지만 (탭 없음) */
+    var due=pSvDue(),pg=QM==='pask'?'req':QM==='pnote'?'note':'sv';
+    if(pg==='note')h+='<div class="card"><h2 '+C+'>📒 우리 아이 알림장</h2><div class="hint" style="line-height:1.7">준비 중인 메뉴입니다. 지금은 알림장을 이 채팅방으로 받으실 수 있고, 열리면 이 메뉴에서 지난 알림장을 모아 보실 수 있습니다.</div></div>';
+    else if(pg==='req')h+=pReqHtml();
+    else h+=pSvHtml(due);
     h+='<div class="card"><div class="hint" style="line-height:1.7">채팅방 메뉴 <b>윗줄</b>(🏁 수업시작 · 🏠 집가기전 · 👤 나소개)은 <b>학생용</b>, <b>아랫줄</b>은 학부모님용입니다. 급한 일은 채팅방에 바로 남겨 주세요.</div></div><div style="height:30px"></div>';
     out.innerHTML=h;window.scrollTo(0,0);pBind();}
   var PA={};
