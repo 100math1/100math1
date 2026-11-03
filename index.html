@@ -64,7 +64,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.20 (2026-11-03 23:36 원장: 안내 화면의 「학생 코드 넣기」「학부모 코드 넣기」 링크 빼기 — 코드 맞추는 건 학원에서 쌤과 아이가) · v0.19 (2026-11-03 23:34 원장: 학부모가 윗줄 누를 때 안내 = 「여기는 학생용 메뉴입니다」만, 메뉴 설명 문단 빼기 — 학원에서 아이가 폰 많이 만지는 느낌) · v0.18 (2026-11-03 23:27 원장: 설문 진학 질문 학년별 — 중 = 가고 싶은 고등학교 + 대학교, 고 = 대학교만, 초 = 그대로) · v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
@@ -178,15 +178,13 @@ input.w{width:100%;max-width:520px}
   function gStu(){out.innerHTML='<div class="card done-scr"><div class="e">👪</div><div class="m">여기는 부모님이 쓰시는 메뉴예요</div>'+
       '<div class="hint" style="margin-top:10px;line-height:1.7">아이설문 · 학습현황 · 요청하기는 부모님이 직접 적고 보시는 곳이라<br>학생 코드로는 열리지 않아.<br><b>내 기록은 윗줄 메뉴</b>에서 해 줘!</div>'+G_MAP+
       '<div class="row" style="justify-content:center;margin-top:18px;gap:8px"><button class="send" style="width:auto;padding:13px 20px" id="gS1">🏁 수업시작</button><button class="send" style="width:auto;padding:13px 20px" id="gS2">🏠 집가기전</button></div>'+
-      '<div class="hint" style="margin-top:18px">부모님 폰인데 이 화면이 보이시나요? <a href="#" id="gS3">학부모 코드 넣기 →</a></div></div>';
-    window.scrollTo(0,0);document.getElementById('gS1').onclick=function(){gGo('start');};document.getElementById('gS2').onclick=function(){gGo('end');};
-    document.getElementById('gS3').onclick=function(e){e.preventDefault();pLoad();};}
-  function gPar(){pHead();out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">여기는 학생이 직접 기록하는 메뉴입니다</div>'+
-      '<div class="hint" style="margin-top:10px;line-height:1.7">수업시작 · 집가기전 · 나소개는 아이가 수업 전후에<br>자기 폰으로 숙제·진도를 남기는 곳입니다.<br>아이 기록과 섞이지 않도록 학부모 코드로는 열리지 않습니다.<br><b>부모님께서는 아랫줄 메뉴</b>를 이용해 주세요.</div>'+G_MAP+
+      '</div>';
+    window.scrollTo(0,0);document.getElementById('gS1').onclick=function(){gGo('start');};document.getElementById('gS2').onclick=function(){gGo('end');};}
+  function gPar(){pHead();out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">여기는 학생용 메뉴입니다</div>'+
+      '<div class="hint" style="margin-top:10px">부모님께서는 아랫줄 메뉴를 이용해 주세요.</div>'+
       '<div class="row" style="justify-content:center;margin-top:18px;gap:8px;flex-wrap:wrap"><button class="send" style="width:auto;padding:13px 16px" id="gP1">📋 아이설문</button><button class="send" style="width:auto;padding:13px 16px" id="gP2">📈 학습현황</button><button class="send" style="width:auto;padding:13px 16px" id="gP3">✉️ 요청하기</button></div>'+
-      '<div class="hint" style="margin-top:18px">아이 폰을 대신 맞춰 주시는 중이라면 <a href="#" id="gP4">학생 코드 넣기 →</a></div></div>';
-    window.scrollTo(0,0);document.getElementById('gP1').onclick=function(){gGo('preg');};document.getElementById('gP2').onclick=function(){gGo('pstat');};document.getElementById('gP3').onclick=function(){gGo('pask');};
-    document.getElementById('gP4').onclick=function(e){e.preventDefault();nocode();};}
+      '</div>';
+    window.scrollTo(0,0);document.getElementById('gP1').onclick=function(){gGo('preg');};document.getElementById('gP2').onclick=function(){gGo('pstat');};document.getElementById('gP3').onclick=function(){gGo('pask');};}
   function load(){if(PQ.indexOf(QM)>=0){/* v0.14 카카오 아랫줄=학부모 (parent·preg·pnote·pask) */if(CODE&&!PCODES.length){gStu();return;}pLoad();return;}if(QM!=='help'&&!CODE&&PCODES.length){gPar();return;}if(QM==='help'){helpScr();return;}if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
     SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
       CTX=r.data;if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
@@ -214,7 +212,9 @@ input.w{width:100%;max-width:520px}
  {k:'likes',sec:'나에 대해',q:'요즘 빠져 있는 것·좋아하는 것은?',t:'text',to:'likes'},
  {k:'goal',sec:'나의 목표',q:'이번 학기 수학 목표는? (숫자로 써도 좋아요)',t:'text',to:'goal'},
  {k:'habit',sec:'나의 목표',q:'수학 공부하면서 고치고 싶은 습관 하나는?',t:'text',to:'habit'},
- {k:'path',sec:'나의 목표',q:'가고 싶은 고등학교·진로는?',t:'multi',o:['자사고','과학고·영재고','외고·국제고','일반고','특성화고','아직 모르겠어요'],more:'학교 이름·꿈이 있으면 써 주세요',to:'path'},
+ {k:'path',lv:['초',''],sec:'나의 목표',q:'가고 싶은 고등학교·진로는?',t:'multi',o:['자사고','과학고·영재고','외고·국제고','일반고','특성화고','아직 모르겠어요'],more:'학교 이름·꿈이 있으면 써 주세요',to:'path'},
+ {k:'path',lv:['중'],sec:'나의 목표',q:'가고 싶은 고등학교는?',t:'multi',o:['자사고','과학고·영재고','외고·국제고','일반고','특성화고','아직 모르겠어요'],more:'가고 싶은 학교 이름이 있으면 써 주세요',to:'path'},
+ {k:'univ',lv:['중','고',''],sec:'나의 목표',q:'가고 싶은 대학교·학과는?',t:'multi',o:['서울대·연고대','서울 상위권 대학','인서울','지방 거점 국립대','의·치·한·약대','교대·사범대','과학기술원','아직 모르겠어요'],more:'학교·학과·꿈이 있으면 써 주세요',to:'path'},
  {k:'mind',sec:'수학과 나',q:'수학 하면 드는 마음은?',t:'one',o:['좋아요','자신 있어요','그냥 그래요','자신 없어요','무서워요','싫어요'],to:'mind'},
  {k:'hard',sec:'수학과 나',q:'제일 어렵거나 싫은 부분은?',t:'multi',o:['계산 실수','문제가 길면 읽기 싫음','도형','함수·그래프','서술형','개념 외우기','응용·심화','시간이 모자람'],more:'특히 어려운 단원이 있으면',to:'weak'},
  {k:'good',sec:'수학과 나',q:'내가 잘하는 것은?',t:'multi',o:['계산 빠름','계산 정확','도형 감각','끈기 있게 붙잡음','개념 이해가 빠름','서술형','숙제는 꼭 함'],to:'str'},
@@ -233,10 +233,12 @@ input.w{width:100%;max-width:520px}
  {k:'wish',sec:'우리 집',q:'백수학 쌤한테 바라는 점·하고 싶은 말',t:'text',to:'request'}
 ];
   (function(){var O=['나에 대해','나의 목표','수학과 나','공부 습관','나의 일주일','우리 집'];BZ_SURVEY=BZ_SURVEY.map(function(q,i){return [O.indexOf(q.sec),i,q];}).sort(function(a,b){return a[0]-b[0]||a[1]-b[1];}).map(function(x){return x[2];});})();
+  var BZ_ALL=BZ_SURVEY.slice();/* v0.18: 학년별 질문(lv) — 설문 열 때 이 학생 학년(CTX.lvl)에 맞는 것만 */
+  function svPick(){var l=(CTX&&CTX.lvl)||'';BZ_SURVEY=BZ_ALL.filter(function(q){return !q.lv||q.lv.indexOf(l)>=0;});}
   var SA={},SM={};
   /* v0.4 원장 11-03: 설문 갱신 — 120일 지났거나 새 학기(3/1·8/15) 지나고 30일 넘으면 다시 (하루 한 번 자동으로 띄움, 그 외엔 버튼 노랗게) */
   function svDue(){var l=CTX.survey_last;if(!l)return true;var t=new Date(),ld=new Date(String(l).slice(0,10)+'T00:00:00'),days=Math.floor((t-ld)/864e5),y=t.getFullYear(),a=new Date(y,2,1),b=new Date(y,7,15),ss=t>=b?b:t>=a?a:new Date(y-1,7,15);return days>=120||(ld<ss&&days>=30);}
-  function survey(){var last='',i=0,first=!CTX.survey_last;
+  function survey(){svPick();var last='',i=0,first=!CTX.survey_last;
     var h='<div class="card"><div class="big">📝 '+esc(CTX.name)+' — 나를 소개해 줘</div><div class="hint" style="margin-top:6px">'+(first?'처음 한 번만! 3~5분 · ':svDue()?'새 학기야(지난번 '+esc(String(CTX.survey_last).slice(0,10))+') — 요즘 나로 다시 해 줘 · ':'지난번 '+esc(String(CTX.survey_last).slice(0,10))+'에 했어 — 바뀐 게 있으면 다시 · ')+'정답 없어, 솔직하게 · 쌤들이 나한테 꼭 맞게 가르치려고 물어보는 거야</div>'+'<button class="back" style="margin-top:10px" id="svBack">'+(first?'설문은 나중에 → 오늘 기록 먼저':'← 돌아가기')+'</button></div>';
     BZ_SURVEY.forEach(function(q){i++;if(q.sec!==last){h+='<div style="margin:16px 4px 6px;font-weight:800;color:#fff;background:var(--navy);display:inline-block;padding:3px 12px;border-radius:8px;font-size:14px">'+esc(q.sec)+'</div>';last=q.sec;}
       h+='<div class="card"><h2 style="font-size:17px">'+i+'. '+esc(q.q)+(q.t==='multi'?' <small>여러 개 골라도 돼</small>':'')+'</h2>';
