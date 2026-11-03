@@ -64,29 +64,55 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.4 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
 (function(){
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiamhtd3ZubnJuaGxvYnhhYmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0Nzg2MjQsImV4cCI6MjA5NTA1NDYyNH0.9_cIUr_OtbfvIHmjPzefCwiZRWLyrvP5omXBTUwog2M',{auth:{persistSession:false}});}catch(e){}
-  var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['쎈','RPM','개념원리','개념쎈','일품','블랙라벨','최상위','마플시너지','자이스토리','교과서','학교기출','자체교재','유형만렙','개념+유형 파워','디딤돌'];
+  var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
   function given(n){n=String(n||'').replace(/\s/g,'');return n.length>=3?n.slice(1):n;}
   function lastNum(r){var m=String(r||'').match(/(\d+)\D*$/);return m?+m[1]:null;}
-  var q=new URLSearchParams(location.search),k=q.get('k'),SVQ=q.get('sv')==='1';
-  if(k){LS('bzs_code',k.trim());try{history.replaceState(null,'',location.pathname);}catch(e){}}
+  var q=new URLSearchParams(location.search),k=q.get('k'),SVQ=q.get('sv')==='1'||q.get('m')==='survey',QM=q.get('m')||'';/* v0.10: 카카오 채널 하단 메뉴용 — ?m=start(수업 시작)·end(집에 가기 전)·survey(설문)·wrong(오답) 으로 바로 그 화면 */
+  if(k){LS('bzs_code',k.trim());try{history.replaceState(null,'',location.pathname+(QM?'?m='+QM:''));}catch(e){}}
   CODE=LS('bzs_code')||'';
-  function nocode(msg){out.innerHTML='<div class="card done-scr"><div class="e">📷</div><div class="m">'+(msg||'쌤이 준 QR 카드를 폰 카메라로 찍어 줘')+'</div><div class="hint" style="margin-top:10px">한 번 찍으면 이 폰에 기억돼서 다음부턴 바로 열려요</div></div>';}
-  function load(){if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
+  /* v0.11 원장 17:10 「다른 사람 기록으로 들어갈 일 없게」: ① 처음 등록 때 「○○ 맞아?」 확인 ② 이름 크게 + 「내가 아니야」 ③ 폰 번호(무작위)를 같이 보내 한 폰에서 두 학생이 보내면 쌤 화면 ⚠ */
+  var DEV=LS('bzs_dev');if(!DEV){DEV='d'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);LS('bzs_dev',DEV);}
+  function notMe(){if(!confirm('이 폰에서 지금 이름을 지우고 내 카드로 다시 들어갈까?'))return;LS('bzs_code',null);LS('bzs_ok',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');}
+  function nocode(msg){out.innerHTML='<div class="card done-scr"><div class="e">📷</div><div class="m">'+(msg||'쌤이 준 QR 카드를 폰 카메라로 찍어 줘')+'</div><div class="hint" style="margin-top:10px">한 번 하면 이 폰에 기억돼서 다음부턴 바로 열려요</div>'+
+      '<div style="margin-top:22px;font-size:15px">또는 카드 아래 <b>코드</b>를 그대로 입력 (대소문자 그대로)</div><div class="row" style="justify-content:center"><input class="t" id="cdIn" style="width:200px;text-align:center;letter-spacing:1px" placeholder="예: Qvdqt3F9wM" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="back" id="cdGo">확인</button></div></div>';
+    document.getElementById('cdGo').onclick=function(){var v=(document.getElementById('cdIn').value||'').replace(/\s/g,'');if(v.length<8){toast('코드를 다시 확인해 줘');return;}LS('bzs_code',v);CODE=v;load();};}
+  /* v0.12 원장 18:16: 학생용 사용법 (?m=help — 코드 없어도 보임, 카카오 메뉴 「사용법」) */
+  function helpScr(){var C='style="margin:0 0 6px;font-size:18px;color:var(--navy)"',L='style="margin:6px 0 0 18px;padding:0;line-height:1.8;font-size:16px"';
+    out.innerHTML='<div class="card"><div class="big">❓ 백수학 오늘 기록 — 사용법</div><div class="hint" style="margin-top:6px">채팅방 아래 메뉴로 들어와요 · 1분이면 끝!</div></div>'+
+      '<div class="card"><h2 '+C+'>처음 한 번만</h2><ol '+L+'><li>아무 메뉴나 누르기</li><li>쌤이 준 카드의 <b>코드</b> 입력 (또는 카드 QR 찍기)</li><li>「<b>내 이름 맞아?</b>」 → 내 이름이면 [응, 나야]</li><li><b>📝 나 소개</b>(설문) 3~5분 — 쌤들이 나한테 맞게 가르치려고 물어보는 거야</li></ol><div class="hint" style="margin-top:8px">한 번 하면 이 폰이 기억해서 다음부턴 바로 열려요</div></div>'+
+      '<div class="card"><h2 '+C+'>매 수업마다 2번</h2><table style="width:100%;border-collapse:collapse;font-size:15px">'+
+        '<tr><td style="padding:8px 6px;border-bottom:1px solid #eee;white-space:nowrap"><b>🏁 수업시작</b><br><span class="hint">오기 전 5분·시작할 때</span></td><td style="padding:8px 6px;border-bottom:1px solid #eee">지난 숙제 얼마나 했는지 버튼 하나<br><span class="hint">곧: 틀린 문제 다시 풀기·풀이 사진</span></td></tr>'+
+        '<tr><td style="padding:8px 6px;white-space:nowrap"><b>🏠 집가기전</b><br><span class="hint">수업 끝 1분</span></td><td style="padding:8px 6px"><b>개념서</b> 몇 쪽까지 나갔는지 · <b>유형서</b> 숙제 몇 쪽까지 풀어 올지 — 책은 미리 골라져 있어서 <b>쪽 번호만</b> 치면 돼요</td></tr></table></div>'+
+      '<div class="card"><h2 '+C+'>메뉴</h2><ul '+L+'><li><b>🏁 수업시작</b> — 지난 숙제 확인</li><li><b>🏠 집가기전</b> — 오늘 진도·숙제</li><li><b>📝 나소개</b> — 설문 (새 학기마다 한 번 더)</li><li><b>📕 내오답</b> — 틀린 문제 다시 풀기 (곧 열려요)</li><li><b>❓ 사용법</b> — 이 화면</li></ul></div>'+
+      '<div class="card"><h2 '+C+'>이럴 땐</h2><ul '+L+'><li><b>친구 이름이 떠요</b> → 위 [내가 아니야] → 내 코드 다시</li><li><b>책이 바뀌었어요</b> → 새 책 버튼 누르기 (없으면 ✍ 다른 책)</li><li><b>안 하는 책이에요</b> → 「🚫 지금 안 함」</li><li><b>잘못 보냈어요</b> → 다시 열어서 고치고 보내면 돼요</li><li><b>카드 잃어버렸어요</b> → 쌤한테 말하면 새 코드</li><li><b>내 코드는 나만!</b> 친구 기록을 대신 적지 마요</li></ul></div>'+
+      '<button class="send" id="hGo">'+(CODE?'오늘 기록하러 가기 →':'시작하기 → 코드 넣기')+'</button><div style="height:30px"></div>';
+    window.scrollTo(0,0);document.getElementById('hGo').onclick=function(){QM='';try{history.replaceState(null,'',location.pathname);}catch(e){}load();};}
+  function load(){if(QM==='help'){helpScr();return;}if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
     SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
       CTX=r.data;if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
-      document.getElementById('cn').textContent=CTX.class_name||'';LASTN=(CTX.notes||[]).map(function(n){return {note_date:n.d,hw_items:n.hw||[],learned:n.learn||[]};});var td=new Date().toISOString().slice(0,10);if(!CTX.survey_last||SVQ||(svDue()&&LS('bzs_svask')!==td)){if(CTX.survey_last)LS('bzs_svask',td);survey();}else open0();});}
-  function bookList(){var o={},add=function(b){b=String(b||'').trim();if(b)o[b]=(o[b]||0)+1;};
+      if(LS('bzs_ok')!==CODE){out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">'+esc(CTX.name)+' 맞아?</div><div class="hint" style="margin-top:8px">'+esc(CTX.class_name||'')+'</div><div class="row" style="justify-content:center;margin-top:18px"><button class="send" style="width:auto;padding:14px 30px" id="okY">응, 나야</button><button class="back" id="okN">아니야</button></div><div class="hint" style="margin-top:12px">친구 카드면 「아니야」 — 친구 이름으로 기록돼요</div></div>';
+        document.getElementById('okY').onclick=function(){LS('bzs_ok',CODE);load();};document.getElementById('okN').onclick=function(){LS('bzs_code',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');};return;}
+      document.getElementById('cn').textContent=CTX.class_name||'';LASTN=(CTX.notes||[]).map(function(n){return {note_date:n.d,hw_items:n.hw||[],learned:n.learn||[]};});var td=new Date().toISOString().slice(0,10);if(SVQ){survey();}else if(QM==='wrong'){wrongScr();}else if(QM==='start'||QM==='end'){open0(QM);}else if(svDue()&&LS('bzs_svask')!==td){LS('bzs_svask',td);survey();}else open0();});}
+  function wrongScr(){out.innerHTML='<div class="card"><div class="big">📕 '+esc(CTX.name)+' — 내 오답</div><div class="hint" style="margin-top:8px">채점이 연결되면 여기에 내가 틀린 문제(책·쪽·번호)가 뜨고, 다시 푼 풀이를 📷 사진으로 보낼 수 있어요. 곧 열려요!</div><button class="back" style="margin-top:14px" id="wBack">← 오늘 기록으로</button></div>';document.getElementById('wBack').onclick=function(){open0(autoMode());};}
+  var BOOKS_LV={'중':['개념+유형 개념','개념+유형 라이트','개념+유형 파워','RPM','쎈','쎈B','일품','유형만렙','학원진도교재','학원연습교재'],'고':['개념원리','RPM','쎈','마플시너지','내신고쟁이','자이스토리','학원진도교재','학원연습교재']};
+  function bookList(kk){var o={},add=function(b){b=String(b||'').trim();if(b)o[b]=(o[b]||0)+1;};
     LASTN.forEach(function(n){(n.hw_items||[]).concat(n.learned||[]).forEach(function(i){add(i.book);});});
-    var L=Object.keys(o).sort(function(a,b){return o[b]-o[a];});(CTX.cls_books||[]).forEach(function(b){if(L.indexOf(b)<0)L.push(b);});BOOKS0.forEach(function(b){if(L.length<10&&L.indexOf(b)<0)L.push(b);});return L;}
+    /* v0.6: 로드맵(학생·반)에 적힌 지금 교재 먼저 → 내가 쓴 책 → 반 책 → 기본 · 「다른 책」으로 쓴 것도 버튼으로 */
+    var L=[],ad=function(b){b=String(b||'').trim();if(b&&L.indexOf(b)<0)L.push(b);};(CTX.rm_books||[]).forEach(ad);
+    /* v0.7 원장 11-03 16:24: 학년별로 고를 책을 정해 둠 — 중등은 이것만(+ 로드맵 교재 + 그 학생이 「다른 책」으로 쓴 것) */
+    var lb=CTX.lv_books,LV=null;if(Array.isArray(lb)&&lb.length)LV=lb;else if(lb&&typeof lb==='object'){LV=(kk==='hw'&&Array.isArray(lb.hw)&&lb.hw.length)?lb.hw:(Array.isArray(lb.learn)&&lb.learn.length?lb.learn:null);}if(!LV)LV=BOOKS_LV[CTX.lvl||''];/* v0.8: 목록은 원장이 데일리알림 ⚙ 설정에서 직접 추가·빼기(app_settings) */if(LV){LV.forEach(ad);try{JSON.parse(LS('bzs_mybooks')||'[]').forEach(ad);}catch(e){}if(F){(kk?[kk]:['learn','hw']).forEach(function(k){(F[k]||[]).forEach(function(i){ad(i.book);});});}return L;}
+    Object.keys(o).sort(function(a,b){return o[b]-o[a];}).forEach(ad);(CTX.cls_books||[]).forEach(ad);
+    try{JSON.parse(LS('bzs_mybooks')||'[]').forEach(ad);}catch(e){}if(F){['learn','hw'].forEach(function(k){(F[k]||[]).forEach(function(i){ad(i.book);});});}
+    BOOKS0.forEach(ad);return L;}
   function lastEnd(book){var best=null;LASTN.some(function(n){var hit=null;(n.learned||[]).concat(n.hw_items||[]).forEach(function(i){if(i.book===book){var e=lastNum(i.range);if(e!=null&&(hit==null||e>hit))hit=e;}});if(hit!=null){best=hit;return true;}return false;});return best;}
   /* v0.2 원장 11-03 06:47: 두 번 나눠 기록 — 🏁 수업 시작(오기 전 5분·시작 직후): 지난 숙제 얼마나 했나 (+ 다음: 틀린 문제 다시 풀기·풀이 사진)
      🏠 수업 끝 1분(집에 가기 전): 오늘 진도(어떤 책 어디까지) · 숙제(어떤 책 어디까지 풀어오기로) · 테스트 · 한마디. 시간표(프로필 「수업 요일·시간」) 있으면 자동으로 맞는 화면 */
@@ -120,7 +146,7 @@ input.w{width:100%;max-width:520px}
   /* v0.4 원장 11-03: 설문 갱신 — 120일 지났거나 새 학기(3/1·8/15) 지나고 30일 넘으면 다시 (하루 한 번 자동으로 띄움, 그 외엔 버튼 노랗게) */
   function svDue(){var l=CTX.survey_last;if(!l)return true;var t=new Date(),ld=new Date(String(l).slice(0,10)+'T00:00:00'),days=Math.floor((t-ld)/864e5),y=t.getFullYear(),a=new Date(y,2,1),b=new Date(y,7,15),ss=t>=b?b:t>=a?a:new Date(y-1,7,15);return days>=120||(ld<ss&&days>=30);}
   function survey(){var last='',i=0,first=!CTX.survey_last;
-    var h='<div class="card"><div class="big">📝 '+esc(CTX.name)+' — 나를 소개해 줘</div><div class="hint" style="margin-top:6px">'+(first?'처음 한 번만! 3~5분 · ':svDue()?'새 학기야(지난번 '+esc(String(CTX.survey_last).slice(0,10))+') — 요즘 나로 다시 해 줘 · ':'지난번 '+esc(String(CTX.survey_last).slice(0,10))+'에 했어 — 바뀐 게 있으면 다시 · ')+'정답 없어, 솔직하게 · 쌤들이 나한테 꼭 맞게 가르치려고 물어보는 거야</div>'+(first?'':'<button class="back" style="margin-top:10px" id="svBack">← 돌아가기</button>')+'</div>';
+    var h='<div class="card"><div class="big">📝 '+esc(CTX.name)+' — 나를 소개해 줘</div><div class="hint" style="margin-top:6px">'+(first?'처음 한 번만! 3~5분 · ':svDue()?'새 학기야(지난번 '+esc(String(CTX.survey_last).slice(0,10))+') — 요즘 나로 다시 해 줘 · ':'지난번 '+esc(String(CTX.survey_last).slice(0,10))+'에 했어 — 바뀐 게 있으면 다시 · ')+'정답 없어, 솔직하게 · 쌤들이 나한테 꼭 맞게 가르치려고 물어보는 거야</div>'+'<button class="back" style="margin-top:10px" id="svBack">'+(first?'설문은 나중에 → 오늘 기록 먼저':'← 돌아가기')+'</button></div>';
     BZ_SURVEY.forEach(function(q){i++;if(q.sec!==last){h+='<div style="margin:16px 4px 6px;font-weight:800;color:#fff;background:var(--navy);display:inline-block;padding:3px 12px;border-radius:8px;font-size:14px">'+esc(q.sec)+'</div>';last=q.sec;}
       h+='<div class="card"><h2 style="font-size:17px">'+i+'. '+esc(q.q)+(q.t==='multi'?' <small>여러 개 골라도 돼</small>':'')+'</h2>';
       if(q.o){var sel=SA[q.k]||[];h+='<div class="bk">'+q.o.map(function(o){return '<button class="bkc'+(sel.indexOf(o)>-1?' on':'')+'" data-sq="'+q.k+'" data-so="'+esc(o)+'">'+esc(o)+'</button>';}).join('')+'</div>';}
@@ -129,7 +155,7 @@ input.w{width:100%;max-width:520px}
       h+='</div>';});
     h+='<button class="send" id="svSend">설문 보내기 ✅</button><div style="height:30px"></div>';
     out.innerHTML=h;window.scrollTo(0,0);
-    var bk=document.getElementById('svBack');if(bk)bk.onclick=function(){open0(autoMode());};
+    var bk=document.getElementById('svBack');if(bk)bk.onclick=function(){LS('bzs_svask',new Date().toISOString().slice(0,10));open0(autoMode());};
     out.querySelectorAll('[data-sq]').forEach(function(c){c.onclick=function(){var k=c.getAttribute('data-sq'),o=c.getAttribute('data-so'),q=BZ_SURVEY.filter(function(x){return x.k===k;})[0],a=SA[k]||[];
       if(q.t==='one')a=a[0]===o?[]:[o];else{var j=a.indexOf(o);if(j>-1)a.splice(j,1);else a.push(o);}SA[k]=a;c.parentNode.querySelectorAll('[data-sq]').forEach(function(x){x.classList.toggle('on',a.indexOf(x.getAttribute('data-so'))>-1);});};});
     out.querySelectorAll('[data-st]').forEach(function(x){x.oninput=function(){SA[x.getAttribute('data-st')]=x.value;};});
@@ -137,7 +163,7 @@ input.w{width:100%;max-width:520px}
     document.getElementById('svSend').onclick=function(){var n=Object.keys(SA).filter(function(k){var v=SA[k];return Array.isArray(v)?v.length:String(v||'').trim();}).length;
       if(n<5){toast('조금만 더! 아는 것만이라도 골라 줘 ('+n+'개 답함)');return;}
       var b=this;b.disabled=true;b.textContent='보내는 중…';
-      SB.rpc('stu_survey',{p_code:CODE,p_ans:{a:SA,more:SM}}).then(function(r){if(r.error||r.data!==true){b.disabled=false;b.textContent='설문 보내기 ✅';toast('저장 안 됨 — 다시 눌러 줘');return;}
+      SB.rpc('stu_survey',{p_code:CODE,p_ans:{a:SA,more:SM,dev:DEV}}).then(function(r){if(r.error||r.data!==true){b.disabled=false;b.textContent='설문 보내기 ✅';toast('저장 안 됨 — 다시 눌러 줘');return;}
         CTX.survey_last=CTX.today||'오늘';out.innerHTML='<div class="card done-scr"><div class="e">🙌</div><div class="m">고마워! 쌤들이 꼭 참고할게</div><button class="back" style="margin-top:20px" id="svGo">오늘 기록하러 가기 →</button></div>';
         document.getElementById('svGo').onclick=function(){open0(autoMode());};});};}
 
@@ -150,11 +176,17 @@ input.w{width:100%;max-width:520px}
   function open0(m){var old=CTX.mine||{};MODE=m||MODE||autoMode();
     F={hwc:(old.hwc&&old.hwc.length?old.hwc:hwPrev().filter(function(i){return i.book||i.range;}).map(function(i){return {book:i.book||'',range:i.range||'',pct:null};})).map(function(i){return {book:i.book,range:i.range,pct:i.pct==null?null:i.pct};}),
        learn:(old.learn||[]).map(function(i){return {book:i.book,to:i.to!=null?i.to:lastNum(i.range)};}),hw:(old.hw||[]).map(function(i){return {book:i.book,to:i.to!=null?i.to:lastNum(i.range)};}),tests:(old.tests||[]).slice(),say:old.say||''};
-    if(!F.learn.length){var n0=LASTN[0]||{},bl=bookList();F.learn=[{book:(n0.learned&&n0.learned[0]&&n0.learned[0].book)||bl[0]||'',to:''}];}
-    if(!F.hw.length){var h0=hwPrev();F.hw=[{book:(h0[0]&&h0[0].book)||F.learn[0].book,to:''}];}
+    if(!F.learn.length){var n0=LASTN[0]||{},bl=bookList('learn');F.learn=[{book:(n0.learned&&n0.learned[0]&&n0.learned[0].book)||bl[0]||'',to:''}];}
+    if(!F.hw.length){var h0=hwPrev(),bh=bookList('hw');F.hw=[{book:(h0[0]&&h0[0].book)||(bh.indexOf(F.learn[0].book)>=0?F.learn[0].book:bh[0]||''),to:''}];}
+    /* v0.9 원장 11-03 16:42: 로드맵 이름 그대로 — 개념서(진도)·유형서1(숙제1)·유형서2(숙제2)·심화·복습, 「지금 안 함」 */
+    var os=old.slots||{},rn=CTX.rm_now||{},n0=LASTN[0]||{},hp=hwPrev();F.slots={};
+    SLOTS.forEach(function(sl,ix){var k=sl[0],o=os[k];if(o){F.slots[k]={book:o.book||'',to:o.to==null?'':o.to,none:!!o.none};return;}
+      var b=String(rn[k]||'');if(b.indexOf('｜')>=0)b=b.split('｜')[1];
+      if(!b){if(k==='concept')b=(n0.learned&&n0.learned[0]&&n0.learned[0].book)||'';else if(k==='type')b=(hp[0]&&hp[0].book)||'';else if(k==='type2')b=(hp[1]&&hp[1].book)||'';}
+      F.slots[k]={book:b,to:'',none:!b&&sl[4]};});
     form();}
   function form(){var bl=bookList(),P=[[100,'다 했어'],[75,'거의'],[50,'반쯤'],[25,'조금'],[0,'못 했어']],mine=CTX.mine||{},doneS=!!mine.hwc,doneE=!!mine.learn;
-    var h='<div class="card"><div class="row" style="margin:0"><div class="big">'+esc(CTX.name)+'</div></div><div class="pcts" style="margin-top:10px">'+
+    var h='<div class="card"><div class="row" style="margin:0"><div class="big">'+esc(CTX.name)+'</div><button class="back" id="notMe" style="margin-left:auto;padding:6px 10px;font-size:13px">내가 아니야</button></div><div class="pcts" style="margin-top:10px">'+
       '<button class="pc'+(MODE==='start'?' on':'')+'" data-md="start" style="flex:1">🏁 수업 시작'+(doneS?' ✅':'')+'<br><small>지난 숙제 확인</small></button>'+
       '<button class="pc'+(MODE==='end'?' on':'')+'" data-md="end" style="flex:1">🏠 집에 가기 전'+(doneE?' ✅':'')+'<br><small>오늘 진도·숙제</small></button></div><div style="text-align:right;margin-top:8px"><button class="back" id="svOpen" style="font-size:13px;padding:6px 12px'+(svDue()?';border-color:#f2b21b;background:#fff6dc':'')+'">📝 나 소개(설문)'+(svDue()?' — 다시 할 때!':CTX.survey_last?' ✅':'')+'</button></div></div>';
     if(MODE==='start'){
@@ -164,45 +196,52 @@ input.w{width:100%;max-width:520px}
       h+='</div><div class="card"><h2>📕 틀린 문제 다시 풀기 <small>곧 열려요</small></h2><div class="hint">채점이 연결되면 여기에 내가 틀린 문제(책·쪽·번호)가 뜨고, 다시 푼 풀이를 📷 사진으로 보낼 수 있어요.</div></div>';
       h+='<button class="send" id="send">보내기 ✅</button><div style="height:30px"></div>';
     } else {
-      [['learn','📖 오늘 진도 — 어떤 책 어디까지 나갔어?','쪽까지 나갔어'],['hw','✏️ 숙제 — 어떤 책 어디까지 풀어 오기로 했어?','쪽까지 풀어 올게']].forEach(function(sec){var k=sec[0];
-        h+='<div class="card"><h2>'+sec[1]+' <small>책 누르고 → 마지막 쪽 번호만</small></h2>';
-        F[k].forEach(function(i,ix){var st=startOf(k,i);
-          h+='<div class="ent"><div class="bk">'+bl.map(function(b){return '<button class="bkc'+(i.book===b?' on':'')+'" data-bk="'+k+'" data-i="'+ix+'" data-v="'+esc(b)+'">'+esc(b)+'</button>';}).join('')+'<button class="bkc" data-bkx="'+k+'" data-i="'+ix+'">✍ 다른 책</button></div>'+
-            '<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-to="'+k+'" data-i="'+ix+'" value="'+esc(i.to==null?'':i.to)+'" placeholder="쪽 번호"> <span>'+sec[2]+'</span>'+(F[k].length>1?'<button class="x" data-del="'+k+'" data-i="'+ix+'">✕</button>':'')+'</div></div>';});
-        h+='<button class="add" data-add="'+k+'">+ 책 하나 더</button></div>';});
+      h+='<div class="hint" style="margin:0 4px 8px">로드맵이랑 같은 이름이야 · 책 누르고 → 마지막 쪽 번호만 · 안 하는 건 「🚫 지금 안 함」</div>';
+      SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k],bl=bookList(sl[3]),st=startOfS(k,x);
+        h+='<div class="card"'+(x.none?' style="opacity:.75"':'')+'><h2>'+sl[1]+' <small>'+sl[2]+'</small></h2>';
+        h+=(x.none?'<div class="hint" style="margin-bottom:6px">🚫 지금 안 하고 있음</div>':x.book?'<div class="lbl" style="margin-bottom:6px">📗 '+esc(x.book)+'</div>':'<div class="hint" style="margin-bottom:6px">책을 골라 줘 👇</div>');
+        h+='<div class="bk">'+bl.map(function(bk){return '<button class="bkc'+(!x.none&&x.book===bk?' on':'')+'" data-sb="'+k+'" data-v="'+esc(bk)+'">'+esc(bk)+'</button>';}).join('')+'<button class="bkc" data-sbx="'+k+'">✍ 다른 책</button>'+(sl[4]?'<button class="bkc'+(x.none?' on':'')+'" data-sn="'+k+'" style="'+(x.none?'background:#6b7585;border-color:#6b7585;color:#fff':'')+'">🚫 지금 안 함</button>':'')+'</div>';
+        if(!x.none)h+='<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽 번호"> <span>'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div>';
+        h+='</div>';});
       h+='<div class="card"><h2>📝 오늘 테스트 봤어? <small>안 봤으면 넘어가요</small></h2>';
       F.tests.forEach(function(t,ix){h+='<div class="row"><input class="t w" style="max-width:260px" data-tn="'+ix+'" value="'+esc(t.name)+'" placeholder="무슨 테스트"><input class="t" type="number" inputmode="numeric" data-ts="'+ix+'" value="'+esc(t.score)+'" placeholder="점수"> 점 <button class="x" data-tdel="'+ix+'">✕</button></div>';});
       h+='<button class="add" id="tAdd">+ 테스트 점수 넣기</button></div>';
       h+='<div class="card"><h2>💬 쌤한테 한마디 <small>어려웠던 거 · 질문 — 쌤만 봐요 (부모님께 안 가요)</small></h2><input class="t w" id="say" value="'+esc(F.say||'')+'" placeholder="예: 3번 유형이 헷갈려요"></div>';
       h+='<button class="send" id="send">보내기 ✅</button><div style="height:30px"></div>';}
     out.innerHTML=h;window.scrollTo(0,0);bind();}
+  var SLOTS=[['concept','📖 개념서','진도 책 · 오늘 어디까지 나갔어?','learn',false],['type','✏️ 유형서1','숙제 책 · 어디까지 풀어 올 거야?','hw',false],['type2','✏️ 유형서2','숙제 책 2','hw',true],['review','🔥 심화','하는 친구만','hw',true],['recap','🔁 복습','하는 친구만','hw',true]];
+  function startOfS(k,x){if(!x||x.none||!x.book)return null;if(k!=='concept'){var c=F.slots.concept;if(c&&!c.none&&c.book===x.book&&String(c.to).trim())return +c.to+1;}var e=lastEnd(x.book);return e!=null?e+1:null;}
   function startOf(k,i){if(!i.book)return null;var e=lastEnd(i.book);if(k==='hw'){var l=F.learn.filter(function(x){return x.book===i.book&&x.to;})[0];if(l)return +l.to+1;}return e!=null?e+1:null;}
   function bind(){
+    var nm=document.getElementById('notMe');if(nm)nm.onclick=notMe;
     var so=document.getElementById('svOpen');if(so)so.onclick=function(){sync();survey();};
     out.querySelectorAll('[data-md]').forEach(function(b){b.onclick=function(){sync();MODE=b.getAttribute('data-md');form();};});
     out.querySelectorAll('[data-hp]').forEach(function(b){b.onclick=function(){F.hwc[+b.getAttribute('data-hp')].pct=+b.getAttribute('data-v');form();};});
     out.querySelectorAll('[data-bk]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-bk'),i=+b.getAttribute('data-i');sync();F[k][i].book=b.getAttribute('data-v');form();};});
-    out.querySelectorAll('[data-bkx]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-bkx'),i=+b.getAttribute('data-i'),v=prompt('책 이름');if(v&&v.trim()){sync();F[k][i].book=v.trim();form();}};});
+    out.querySelectorAll('[data-bkx]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-bkx'),i=+b.getAttribute('data-i'),v=prompt('책 이름을 써 줘 (예: 수학의 바이블 대수)');if(v&&v.trim()){sync();F[k][i].book=v.trim();try{var mb=JSON.parse(LS('bzs_mybooks')||'[]');if(mb.indexOf(v.trim())<0){mb.unshift(v.trim());LS('bzs_mybooks',JSON.stringify(mb.slice(0,8)));}}catch(e){}form();}};});
     out.querySelectorAll('[data-to]').forEach(function(el){el.oninput=function(){F[el.getAttribute('data-to')][+el.getAttribute('data-i')].to=el.value;};});
     out.querySelectorAll('[data-add]').forEach(function(b){b.onclick=function(){sync();F[b.getAttribute('data-add')].push({book:'',to:''});form();};});
     out.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){sync();F[b.getAttribute('data-del')].splice(+b.getAttribute('data-i'),1);form();};});
+    out.querySelectorAll('[data-sb]').forEach(function(b){b.onclick=function(){sync();var x=F.slots[b.getAttribute('data-sb')];x.book=b.getAttribute('data-v');x.none=false;form();};});
+    out.querySelectorAll('[data-sn]').forEach(function(b){b.onclick=function(){sync();var x=F.slots[b.getAttribute('data-sn')];x.none=!x.none;form();};});
+    out.querySelectorAll('[data-sbx]').forEach(function(b){b.onclick=function(){var v=prompt('책 이름을 써 줘');if(v&&v.trim()){sync();var x=F.slots[b.getAttribute('data-sbx')];x.book=v.trim();x.none=false;try{var mb=JSON.parse(LS('bzs_mybooks')||'[]');if(mb.indexOf(v.trim())<0){mb.unshift(v.trim());LS('bzs_mybooks',JSON.stringify(mb.slice(0,8)));}}catch(e){}form();}};});
+    out.querySelectorAll('[data-st2]').forEach(function(el){el.oninput=function(){F.slots[el.getAttribute('data-st2')].to=el.value;};});
     var ta=document.getElementById('tAdd');if(ta)ta.onclick=function(){sync();F.tests.push({name:'',score:''});form();};
     out.querySelectorAll('[data-tdel]').forEach(function(b){b.onclick=function(){sync();F.tests.splice(+b.getAttribute('data-tdel'),1);form();};});
     document.getElementById('send').onclick=send;}
-  function sync(){out.querySelectorAll('[data-to]').forEach(function(el){F[el.getAttribute('data-to')][+el.getAttribute('data-i')].to=el.value;});
+  function sync(){out.querySelectorAll('[data-st2]').forEach(function(el){F.slots[el.getAttribute('data-st2')].to=el.value;});out.querySelectorAll('[data-to]').forEach(function(el){F[el.getAttribute('data-to')][+el.getAttribute('data-i')].to=el.value;});
     out.querySelectorAll('[data-tn]').forEach(function(el){F.tests[+el.getAttribute('data-tn')].name=el.value;});
     out.querySelectorAll('[data-ts]').forEach(function(el){F.tests[+el.getAttribute('data-ts')].score=el.value;});
     var sy=document.getElementById('say');if(sy)F.say=sy.value;}
   function send(){sync();var data;
     if(MODE==='start'){if(F.hwc.some(function(i){return i.pct==null;})){toast('📌 숙제마다 얼마나 했는지 눌러 줘');return;}
       data={hwc:F.hwc.map(function(i){return {book:i.book,range:i.range,pct:i.pct};}),at_start:new Date().toISOString()};}
-    else{var mk=function(k){return F[k].filter(function(i){return i.book&&String(i.to).trim();}).map(function(i){var st=startOf(k,i),to=+i.to;return {book:i.book,to:to,range:(st!=null&&st<=to?st+'~':'')+to+'쪽'};});};
-      var learn=mk('learn'),hw=mk('hw');
-      if(!learn.length){toast('📖 오늘 어떤 책 몇 쪽까지 나갔는지 넣어 줘');return;}
-      if(!hw.length&&!confirm('숙제 없는 날이야? (있으면 [취소] 누르고 넣어 줘)'))return;
-      data={learn:learn,hw:hw,tests:F.tests.filter(function(t){return t.name||t.score!=='';}).map(function(t){return {name:t.name||'테스트',score:t.score===''?'':+t.score};}),say:(F.say||'').trim(),at_end:new Date().toISOString()};}
+    else{var c=F.slots.concept;if(!c.book||!String(c.to).trim()){toast('📖 개념서 — 어떤 책 몇 쪽까지 나갔는지 넣어 줘');return;}
+      var miss=SLOTS.filter(function(sl){var x=F.slots[sl[0]];return !x.none&&x.book&&!String(x.to).trim();})[0];if(miss){toast(miss[1]+' — 쪽 번호 넣어 줘 (안 하면 「🚫 지금 안 함」)');return;}
+      var slots={},learn=[],hw=[];SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k];if(x.none||!x.book){slots[k]={none:1};return;}var st=startOfS(k,x),to=+x.to,it={book:x.book,to:to,range:(st!=null&&st<=to?st+'~':'')+to+'쪽'};slots[k]=it;(sl[3]==='learn'?learn:hw).push(it);});
+      data={slots:slots,learn:learn,hw:hw,tests:F.tests.filter(function(t){return t.name||t.score!=='';}).map(function(t){return {name:t.name||'테스트',score:t.score===''?'':+t.score};}),say:(F.say||'').trim(),at_end:new Date().toISOString()};}
     var b=document.getElementById('send');b.disabled=true;b.textContent='보내는 중…';
-    SB.rpc('stu_submit',{p_code:CODE,p_data:data}).then(function(r){
+    (data.dev=DEV,SB.rpc('stu_submit',{p_code:CODE,p_data:data})).then(function(r){
       if(r.error||r.data!==true){b.disabled=false;b.textContent='보내기 ✅';toast('저장 안 됨 — 다시 눌러 줘'+(r.error?' ('+r.error.message+')':''));return;}
       var m=CTX.mine||{};Object.keys(data).forEach(function(k){m[k]=data[k];});CTX.mine=m;var st=MODE==='start';
       out.innerHTML='<div class="card done-scr"><div class="e">'+(st?'👍':'👋')+'</div><div class="m">'+esc(given(CTX.name))+(st?', 확인 끝! 수업 잘 듣자':', 보냈어! 조심히 가~')+'</div><div class="hint" style="margin-top:10px">'+(st?'수업 끝나면 「🏠 집에 가기 전」도 잊지 마':'쌤이 확인하고 부모님께 알림장 보내요')+' · 고칠 게 있으면 다시 열면 돼</div><button class="back" style="margin-top:20px" id="again">✏️ 고치기</button></div>';
