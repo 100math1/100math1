@@ -64,7 +64,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
@@ -92,11 +92,67 @@ input.w{width:100%;max-width:520px}
       '<div class="card"><h2 '+C+'>매 수업마다 2번</h2><table style="width:100%;border-collapse:collapse;font-size:15px">'+
         '<tr><td style="padding:8px 6px;border-bottom:1px solid #eee;white-space:nowrap"><b>🏁 수업시작</b><br><span class="hint">오기 전 5분·시작할 때</span></td><td style="padding:8px 6px;border-bottom:1px solid #eee">지난 숙제 얼마나 했는지 버튼 하나<br><span class="hint">곧: 틀린 문제 다시 풀기·풀이 사진</span></td></tr>'+
         '<tr><td style="padding:8px 6px;white-space:nowrap"><b>🏠 집가기전</b><br><span class="hint">수업 끝 1분</span></td><td style="padding:8px 6px"><b>개념서</b> 몇 쪽까지 나갔는지 · <b>유형서</b> 숙제 몇 쪽까지 풀어 올지 — 책은 미리 골라져 있어서 <b>쪽 번호만</b> 치면 돼요</td></tr></table></div>'+
-      '<div class="card"><h2 '+C+'>메뉴</h2><ul '+L+'><li><b>🏁 수업시작</b> — 지난 숙제 확인</li><li><b>🏠 집가기전</b> — 오늘 진도·숙제</li><li><b>📝 나소개</b> — 설문 (새 학기마다 한 번 더)</li><li><b>📕 내오답</b> — 틀린 문제 다시 풀기 (곧 열려요)</li><li><b>❓ 사용법</b> — 이 화면</li></ul></div>'+
+      '<div class="card"><h2 '+C+'>메뉴</h2><ul '+L+'><li><b>🏁 수업시작</b> — 지난 숙제 확인 + 틀린 문제 다시 풀기</li><li><b>🏠 집가기전</b> — 오늘 진도·숙제</li><li><b>📝 나소개</b> — 설문 (새 학기마다 한 번 더)</li><li><b>❓</b> (화면 오른쪽 아래 동그라미) — 이 사용법</li></ul></div>'+
       '<div class="card"><h2 '+C+'>이럴 땐</h2><ul '+L+'><li><b>친구 이름이 떠요</b> → 위 [내가 아니야] → 내 코드 다시</li><li><b>책이 바뀌었어요</b> → 새 책 버튼 누르기 (없으면 ✍ 다른 책)</li><li><b>안 하는 책이에요</b> → 「🚫 지금 안 함」</li><li><b>잘못 보냈어요</b> → 다시 열어서 고치고 보내면 돼요</li><li><b>카드 잃어버렸어요</b> → 쌤한테 말하면 새 코드</li><li><b>내 코드는 나만!</b> 친구 기록을 대신 적지 마요</li></ul></div>'+
       '<button class="send" id="hGo">'+(CODE?'오늘 기록하러 가기 →':'시작하기 → 코드 넣기')+'</button><div style="height:30px"></div>';
     window.scrollTo(0,0);document.getElementById('hGo').onclick=function(){QM='';try{history.replaceState(null,'',location.pathname);}catch(e){}load();};}
-  function load(){if(QM==='help'){helpScr();return;}if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
+  /* v0.14 학부모: 학생 코드와 따로(학부모가 아이 기록을 대신 못 쓰게). ?p=코드 로 들어오면 이 폰에 기억, 형제는 여러 개 */
+  var PQ=['parent','preg','pnote','pask'],PCODES=[],PCUR='',PCTX=null,PTAB='';
+  try{PCODES=JSON.parse(LS('bzp_codes')||'[]')||[];}catch(e){PCODES=[];}
+  (function(){var pp=q.get('p');if(pp){pp=pp.trim();if(PCODES.map(function(x){return x.c;}).indexOf(pp)<0)PCODES.push({c:pp,n:''});LS('bzp_codes',JSON.stringify(PCODES));LS('bzp_cur',pp);if(!QM)QM='pask';try{history.replaceState(null,'',location.pathname+'?m='+QM);}catch(e){}}})();
+  PCUR=LS('bzp_cur')||(PCODES[0]&&PCODES[0].c)||'';
+  var PSV=[
+    ['home','집에서 공부하는 모습은?',['스스로 해요','시키면 해요','거의 안 해요'],0],
+    ['mood','수학을 대하는 마음은?',['좋아해요','보통이에요','싫어하거나 불안해해요'],0],
+    ['stuck','숙제하다 막히면 보통 어떻게 하나요?',['끝까지 붙잡아요','답지를 봐요','그냥 넘겨요','물어봐요','잘 모르겠어요'],1],
+    ['phone','휴대폰·게임 시간은 (하루)?',['1시간 안','1~2시간','2~3시간','3시간 넘게'],0],
+    ['char','아이 성격에 가까운 것 (여러 개)',['꼼꼼해요','급해요','소심해요','승부욕 있어요','칭찬에 힘나요','혼자가 편해요','친구랑 하면 잘해요'],1],
+    ['goal','이번 학기 바라는 것 (여러 개)',['성적 올리기','공부 습관','선행','자신감','시험 대비'],1]];
+  var PRK=['숙제 양','진도','시험 대비','상담 요청','기타'];
+  function pHead(){var h=document.querySelector('.top h1');if(h)h.textContent='👪 백수학 학부모';var hb=document.getElementById('qHelp');if(hb)hb.style.display='none';document.title='백수학 학부모';}
+  function pNoCode(msg){out.innerHTML='<div class="card done-scr"><div class="e">👪</div><div class="m">'+(msg||'학부모님 코드를 넣어 주세요')+'</div><div class="hint" style="margin-top:10px">원장이 보내 드린 <b>학부모 링크</b>를 누르시면 자동으로 들어가집니다. 한 번 하면 이 폰이 기억합니다.</div>'+
+      '<div class="row" style="justify-content:center;margin-top:16px"><input class="t" id="pcIn" style="width:200px;text-align:center;letter-spacing:1px" placeholder="P로 시작하는 코드" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="back" id="pcGo">확인</button></div>'+
+      '<div class="hint" style="margin-top:14px">학생 코드로는 들어갈 수 없습니다 (학생 메뉴는 윗줄).</div></div>';
+    document.getElementById('pcGo').onclick=function(){var v=(document.getElementById('pcIn').value||'').replace(/\s/g,'');if(v.length<8){toast('코드를 다시 확인해 주세요');return;}if(PCODES.map(function(x){return x.c;}).indexOf(v)<0)PCODES.push({c:v,n:''});LS('bzp_codes',JSON.stringify(PCODES));LS('bzp_cur',v);PCUR=v;pLoad();};}
+  function pLoad(){pHead();if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 주세요</div>';return;}if(!PCUR){pNoCode();return;}
+    out.innerHTML='<div class="card">불러오는 중…</div>';
+    SB.rpc('par_ctx',{p_code:PCUR}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어요 — 다시 열어 주세요<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
+      if(!r.data||r.data.err){PCODES=PCODES.filter(function(x){return x.c!==PCUR;});LS('bzp_codes',JSON.stringify(PCODES));LS('bzp_cur',null);PCUR='';pNoCode('코드가 맞지 않아요 — 학부모 링크로 다시 들어와 주세요');return;}
+      PCTX=r.data;PCODES.forEach(function(x){if(x.c===PCUR)x.n=PCTX.name;});LS('bzp_codes',JSON.stringify(PCODES));
+      var cn=document.getElementById('cn');if(cn)cn.textContent=PCTX.class_name||'';pMain();});}
+  function pSvDue(){var l=PCTX&&PCTX.psv_last;if(!l)return true;var d=(Date.now()-new Date(l).getTime())/864e5;if(d>120)return true;var t=new Date(),y=t.getFullYear(),st=[new Date(y,2,1),new Date(y,7,15)];return st.some(function(x){var a=(t-x)/864e5;return a>=0&&a<=30&&new Date(l)<x;});}
+  function pMain(){var C='style="margin:0 0 6px;font-size:18px;color:var(--navy)"';
+    var sw=PCODES.length>1?'<div class="pcts" style="margin-top:10px">'+PCODES.map(function(x){return '<button class="pc'+(x.c===PCUR?' on':'')+'" data-pc="'+esc(x.c)+'">'+esc(x.n||'아이')+'</button>';}).join('')+'</div>':'';
+    var h='<div class="card"><div class="big">'+esc(PCTX.name)+' 학부모님</div>'+sw+'<div style="text-align:right;margin-top:6px"><button class="back" id="pAdd" style="font-size:12px;padding:5px 10px">＋ 다른 자녀 코드</button></div></div>';
+    if(QM==='preg'||QM==='pnote'){h+='<div class="card"><h2 '+C+'>'+(QM==='preg'?'👪 처음 등록·정보 동의':'📒 우리 아이 알림장')+'</h2><div class="hint">준비 중인 메뉴입니다. 열리면 이 메뉴에서 바로 보입니다.</div></div>';}
+    var due=pSvDue();
+    h+='<div class="pcts" style="margin:0 0 10px"><button class="pc'+(PTAB!=='req'?' on':'')+'" data-pt="sv" style="flex:1">📋 우리 아이 설문'+(due?' <small>— 해 주세요</small>':' ✅')+'</button><button class="pc'+(PTAB==='req'?' on':'')+'" data-pt="req" style="flex:1">✉️ 학원에 요청</button></div>';
+    if(PTAB==='req')h+=pReqHtml();else h+=pSvHtml(due);
+    h+='<div class="card"><div class="hint" style="line-height:1.7">채팅방 메뉴 <b>윗줄</b>(🏁 수업시작 · 🏠 집가기전 · 👤 나소개)은 <b>학생용</b>, <b>아랫줄</b>은 학부모님용입니다. 급한 일은 채팅방에 바로 남겨 주세요.</div></div><div style="height:30px"></div>';
+    out.innerHTML=h;window.scrollTo(0,0);pBind();}
+  var PA={};
+  function pSvHtml(due){var h='<div class="card"><h2 style="margin:0 0 4px;font-size:18px;color:var(--navy)">📋 부모님이 보시는 우리 아이</h2><div class="hint">'+(PCTX.psv_last?'마지막 작성: '+esc(PCTX.psv_last)+(due?' · 새 학기라 한 번 더 부탁드려요':''):'3분이면 됩니다. 수업을 아이에게 맞추는 데 씁니다.')+'</div></div>';
+    PSV.forEach(function(qq){var k=qq[0],multi=qq[3],v=PA[k]||(multi?[]:'');h+='<div class="card"><div class="lbl" style="font-weight:700;margin-bottom:8px">'+esc(qq[1])+(multi?' <small class="hint">여러 개</small>':'')+'</div><div class="pcts" style="flex-wrap:wrap">'+qq[2].map(function(o){var on=multi?v.indexOf(o)>=0:v===o;return '<button class="pc'+(on?' on':'')+'" data-pq="'+k+'" data-po="'+esc(o)+'" style="flex:0 0 auto">'+esc(o)+'</button>';}).join('')+'</div></div>';});
+    h+='<div class="card"><div class="lbl" style="font-weight:700;margin-bottom:8px">학원이 알아 두면 좋을 것 <small class="hint">자유롭게 · 안 써도 돼요</small></div><textarea id="pFree" rows="4" style="width:100%;box-sizing:border-box;font:inherit;padding:10px;border:2px solid var(--line);border-radius:12px">'+esc(PA.free||'')+'</textarea></div>';
+    return h+'<button class="send" id="pSvGo">설문 보내기</button>';}
+  function pReqHtml(){var h='<div class="card"><h2 style="margin:0 0 8px;font-size:18px;color:var(--navy)">✉️ 학원에 요청하기</h2><div class="pcts" style="flex-wrap:wrap">'+PRK.map(function(k){return '<button class="pc'+(PA.rk===k?' on':'')+'" data-rk="'+esc(k)+'" style="flex:0 0 auto">'+esc(k)+'</button>';}).join('')+'</div>'+
+      '<textarea id="pReq" rows="5" placeholder="원장에게 전할 내용을 적어 주세요" style="margin-top:10px;width:100%;box-sizing:border-box;font:inherit;padding:10px;border:2px solid var(--line);border-radius:12px">'+esc(PA.rq||'')+'</textarea><button class="send" id="pRqGo" style="margin-top:12px;font-size:20px;padding:15px">요청 보내기</button></div>';
+    var rs=PCTX.reqs||[];if(rs.length)h+='<div class="card"><h2 style="margin:0 0 6px;font-size:16px;color:var(--navy)">보낸 요청</h2>'+rs.map(function(x){return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><b>'+esc(x.kind)+'</b> <span class="hint">'+esc(String(x.at||'').slice(5,10).replace('-','/'))+' · '+(x.done?'원장 확인함':'전달됨')+'</span><br>'+esc(x.body)+'</div>';}).join('')+'</div>';
+    return h;}
+  function pBind(){Array.prototype.forEach.call(document.querySelectorAll('[data-pc]'),function(b){b.onclick=function(){PCUR=b.getAttribute('data-pc');LS('bzp_cur',PCUR);PA={};pLoad();};});
+    var ad=document.getElementById('pAdd');if(ad)ad.onclick=function(){pNoCode('다른 자녀의 학부모 코드를 넣어 주세요');};
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pt]'),function(b){b.onclick=function(){pKeep();PTAB=b.getAttribute('data-pt');pMain();};});
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pq]'),function(b){b.onclick=function(){var k=b.getAttribute('data-pq'),o=b.getAttribute('data-po'),qq=PSV.filter(function(x){return x[0]===k;})[0];
+      if(qq[3]){var a=PA[k]||[];var i=a.indexOf(o);if(i>=0)a.splice(i,1);else a.push(o);PA[k]=a;b.classList.toggle('on');}else{PA[k]=o;Array.prototype.forEach.call(document.querySelectorAll('[data-pq="'+k+'"]'),function(x){x.classList.toggle('on',x===b);});}};});
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rk]'),function(b){b.onclick=function(){PA.rk=b.getAttribute('data-rk');Array.prototype.forEach.call(document.querySelectorAll('[data-rk]'),function(x){x.classList.toggle('on',x===b);});};});
+    var sg=document.getElementById('pSvGo');if(sg)sg.onclick=function(){pKeep();var ans={},n=0;PSV.forEach(function(qq){var v=PA[qq[0]];if(v&&(!qq[3]||v.length)){ans[qq[0]]=v;n++;}});if(PA.free)ans.free=PA.free;if(n<3){toast('세 개 이상만 골라 주세요');return;}
+      sg.disabled=true;SB.rpc('par_survey',{p_code:PCUR,p_ans:ans}).then(function(r){sg.disabled=false;if(r.error||!r.data){toast('보내기 실패 — 다시 눌러 주세요');return;}PA={};PCTX.psv_last=PCTX.today||new Date().toISOString().slice(0,10);out.innerHTML='<div class="card done-scr"><div class="e">✅</div><div class="m">설문이 전달됐습니다. 감사합니다.</div><button class="back" id="pBk" style="margin-top:16px">← 돌아가기</button></div>';document.getElementById('pBk').onclick=pMain;});};
+    var rg=document.getElementById('pRqGo');if(rg)rg.onclick=function(){pKeep();var t=(PA.rq||'').trim();if(t.length<2){toast('내용을 적어 주세요');return;}
+      rg.disabled=true;SB.rpc('par_request',{p_code:PCUR,p_kind:PA.rk||'기타',p_body:t}).then(function(r){rg.disabled=false;if(r.error||!r.data){toast('보내기 실패 — 잠시 뒤 다시 (하루 10개까지)');return;}PA.rq='';PA.rk='';toast('전달됐습니다');pLoad();});};}
+  function pKeep(){var f=document.getElementById('pFree');if(f)PA.free=f.value;var r=document.getElementById('pReq');if(r)PA.rq=r.value;}
+  /* v0.13: 카카오 「사용법」 메뉴를 빼도 되게 — 화면 오른쪽 아래 ❓ */
+  (function(){try{var b=document.createElement('button');b.id='qHelp';b.textContent='❓';b.setAttribute('aria-label','사용법');b.style.cssText='position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:22px;border:0;background:var(--navy,#1f2a5a);color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:50';b.onclick=function(){QM='help';helpScr();};document.body.appendChild(b);}catch(e){}})();
+  function load(){if(PQ.indexOf(QM)>=0){/* v0.14 카카오 아랫줄=학부모 (parent·preg·pnote·pask) */pLoad();return;}if(QM==='help'){helpScr();return;}if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
     SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
       CTX=r.data;if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
       if(LS('bzs_ok')!==CODE){out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">'+esc(CTX.name)+' 맞아?</div><div class="hint" style="margin-top:8px">'+esc(CTX.class_name||'')+'</div><div class="row" style="justify-content:center;margin-top:18px"><button class="send" style="width:auto;padding:14px 30px" id="okY">응, 나야</button><button class="back" id="okN">아니야</button></div><div class="hint" style="margin-top:12px">친구 카드면 「아니야」 — 친구 이름으로 기록돼요</div></div>';
