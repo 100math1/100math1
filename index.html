@@ -64,7 +64,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
-/* 백수학_학생폰 v0.20 (2026-11-03 23:36 원장: 안내 화면의 「학생 코드 넣기」「학부모 코드 넣기」 링크 빼기 — 코드 맞추는 건 학원에서 쌤과 아이가) · v0.19 (2026-11-03 23:34 원장: 학부모가 윗줄 누를 때 안내 = 「여기는 학생용 메뉴입니다」만, 메뉴 설명 문단 빼기 — 학원에서 아이가 폰 많이 만지는 느낌) · v0.18 (2026-11-03 23:27 원장: 설문 진학 질문 학년별 — 중 = 가고 싶은 고등학교 + 대학교, 고 = 대학교만, 초 = 그대로) · v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
+/* 백수학_학생폰 v0.21 (2026-11-03 23:46 원장: 교재가 너무 많이 나열 → 고른 책만 보이고 [🔄 책 바꾸기] 눌러야 목록) · v0.20 (2026-11-03 23:36 원장: 안내 화면의 「학생 코드 넣기」「학부모 코드 넣기」 링크 빼기 — 코드 맞추는 건 학원에서 쌤과 아이가) · v0.19 (2026-11-03 23:34 원장: 학부모가 윗줄 누를 때 안내 = 「여기는 학생용 메뉴입니다」만, 메뉴 설명 문단 빼기 — 학원에서 아이가 폰 많이 만지는 느낌) · v0.18 (2026-11-03 23:27 원장: 설문 진학 질문 학년별 — 중 = 가고 싶은 고등학교 + 대학교, 고 = 대학교만, 초 = 그대로) · v0.17 (2026-11-03 23:2x 원장: 아랫줄 가운데 「알림장」→「📈 우리아이 학습현황」 — 알림장은 채팅방에 이미 쌓이니까, 주간·월간에 보낼 것을 실시간으로. ?m=pstat, 옛 ?m=pnote도 같은 화면) · v0.16 (2026-11-03 23:17 원장: 학부모가 윗줄·학생이 아랫줄 누르면 「이건 ○○가 적는 칸」 안내) · v0.15 (2026-11-03 22:58 원장: 아랫줄 메뉴마다 다른 화면 — preg=우리 아이 설문, pnote=알림장, pask=학원에 요청) · v0.14 (2026-11-03 22:31 원장: 카카오 아랫줄=학부모 — 학부모 코드(?p=), 💬 우리아이 = 부모님 설문 + 학원에 요청, 형제 전환) · v0.13 (2026-11-03 22:2x 원장: 카카오 메뉴6 「학부모」 간단판 ?m=parent · 「사용법」 메뉴 빼도 되게 화면 안 ❓ 버튼) · v0.12 (백수학_비서, 2026-11-03 원장: "학생 폰으로" — 반이 우르르 나가도 각자 폰으로 동시에)
    - 로그인 없음. 학생별 QR 카드의 개인 코드(?k=)로만 자기 것 읽기·쓰기 (Supabase RPC stu_ctx / stu_submit, 코드 없는 사람은 아무것도 못 봄)
    - 한 번 찍으면 폰에 기억 → 다음부턴 주소만 열면 바로
    - 저장 = student_reports (오늘 날짜) → 데일리알림 일일 기록에 자동 채움 → 쌤 확인 후 발송 */
@@ -205,7 +205,7 @@ input.w{width:100%;max-width:520px}
   function lastEnd(book){var best=null;LASTN.some(function(n){var hit=null;(n.learned||[]).concat(n.hw_items||[]).forEach(function(i){if(i.book===book){var e=lastNum(i.range);if(e!=null&&(hit==null||e>hit))hit=e;}});if(hit!=null){best=hit;return true;}return false;});return best;}
   /* v0.2 원장 11-03 06:47: 두 번 나눠 기록 — 🏁 수업 시작(오기 전 5분·시작 직후): 지난 숙제 얼마나 했나 (+ 다음: 틀린 문제 다시 풀기·풀이 사진)
      🏠 수업 끝 1분(집에 가기 전): 오늘 진도(어떤 책 어디까지) · 숙제(어떤 책 어디까지 풀어오기로) · 테스트 · 한마디. 시간표(프로필 「수업 요일·시간」) 있으면 자동으로 맞는 화면 */
-  var MODE='';
+  var MODE='',BKOPEN={};
   /* v0.3 원장 11-03 06:50: 종이 설문지 → 폰. 처음 연 학생(설문 안 한 학생)은 설문부터 · 언제든 「📝 나 소개」로 다시. 답은 프로필로 자동(데일리알림이 열릴 때 종이 옮겨 적기와 같은 규칙으로 반영) */
   var BZ_SURVEY=[
  {k:'per',sec:'나에 대해',q:'나는 어떤 사람?',t:'multi',o:['밝고 활발함','차분함','끝까지 성실함','승부욕 있음','칭찬 받으면 신남','조용함','말이 많음','질문하기 어려움','기분에 따라 다름','쉽게 포기함','혼나면 위축됨','장난 많음'],to:'per'},
@@ -289,11 +289,12 @@ input.w{width:100%;max-width:520px}
       h+='</div><div class="card"><h2>📕 틀린 문제 다시 풀기 <small>곧 열려요</small></h2><div class="hint">채점이 연결되면 여기에 내가 틀린 문제(책·쪽·번호)가 뜨고, 다시 푼 풀이를 📷 사진으로 보낼 수 있어요.</div></div>';
       h+='<button class="send" id="send">보내기 ✅</button><div style="height:30px"></div>';
     } else {
-      h+='<div class="hint" style="margin:0 4px 8px">로드맵이랑 같은 이름이야 · 책 누르고 → 마지막 쪽 번호만 · 안 하는 건 「🚫 지금 안 함」</div>';
+      h+='<div class="hint" style="margin:0 4px 8px">쪽 번호만 쓰면 돼 · 책이 바뀌었으면 「🔄 책 바꾸기」</div>';
       SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k],bl=bookList(sl[3]),st=startOfS(k,x);
         h+='<div class="card"'+(x.none?' style="opacity:.75"':'')+'><h2>'+sl[1]+' <small>'+sl[2]+'</small></h2>';
-        h+=(x.none?'<div class="hint" style="margin-bottom:6px">🚫 지금 안 하고 있음</div>':x.book?'<div class="lbl" style="margin-bottom:6px">📗 '+esc(x.book)+'</div>':'<div class="hint" style="margin-bottom:6px">책을 골라 줘 👇</div>');
-        h+='<div class="bk">'+bl.map(function(bk){return '<button class="bkc'+(!x.none&&x.book===bk?' on':'')+'" data-sb="'+k+'" data-v="'+esc(bk)+'">'+esc(bk)+'</button>';}).join('')+'<button class="bkc" data-sbx="'+k+'">✍ 다른 책</button>'+(sl[4]?'<button class="bkc'+(x.none?' on':'')+'" data-sn="'+k+'" style="'+(x.none?'background:#6b7585;border-color:#6b7585;color:#fff':'')+'">🚫 지금 안 함</button>':'')+'</div>';
+        var shut=(x.book||x.none)&&!BKOPEN[k];/* v0.21: 책이 정해져 있으면 목록 접기 */
+        h+=(x.none?'<div class="row" style="margin:0 0 6px"><span class="hint">🚫 지금 안 하고 있음</span>'+(shut?'<button class="bkc" data-bko="'+k+'" style="margin-left:auto">다시 하기</button>':'')+'</div>':x.book?'<div class="row" style="margin:0 0 6px"><span class="lbl" style="font-size:18px">📗 '+esc(x.book)+'</span>'+(shut?'<button class="bkc" data-bko="'+k+'" style="margin-left:auto">🔄 책 바꾸기</button>':'')+'</div>':'<div class="hint" style="margin-bottom:6px">책을 골라 줘 👇</div>');
+        if(!shut)h+='<div class="bk">'+bl.map(function(bk){return '<button class="bkc'+(!x.none&&x.book===bk?' on':'')+'" data-sb="'+k+'" data-v="'+esc(bk)+'">'+esc(bk)+'</button>';}).join('')+'<button class="bkc" data-sbx="'+k+'">✍ 다른 책</button>'+(sl[4]?'<button class="bkc'+(x.none?' on':'')+'" data-sn="'+k+'" style="'+(x.none?'background:#6b7585;border-color:#6b7585;color:#fff':'')+'">🚫 지금 안 함</button>':'')+'</div>';
         if(!x.none)h+='<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽 번호"> <span>'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div>';
         h+='</div>';});
       h+='<div class="card"><h2>📝 오늘 테스트 봤어? <small>안 봤으면 넘어가요</small></h2>';
@@ -315,9 +316,10 @@ input.w{width:100%;max-width:520px}
     out.querySelectorAll('[data-to]').forEach(function(el){el.oninput=function(){F[el.getAttribute('data-to')][+el.getAttribute('data-i')].to=el.value;};});
     out.querySelectorAll('[data-add]').forEach(function(b){b.onclick=function(){sync();F[b.getAttribute('data-add')].push({book:'',to:''});form();};});
     out.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){sync();F[b.getAttribute('data-del')].splice(+b.getAttribute('data-i'),1);form();};});
-    out.querySelectorAll('[data-sb]').forEach(function(b){b.onclick=function(){sync();var x=F.slots[b.getAttribute('data-sb')];x.book=b.getAttribute('data-v');x.none=false;form();};});
-    out.querySelectorAll('[data-sn]').forEach(function(b){b.onclick=function(){sync();var x=F.slots[b.getAttribute('data-sn')];x.none=!x.none;form();};});
-    out.querySelectorAll('[data-sbx]').forEach(function(b){b.onclick=function(){var v=prompt('책 이름을 써 줘');if(v&&v.trim()){sync();var x=F.slots[b.getAttribute('data-sbx')];x.book=v.trim();x.none=false;try{var mb=JSON.parse(LS('bzs_mybooks')||'[]');if(mb.indexOf(v.trim())<0){mb.unshift(v.trim());LS('bzs_mybooks',JSON.stringify(mb.slice(0,8)));}}catch(e){}form();}};});
+    out.querySelectorAll('[data-sb]').forEach(function(b){b.onclick=function(){sync();var kk=b.getAttribute('data-sb'),x=F.slots[kk];x.book=b.getAttribute('data-v');x.none=false;BKOPEN[kk]=false;form();};});
+    out.querySelectorAll('[data-bko]').forEach(function(b){b.onclick=function(){sync();BKOPEN[b.getAttribute('data-bko')]=true;form();};});
+    out.querySelectorAll('[data-sn]').forEach(function(b){b.onclick=function(){sync();var kk=b.getAttribute('data-sn'),x=F.slots[kk];x.none=!x.none;BKOPEN[kk]=false;form();};});
+    out.querySelectorAll('[data-sbx]').forEach(function(b){b.onclick=function(){var v=prompt('책 이름을 써 줘');if(v&&v.trim()){sync();var x=F.slots[b.getAttribute('data-sbx')];x.book=v.trim();x.none=false;BKOPEN[b.getAttribute('data-sbx')]=false;try{var mb=JSON.parse(LS('bzs_mybooks')||'[]');if(mb.indexOf(v.trim())<0){mb.unshift(v.trim());LS('bzs_mybooks',JSON.stringify(mb.slice(0,8)));}}catch(e){}form();}};});
     out.querySelectorAll('[data-st2]').forEach(function(el){el.oninput=function(){F.slots[el.getAttribute('data-st2')].to=el.value;};});
     var ta=document.getElementById('tAdd');if(ta)ta.onclick=function(){sync();F.tests.push({name:'',score:''});form();};
     out.querySelectorAll('[data-tdel]').forEach(function(b){b.onclick=function(){sync();F.tests.splice(+b.getAttribute('data-tdel'),1);form();};});
