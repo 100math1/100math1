@@ -94,6 +94,8 @@ input.w{width:100%;max-width:520px}
 (function(){
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
+  /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
+  var APPV='v0.29d';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -309,14 +311,14 @@ input.w{width:100%;max-width:520px}
   var GR={};
   function grBooks(){var a=[],s=(CTX.mine&&CTX.mine.slots)||{};hwPrev().forEach(function(i){if(i.book)a.push({book:i.book,to:i.to!=null?i.to:lastNum(i.range)});});
     Object.keys(s).forEach(function(k){var x=s[k];if(x&&x.book&&!x.none)a.push({book:x.book,to:x.to});});
-    var seen={},r=[];a.forEach(function(x){if(!seen[x.book]){seen[x.book]=1;r.push(x);}});return r;}
-  function grScr(book,to){GR={book:book||'',to:to||'',terms:null,term:'',from:'',data:null,marks:{}};
-    if(!GR.book){var bs=grBooks();out.innerHTML='<div class="card"><div class="big">✅ 교재 채점</div><div class="hint" style="margin:6px 0 10px">어떤 책 채점할 거야?</div><div class="bk">'+
+    (LASTN||[]).slice(0,6).forEach(function(n){(n.hw_items||[]).concat(n.learned||[]).forEach(function(i){if(i&&i.book)a.push({book:i.book,to:''});});});[].concat(CTX.rm_books||[],CTX.cls_books||[]).forEach(function(b){b=String(b||'');if(b.indexOf('｜')>=0)b=b.split('｜')[1];if(b)a.push({book:b,to:''});});var seen={},r=[];a.forEach(function(x){if(!seen[x.book]){seen[x.book]=1;r.push(x);}});return r;}
+  var GR_ALL=0;function grScr(book,to){GR={book:book||'',to:to||'',terms:null,term:'',from:'',data:null,marks:{},all:GR_ALL};GR_ALL=0;
+    if(!GR.book){var bs=grBooks();if(!bs.length)GR.all=1;out.innerHTML='<div class="card"><div class="big">✅ 교재 채점</div><div class="hint" style="margin:6px 0 10px">어떤 책 채점할 거야? <small>(내가 쓰는 책)</small></div><div class="bk">'+
       bs.map(function(x,i){return '<button class="bkc" data-gb="'+i+'">📗 '+esc(x.book)+(x.to?' ~'+esc(x.to)+'쪽':'')+'</button>';}).join('')+
-      bookList('hw').filter(function(b){return !bs.some(function(x){return x.book===b;});}).map(function(b){return '<button class="bkc" data-gbn="'+esc(b)+'">'+esc(b)+'</button>';}).join('')+
+      (GR.all?bookList('hw').filter(function(b){return !bs.some(function(x){return x.book===b;});}).map(function(b){return '<button class="bkc" data-gbn="'+esc(b)+'">'+esc(b)+'</button>';}).join(''):'<button class="bkc" id="grAll" style="opacity:.7">＋ 다른 책</button>')+
       '</div><button class="back" style="margin-top:14px" id="grBack">← 오늘 기록으로</button></div>';window.scrollTo(0,0);
       out.querySelectorAll('[data-gb]').forEach(function(b){b.onclick=function(){var x=bs[+b.getAttribute('data-gb')];grScr(x.book,x.to);};});
-      out.querySelectorAll('[data-gbn]').forEach(function(b){b.onclick=function(){grScr(b.getAttribute('data-gbn'),'');};});
+      out.querySelectorAll('[data-gbn]').forEach(function(b){b.onclick=function(){grScr(b.getAttribute('data-gbn'),'');};});var ga=document.getElementById('grAll');if(ga)ga.onclick=function(){GR_ALL=1;grScr();};
       document.getElementById('grBack').onclick=function(){open0();};return;}
     out.innerHTML='<div class="card">📗 '+esc(GR.book)+' 불러오는 중…</div>';
     SB.rpc('stu_book_terms',{p_code:CODE,p_brand:GR.book}).then(function(r){GR.terms=(r.data||[]);var sv=LS('bzs_term_'+GR.book)||LS('bzs_term')||'';
@@ -326,39 +328,44 @@ input.w{width:100%;max-width:520px}
   function grRange(){var t=GR.terms||[],to=parseInt(GR.to,10)||'',fr=GR.from||(to?Math.max(1,to-2):'');
     var h='<div class="card"><div class="row" style="margin:0"><div class="big">✅ '+esc(GR.book)+'</div><button class="back" id="grBack" style="margin-left:auto;padding:6px 10px;font-size:13px">← 뒤로</button></div>';
     if(!t.length)h+='<div class="hint" style="margin-top:10px">이 책은 아직 채점 준비가 안 됐어 — 쌤한테 말해 줘 🙏</div>';
-    else{h+='<div class="hint" style="margin-top:10px">몇 학년 몇 학기 책이야?</div><div class="bk">'+t.map(function(x){return '<button class="bkc'+(GR.term===x.term?' on':'')+'" data-gt="'+esc(x.term)+'">'+esc(x.term)+'</button>';}).join('')+'</div>';
+    else{h+='<div class="hint" style="margin-top:10px">몇 학년 몇 학기 책이야?</div><div class="bk">'+t.filter(function(x){return GR.tall||!GR.term||x.term===GR.term;}).map(function(x){return '<button class="bkc'+(GR.term===x.term?' on':'')+'" data-gt="'+esc(x.term)+'">'+esc(x.term)+'</button>';}).join('')+(GR.term&&!GR.tall&&t.length>1?'<button class="bkc" id="grTall" style="opacity:.7">＋ 다른 학기</button>':'')+'</div>';
       h+='<div class="row" style="margin-top:12px"><input class="t" type="number" inputmode="numeric" id="grF" value="'+esc(fr)+'" placeholder="쪽"> <span>쪽부터</span> <input class="t" type="number" inputmode="numeric" id="grT" value="'+esc(to)+'" placeholder="쪽"> <span>쪽까지</span></div>';
       h+='<button class="send" id="grGo" style="margin-top:12px">채점 시작 ▶</button>';}
     out.innerHTML=h+'</div>';window.scrollTo(0,0);document.getElementById('grBack').onclick=function(){grScr();};
-    out.querySelectorAll('[data-gt]').forEach(function(b){b.onclick=function(){GR.term=b.getAttribute('data-gt');var f=document.getElementById('grF'),e=document.getElementById('grT');GR.from=f&&f.value;GR.to=e&&e.value;grRange();};});
-    var g=document.getElementById('grGo');if(g)g.onclick=function(){var f=parseInt(document.getElementById('grF').value,10),e=parseInt(document.getElementById('grT').value,10);
-      if(!GR.term){alert('학년·학기를 골라 줘');return;}if(!e){alert('몇 쪽까지인지 써 줘');return;}if(!f||f>e)f=e;if(e-f>15)f=e-15;GR.from=f;GR.to=e;
+    out.querySelectorAll('[data-gt]').forEach(function(b){b.onclick=function(){GR.term=b.getAttribute('data-gt');GR.tall=0;var f=document.getElementById('grF'),e=document.getElementById('grT');GR.from=f&&f.value;GR.to=e&&e.value;grRange();};});
+    var tl=document.getElementById('grTall');if(tl)tl.onclick=function(){var f=document.getElementById('grF'),e=document.getElementById('grT');GR.from=f&&f.value;GR.to=e&&e.value;GR.tall=1;grRange();};var g=document.getElementById('grGo');if(g)g.onclick=function(){var f=parseInt(document.getElementById('grF').value,10),e=parseInt(document.getElementById('grT').value,10);
+      if(!GR.term){alert('학년·학기를 골라 줘');return;}if(!e){alert('몇 쪽까지인지 써 줘');return;}if(!f||f>e)f=e;if(e-f>39){alert('한 번에 40쪽까지만 돼 — '+(e-39)+'쪽부터 보여 줄게');f=e-39;}GR.from=f;GR.to=e;
       LS('bzs_term_'+GR.book,GR.term);LS('bzs_term',GR.term);grLoad();};}
   function grLoad(){out.innerHTML='<div class="card">📗 '+esc(GR.book+' '+GR.term)+' '+GR.from+'~'+GR.to+'쪽 불러오는 중…</div>';
     SB.rpc('stu_pages',{p_code:CODE,p_book:GR.book+' '+GR.term,p_from:+GR.from,p_to:+GR.to}).then(function(r){if(r.error||!r.data||r.data.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — '+esc((r.error&&r.error.message)||(r.data&&r.data.error)||'')+'<br><button class="back" id="grB2">← 뒤로</button></div>';document.getElementById('grB2').onclick=grRange;return;}
-      GR.data=r.data;GR.marks={};(r.data.pages||[]).forEach(function(p){var m=p.mine||{};Object.keys(m).forEach(function(k){if(m[k]==='o'||m[k]==='x')GR.marks[p.page_id+':'+k]=m[k];});});grForm();});}
+      GR.data=r.data;GR.marks={};GR.why={};(r.data.pages||[]).forEach(function(p){var m=p.mine||{};Object.keys(m).forEach(function(k){if(m[k]==='o'||m[k]==='x'||m[k]==='skip')GR.marks[p.page_id+':'+k]=m[k];});});grForm();});}
   function grForm(){var d=GR.data,P=d.pages||[],op=d.answers_open,h='<div class="card"><div class="row" style="margin:0"><div class="big" style="font-size:20px">✅ '+esc(GR.book+' '+GR.term)+' <small>'+GR.from+'~'+GR.to+'쪽</small></div><button class="back" id="grBack" style="margin-left:auto;padding:6px 10px;font-size:13px">← 뒤로</button></div>';
     if(!op){out.innerHTML=h+'<div class="hint" style="margin-top:12px">🔒 쌤 확인 뒤 열려요</div></div>';document.getElementById('grBack').onclick=grRange;return;}
     if(!d.self_grade){out.innerHTML=h+'<div class="hint" style="margin-top:12px">🔒 쌤 확인 뒤 열려요</div></div>';document.getElementById('grBack').onclick=grRange;return;}
     if(!P.length){out.innerHTML=h+'<div class="hint" style="margin-top:12px">이 쪽엔 채점할 문제가 없어 — 쪽 번호 다시 봐 줘</div></div>';document.getElementById('grBack').onclick=grRange;return;}
-    h+='<div class="hint" style="margin-top:6px">정답 보고 맞으면 ⭕, 틀리면 ❌ 눌러 줘 · 틀린 건 오답으로 모여요</div></div>';
+    h+='<div class="hint" style="margin-top:6px">정답 보고 맞으면 ⭕, 틀리면 ❌, 모르겠거나 질문할 건 ❓ · ❌❓는 오답으로 모여요</div></div>';
     P.forEach(function(p){var A=p.answers||{},L=p.labels||{};h+='<div class="card" style="padding:10px 12px"><h2 style="margin:0 0 6px">'+esc(String(p.label).replace(/^P\./,''))+'쪽 '+(p.unit?'<small>'+esc(p.unit)+'</small>':'')+'</h2>';
       (p.nos||[]).forEach(function(n){var k=p.page_id+':'+n,m=GR.marks[k],lb=(L&&L[n])||n;
-        h+='<div class="row" style="margin:4px 0;align-items:center;gap:6px;border-bottom:1px solid #eef0f4;padding-bottom:6px"><b style="min-width:42px">'+esc(lb)+'</b><span style="flex:1;font-size:15px;word-break:break-all">'+esc(A[n]!=null?A[n]:'—')+'</span>'+
-          '<button class="pc'+(m==='o'?' on':'')+'" data-gm="'+esc(k)+'" data-v="o" style="flex:0 0 50px;padding:8px 0;font-size:20px">⭕</button><button class="pc z'+(m==='x'?' on':'')+'" data-gm="'+esc(k)+'" data-v="x" style="flex:0 0 50px;padding:8px 0;font-size:20px">❌</button></div>';});
+        h+='<div style="display:flex;flex-wrap:nowrap;margin:4px 0;align-items:center;gap:5px;border-bottom:1px solid #eef0f4;padding-bottom:6px"><b style="flex:0 0 36px">'+esc(lb)+'</b><span style="flex:1 1 auto;min-width:0;font-size:15px;overflow-wrap:anywhere">'+esc(A[n]!=null?A[n]:'—')+'</span>'+
+          '<button class="pc'+(m==='o'?' on':'')+'" data-gm="'+esc(k)+'" data-v="o" style="flex:0 0 44px;min-width:0;padding:8px 0;font-size:18px">⭕</button><button class="pc z'+(m==='x'?' on':'')+'" data-gm="'+esc(k)+'" data-v="x" style="flex:0 0 44px;min-width:0;padding:8px 0;font-size:18px">❌</button><button class="pc'+(m==='skip'?' on':'')+'" data-gm="'+esc(k)+'" data-v="q" style="flex:0 0 44px;min-width:0;padding:8px 0;font-size:18px'+(m==='q'?';background:#f2b21b;border-color:#f2b21b;color:#fff':'')+'">❓</button></div>';});
+      var hasSk=(p.nos||[]).some(function(n){return GR.marks[p.page_id+':'+n]==='skip';}),left=(p.nos||[]).filter(function(n){return !GR.marks[p.page_id+':'+n];}).length;
+      if(hasSk){var w=GR.why[p.page_id]||'';h+='<div style="margin-top:8px;padding:8px;border-radius:10px;background:'+(w?'#f3f5f8':'#fff6dc')+'"><div class="hint" style="margin-bottom:4px">➖ 패스한 이유'+(w?'':' <b style="color:#c0392b">— 골라 줘</b>')+'</div><div class="bk">'+['숙제 아님','어려워서 쌤이 빼 줌','쉬워서 쌤이 빼 줌'].map(function(x){return '<button class="bkc'+(w===x?' on':'')+'" data-gw="'+p.page_id+'" data-v="'+x+'">'+x+'</button>';}).join('')+'</div></div>';}
+      if(left)h+='<button class="bkc" data-gall="'+p.page_id+'" style="margin-top:8px">남은 '+left+'개 다 ⭕</button>';
       h+='</div>';});
-    var no=0,nx=0;Object.keys(GR.marks).forEach(function(k){if(GR.marks[k]==='o')no++;else if(GR.marks[k]==='x')nx++;});
-    h+='<div class="hint" style="text-align:center;margin:6px">⭕ '+no+' · ❌ '+nx+'</div><button class="send" id="grSave">채점 저장 ✅</button><div style="height:30px"></div>';
+    var no=0,nx=0,ns=0;Object.keys(GR.marks).forEach(function(k){if(GR.marks[k]==='o')no++;else if(GR.marks[k]==='x')nx++;else ns++;});
+    h+='<div class="hint" style="text-align:center;margin:6px">⭕ '+no+' · ❌ '+nx+(ns?' · ❓ '+ns:'')+'</div><button class="send" id="grSave">채점 저장 ✅</button><div style="height:30px"></div>';
     var y=window.scrollY;out.innerHTML=h;window.scrollTo(0,y);document.getElementById('grBack').onclick=grRange;
     out.querySelectorAll('[data-gm]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-gm'),v=b.getAttribute('data-v');GR.marks[k]=GR.marks[k]===v?null:v;if(!GR.marks[k])delete GR.marks[k];grForm();};});
+    out.querySelectorAll('[data-gw]').forEach(function(b){b.onclick=function(){GR.why[b.getAttribute('data-gw')]=b.getAttribute('data-v');grForm();};});
+    out.querySelectorAll('[data-gall]').forEach(function(b){b.onclick=function(){var pid=b.getAttribute('data-gall');(GR.data.pages||[]).forEach(function(p){if(p.page_id===pid)(p.nos||[]).forEach(function(n){if(!GR.marks[pid+':'+n])GR.marks[pid+':'+n]='o';});});grForm();};});
     document.getElementById('grSave').onclick=grSave;}
   function grSave(){var by={};Object.keys(GR.marks).forEach(function(k){var i=k.indexOf(':'),pid=k.slice(0,i),n=k.slice(i+1);(by[pid]=by[pid]||{})[n]=GR.marks[k];});
-    var ids=Object.keys(by);if(!ids.length){alert('⭕❌를 하나 이상 눌러 줘');return;}var bt=document.getElementById('grSave');bt.disabled=true;bt.textContent='저장 중…';
-    Promise.all(ids.map(function(pid){return SB.rpc('stu_grade',{p_code:CODE,p_page:pid,p_marks:by[pid]});})).then(function(rs){
+    var ids=Object.keys(by);if(!ids.length){alert('⭕❌를 하나 이상 눌러 줘');return;}var noWhy=ids.filter(function(pid){return Object.keys(by[pid]).some(function(n){return by[pid][n]==='skip';})&&!GR.why[pid];});if(noWhy.length){alert('➖ 패스한 이유를 골라 줘');return;}var bt=document.getElementById('grSave');bt.disabled=true;bt.textContent='저장 중…';
+    Promise.all(ids.map(function(pid){var mk={},ck=[];Object.keys(by[pid]).forEach(function(n){if(by[pid][n]==='q'){mk[n]='x';ck.push(n);}else mk[n]=by[pid][n];});return SB.rpc('stu_grade',{p_code:CODE,p_page:pid,p_marks:mk,p_check:ck});})).then(function(rs){
       var bad=rs.filter(function(r){return r.error||r.data<0;});if(bad.length){bt.disabled=false;bt.textContent='채점 저장 ✅';alert('저장이 안 됐어 — 다시 눌러 줘'+(bad[0].error?'\n'+bad[0].error.message:''));return;}
-      var wr=[];(GR.data.pages||[]).forEach(function(p){(p.nos||[]).forEach(function(n){if(GR.marks[p.page_id+':'+n]==='x')wr.push(String(p.label).replace(/^P\./,'')+'쪽 '+((p.labels&&p.labels[n])||n)+'번');});});
-      var no=0,nx=0;Object.keys(GR.marks).forEach(function(k){if(GR.marks[k]==='o')no++;else nx++;});
-      out.innerHTML='<div class="card done-scr"><div class="e">✅</div><div class="m">채점 저장 끝!</div><div style="font-size:22px;margin:10px 0">⭕ '+no+' · ❌ '+nx+'</div>'+
+      var wr=[];(GR.data.pages||[]).forEach(function(p){(p.nos||[]).forEach(function(n){if(GR.marks[p.page_id+':'+n]==='x'||GR.marks[p.page_id+':'+n]==='q')wr.push((GR.marks[p.page_id+':'+n]==='q'?'❓':'')+String(p.label).replace(/^P\./,'')+'쪽 '+((p.labels&&p.labels[n])||n)+'번');});});
+      var no=0,nx=0,ns=0;Object.keys(GR.marks).forEach(function(k){if(GR.marks[k]==='o')no++;else if(GR.marks[k]==='x')nx++;else ns++;});
+      out.innerHTML='<div class="card done-scr"><div class="e">✅</div><div class="m">채점 저장 끝!</div><div style="font-size:22px;margin:10px 0">⭕ '+no+' · ❌ '+nx+(ns?' · ❓ '+ns:'')+'</div>'+(ns?'<div class="hint">❓ 문제는 쌤한테 질문으로 갔어</div>':'')+''+
         (wr.length?'<div class="hint" style="text-align:left">📕 오답으로 모인 문제<br>'+wr.map(esc).join(' · ')+'</div>':'<div class="hint">다 맞았어! 🎉</div>')+
         '<div class="row" style="justify-content:center;margin-top:18px;gap:8px"><button class="back" id="grMore">✅ 다른 책 채점</button><button class="send" style="width:auto;padding:12px 20px" id="grHome">오늘 기록으로</button></div></div>';window.scrollTo(0,0);
       document.getElementById('grMore').onclick=function(){grScr();};document.getElementById('grHome').onclick=function(){open0();};});}
