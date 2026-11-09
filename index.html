@@ -105,7 +105,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.40b';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.41';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -849,8 +849,35 @@ input.w{width:100%;max-width:520px}
   var SA={},SM={};
   /* v0.4 원장 11-03: 설문 갱신 — 120일 지났거나 새 학기(3/1·8/15) 지나고 30일 넘으면 다시 (하루 한 번 자동으로 띄움, 그 외엔 버튼 노랗게) */
   function svDue(){var l=CTX.survey_last;if(!l)return true;var t=new Date(),ld=new Date(String(l).slice(0,10)+'T00:00:00'),days=Math.floor((t-ld)/864e5),y=t.getFullYear(),a=new Date(y,2,1),b=new Date(y,7,15),ss=t>=b?b:t>=a?a:new Date(y-1,7,15);return days>=120||(ld<ss&&days>=30);}
+  /* v0.41 📊 지난 학교 시험 점수 — stu_scores / stu_scores_set (학생 기입 줄만, 사진·쌤 기록은 🔒) */
+  function myScores(){navTo(function(){survey();});out.innerHTML='<div class="card">불러오는 중…</div>';
+    SB.rpc('stu_scores',{p_code:CODE}).then(function(r){var D=r.data;if(r.error||!D){out.innerHTML='<div class="card">못 불러왔어 — 잠깐 뒤에 다시 해 줘</div>';return;}
+      var gm=String(D.grade||'').match(/(초|중|고)?\s*(\d)/);if(gm&&gm[1])D.lvl=gm[1];D.grade=gm?+gm[2]:0;
+      if(D.lvl==='초'||!D.grade){out.innerHTML='<div class="card"><div class="big">📊 학교 시험 점수</div><div class="hint" style="margin-top:6px">중·고등학생만 적어. (학년이 안 잡혀 있으면 쌤한테 말해 줘)</div><button class="back" id="scB" style="margin-top:10px">← 돌아가기</button></div>';document.getElementById('scB').onclick=function(){survey();};return;}
+      var now=new Date(),cy=now.getMonth()<2?now.getFullYear()-1:now.getFullYear(),curT=(now.getMonth()>=7||now.getMonth()<2)?2:1,G=+D.grade,P=D.lvl,S=[];
+      for(var g=1;g<=G;g++){var y=cy-(G-g);for(var t=1;t<=2;t++){if(g===G&&t>curT)continue;['중간','기말'].forEach(function(e){S.push({y:y,t:t,e:e,g:P+g});});}}
+      var M={};(D.rows||[]).forEach(function(x){M[x.y+'|'+x.t+'|'+x.e]=x;});
+      var h='<div class="card"><div class="big">📊 지금까지 본 학교 수학 시험</div><div class="hint" style="margin-top:6px">기억나는 것만 써 줘 · 모르면 비워 둬 · 시험 없던 학기(자유학기 등)도 비워 둬<br>칸: <b>내 점수</b> · <b>학교 평균</b>'+(P==='고'?' · <b>등급</b>(1~9)':'')+' — 모르는 칸은 비워 둬<br>쌤들만 보는 기록이야 (학부모님 알림장엔 안 나가)</div><button class="back" style="margin-top:10px" id="scB">← 나 소개로</button></div><div class="card">';
+      var lastG='';S.slice().reverse().forEach(function(x,i){var k=x.y+'|'+x.t+'|'+x.e,o=M[k],lock=o&&o.by&&o.by!=='학생';
+        if(x.g!==lastG){h+='<div style="margin:10px 0 4px;font-weight:800;color:var(--navy)">'+x.g.replace('중','중학교 ').replace('고','고등학교 ')+'학년 <span class="hint">('+x.y+'년)</span></div>';lastG=x.g;}
+        var IS='style="width:70px;font-size:16px;text-align:center;padding:6px 4px"';
+        h+='<div style="display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap"><span style="min-width:90px">'+x.t+'학기 '+x.e+'</span>'+(lock?'<b>'+o.s+'점</b> <span class="hint">🔒</span>':'<input class="t" inputmode="decimal" data-sc="'+k+'" data-g="'+x.g+'" value="'+(o&&o.s!=null?o.s:'')+'" placeholder="내 점수" '+IS+'>')+
+          ' <input class="t" inputmode="decimal" data-av="'+k+'" value="'+(o&&o.avg!=null?o.avg:'')+'" placeholder="학교 평균" '+IS+'>'+(P==='고'?' <input class="t" inputmode="numeric" data-rk="'+k+'" value="'+(o&&o.rk!=null?o.rk:'')+'" placeholder="등급" style="width:56px;font-size:16px;text-align:center;padding:6px 4px">':'')+'</div>';});
+      h+='</div><div class="card" style="border:2px solid #f2b21b;background:#fffbea"><div style="font-weight:800">🤝 솔직하게 써 줘</div><div class="hint" style="margin:4px 0 8px;line-height:1.6">진짜 점수를 알아야 쌤들이 어디부터 잡을지 정확히 정할 수 있어 — 부풀리면 너한테 안 맞는 공부를 하게 돼.<br>점수는 나중에 성적표·학부모님 확인으로 한 번씩 맞춰 봐. 모르면 비워 두는 게 더 좋아.</div><label style="display:flex;gap:8px;align-items:center;font-weight:800;font-size:16px;cursor:pointer"><input type="checkbox" id="scHonest" style="width:22px;height:22px"> 기억나는 대로 사실대로 적었어요</label></div><button class="send" id="scSave">저장 ✅</button><div style="height:30px"></div>';out.innerHTML=h;window.scrollTo(0,0);
+      document.getElementById('scB').onclick=function(){survey();};
+      document.getElementById('scSave').onclick=function(){if(!document.getElementById('scHonest').checked){toast('맨 아래 「사실대로 적었어요」 체크해 줘');return;}var b=this,R=[],bad=0,K={};out.querySelectorAll('[data-sc],[data-av],[data-rk]').forEach(function(el){var k=el.getAttribute('data-sc')||el.getAttribute('data-av')||el.getAttribute('data-rk');K[k]=1;});
+        Object.keys(K).forEach(function(k){var p=k.split('|'),o=M[k],q=function(a){var el=out.querySelector('['+a+'="'+k+'"]');return el?String(el.value||'').trim():null;},sv=q('data-sc'),av=q('data-av'),rk=q('data-rk');
+          [['data-sc',sv,100],['data-av',av,100],['data-rk',rk,9]].forEach(function(c){if(c[1]&&(isNaN(+c[1])||+c[1]<(c[0]==='data-rk'?1:0)||+c[1]>c[2])){bad++;var el=out.querySelector('['+c[0]+'="'+k+'"]');if(el)el.style.borderColor='#e53935';}});
+          var lock=o&&o.by&&o.by!=='학생';if(sv===null)sv=lock?String(o.s):'';
+          var same=o&&String(o.s==null?'':o.s)===sv&&String(o.avg==null?'':o.avg)===(av||'')&&String(o.rk==null?'':o.rk)===(rk||'');if(same||(!o&&!sv&&!av&&!rk))return;
+          if(!sv&&(av||rk)&&!lock){bad++;var e1=out.querySelector('[data-sc="'+k+'"]');if(e1)e1.style.borderColor='#e53935';return;}
+          R.push({y:+p[0],t:+p[1],e:p[2],g:(out.querySelector('[data-sc="'+k+'"]')||{getAttribute:function(){return ''}}).getAttribute('data-g')||'',s:sv===''?null:+sv,tot:100,avg:av?+av:null,rk:rk?+rk:null});});
+        if(bad){toast('빨간 칸 확인 — 점수·평균 0~100, 등급 1~9 (평균·등급만 쓰면 점수도 같이)');return;}if(!R.length){toast('바뀐 게 없어');survey();return;}
+        b.disabled=true;b.textContent='저장 중…';SB.rpc('stu_scores_set',{p_code:CODE,p_rows:R}).then(function(r){if(r.error||r.data<0){b.disabled=false;b.textContent='저장 ✅';toast('저장이 안 됐어 — 다시 눌러 줘');return;}toast('📊 저장했어 ('+r.data+'개)');survey();});};});}
   function survey(){navTo(function(){open0();});svPick();var last='',i=0,first=!CTX.survey_last;
     var h='<div class="card"><div class="big">📝 '+esc(CTX.name)+' — 나를 소개해 줘</div><div class="hint" style="margin-top:6px">'+(first?'처음 한 번만! 3~5분 · ':svDue()?'새 학기야(지난번 '+esc(String(CTX.survey_last).slice(0,10))+') — 요즘 나로 다시 해 줘 · ':'지난번 '+esc(String(CTX.survey_last).slice(0,10))+'에 했어 — 바뀐 게 있으면 다시 · ')+'정답 없어, 솔직하게 · 쌤들이 나한테 꼭 맞게 가르치려고 물어보는 거야</div>'+'<button class="back" style="margin-top:10px" id="svBack">'+(first?'설문은 나중에 → 오늘 기록 먼저':'← 돌아가기')+'</button></div>';
+    /* v0.41 원장 11-10 05:44~05:46 「지난번 시험 점수 기입」·「지금까지 본 모든 시험 점수 다 기록하게」·「어딘가 작게」·「내 소개 쪽에 포함」 → 작은 칸 → 📊 지난 학교 시험 점수 화면(성적 탭 자동 반영) */
+    h+='<div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:15px">📊 <b>지금까지 본 학교 수학 시험 점수</b> <span class="hint">아는 것만 · 쌤들만 봐</span></span><button class="back" id="scOpen" style="margin-left:auto">적기 ✏️</button></div>';
     BZ_SURVEY.forEach(function(q){i++;if(q.sec!==last){h+='<div style="margin:16px 4px 6px;font-weight:800;color:#fff;background:var(--navy);display:inline-block;padding:3px 12px;border-radius:8px;font-size:14px">'+esc(q.sec)+'</div>';last=q.sec;}
       h+='<div class="card"><h2 style="font-size:17px">'+i+'. '+esc(q.q)+(q.t==='multi'?' <small>여러 개 골라도 돼</small>':'')+'</h2>';
       if(q.o){var sel=SA[q.k]||[];h+='<div class="bk">'+q.o.map(function(o){return '<button class="bkc'+(sel.indexOf(o)>-1?' on':'')+'" data-sq="'+q.k+'" data-so="'+esc(o)+'">'+esc(o)+'</button>';}).join('')+'</div>';}
@@ -859,6 +886,7 @@ input.w{width:100%;max-width:520px}
       h+='</div>';});
     h+='<button class="send" id="svSend">설문 보내기 ✅</button><div style="height:30px"></div>';
     out.innerHTML=h;window.scrollTo(0,0);
+    var sco=document.getElementById('scOpen');if(sco)sco.onclick=function(){myScores();};
     var bk=document.getElementById('svBack');if(bk)bk.onclick=function(){LS('bzs_svask',new Date().toISOString().slice(0,10));open0(autoMode());};
     out.querySelectorAll('[data-sq]').forEach(function(c){c.onclick=function(){var k=c.getAttribute('data-sq'),o=c.getAttribute('data-so'),q=BZ_SURVEY.filter(function(x){return x.k===k;})[0],a=SA[k]||[];
       if(q.t==='one')a=a[0]===o?[]:[o];else{var j=a.indexOf(o);if(j>-1)a.splice(j,1);else a.push(o);}SA[k]=a;c.parentNode.querySelectorAll('[data-sq]').forEach(function(x){x.classList.toggle('on',a.indexOf(x.getAttribute('data-so'))>-1);});};});
