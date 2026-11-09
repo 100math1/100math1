@@ -88,6 +88,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
+/* 백수학_학생폰 v0.34b (02:0x 원장 🧪테스트1호: 데일리 「📚 지금 교재」 바꿔도 학생이 오늘 이미 저장한 책이 이겨서 바로 안 뜸 → 쌤 로드맵 수정(rm_at)이 학생 저장보다 나중이면 쌤 것 우선 · 같은 책이면 쪽수 유지 · 쌤 ✕ 없음 = 지금 안 함) */
 /* 백수학_학생폰 v0.34 (01:5x 비서, §HX·본부 06:1x 확정: 📝 시험 범위 — 쌤이 학교·학년 단위로 넣은 범위(exam_scopes)를 받아 쓰고, 학생도 단원 칩으로 바꿀 수 있음(내 것 우선) · 범위 밖 문제 5개↑ 시험지는 목록에서 빠짐·1~4개는 「범위 밖 n」 표시 + OMR에 회색·채점 제외 · 범위 없으면 시험대비 기간엔 매일 한 번 배너) */
 /* 백수학_학생폰 v0.33c (01:09 원장: 버튼 6개가 답 칸 침범 → 채점 줄 두 줄 = 번호+답(가로) / 버튼 가로 넓게) */
 /* 백수학_학생폰 v0.33b (00:5x 원장: 채점 줄마다 ⚠ 답지 오류 신고 — 정답 틀림·오타·번호 안 맞음·기타 + 한 줄 + 내 답 → student_msgs kind 오류 → 문제은행이 고침) */
@@ -101,7 +102,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.34';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.34b';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -852,10 +853,15 @@ input.w{width:100%;max-width:520px}
     if(!F.hw.length){var h0=hwPrev(),bh=bookList('hw');F.hw=[{book:(h0[0]&&h0[0].book)||(bh.indexOf(F.learn[0].book)>=0?F.learn[0].book:bh[0]||''),to:''}];}
     /* v0.9 원장 11-03 16:42: 로드맵 이름 그대로 — 개념서(진도)·유형서1(숙제1)·유형서2(숙제2)·심화·복습, 「지금 안 함」 */
     var os=old.slots||old.books0||{},rn=CTX.rm_now||{},n0=LASTN[0]||{},hp=hwPrev();F.slots={};
-    SLOTS.forEach(function(sl,ix){var k=sl[0],o=os[k];if(o){F.slots[k]={book:o.book||'',to:o.to==null?'':o.to,none:!!o.none};return;}
+    var myAt=Date.parse(old.at_end||old.at_start||'')||0,tAt=Date.parse(CTX.rm_at||'')||0,tSet=CTX.rm_set||[],tNew=tAt>myAt&&myAt>0,tChg=[];
+    SLOTS.forEach(function(sl,ix){var k=sl[0],o=os[k];
+      if(o&&tNew&&tSet.indexOf(k)>=0){var tb=String(rn[k]||'');if(tb.indexOf('｜')>=0)tb=tb.split('｜')[1];var ob=o.none?'':(o.book||'');
+        if(tb!==ob){F.slots[k]=tb?{book:tb,to:'',none:false}:{book:'',to:'',none:true};tChg.push(sl[1].replace(/^\S+\s/,'')+' '+(tb||'없음'));return;}}
+      if(o){F.slots[k]={book:o.book||'',to:o.to==null?'':o.to,none:!!o.none};return;}
       var b=String(rn[k]||'');if(b.indexOf('｜')>=0)b=b.split('｜')[1];
       if(!b){if(k==='concept')b=(n0.learned&&n0.learned[0]&&n0.learned[0].book)||'';else if(k==='type')b=(hp[0]&&hp[0].book)||'';else if(k==='type2')b=(hp[1]&&hp[1].book)||'';}
       F.slots[k]={book:b,to:'',none:!b&&sl[4]};});
+    if(tChg.length)setTimeout(function(){toast('📚 쌤이 책을 바꿨어 — '+tChg.join(' · '));},400);
     form();}
   function form(){NAVBACK=null;var bl=bookList(),P=[[100,'다 했어'],[75,'거의'],[50,'반쯤'],[25,'조금'],[0,'못 했어']],mine=CTX.mine||{},doneS=!!mine.hwc,doneE=!!mine.learn;
     var h='<div class="card"><div class="row" style="margin:0"><div class="big">'+esc(CTX.name)+'</div><button class="back" id="notMe" style="margin-left:auto;padding:6px 10px;font-size:13px">내가 아니야</button></div><div class="pcts" style="margin-top:10px">'+
