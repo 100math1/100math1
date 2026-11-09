@@ -105,7 +105,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.37';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.38';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -325,10 +325,10 @@ input.w{width:100%;max-width:520px}
 
   /* 🎮 내 현황 문 (원장 00:14) — 게임 카드 + 📈 내 현황 + 💪 응원. 오늘 기록 화면에서는 뺌(가볍게) */
   function meScr(){setDoor('me');navTo(function(){gGo('');});try{history.replaceState(null,'',location.pathname+'?m=me');}catch(e){}
-    out.innerHTML=gHtml()+'<div id="stv">'+stvHtml()+'</div><div style="height:30px"></div>';window.scrollTo(0,0);gBind();gApply();gLoad(true);stvBind();stvLoad();}
+    out.innerHTML=gHtml()+'<div id="goalBox">'+goalHtml()+'</div><div id="stv">'+stvHtml()+'</div><div style="height:30px"></div>';window.scrollTo(0,0);gBind();gApply();gLoad(true);goalBind();goalLoad();stvBind();stvLoad();}
   /* ✉️ 수업 때 물어볼 것 남기기 (원장 00:18 「질문탭은 한쪽에 같이 구현해도 돼」 · 00:16 온라인 답 X → 수업 때 쌤과) — 사진(줄여서) + 책·쪽·번호(선택) + 한 줄 → student_msgs(kind 질문) → 쌤 데일리알림 🙋 목록 [같이 풀었음 ✔] */
   var AK={photo:null};
-  function shrinkImg(file,cb){var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){var mx=1000,w=img.width,h=img.height,s=Math.min(1,mx/Math.max(w,h));var c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);var q=0.75,d=c.toDataURL('image/jpeg',q);while(d.length>580000&&q>0.3){q-=0.1;d=c.toDataURL('image/jpeg',q);}cb(d);};img.onerror=function(){cb(null);};img.src=fr.result;};fr.onerror=function(){cb(null);};fr.readAsDataURL(file);}
+  function shrinkImg(file,cb,mx0){var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){var mx=mx0||1000,w=img.width,h=img.height,s=Math.min(1,mx/Math.max(w,h));var c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);var q=0.75,d=c.toDataURL('image/jpeg',q);while(d.length>(mx0?850000:580000)&&q>0.3){q-=0.1;d=c.toDataURL('image/jpeg',q);}cb(d);};img.onerror=function(){cb(null);};img.src=fr.result;};fr.onerror=function(){cb(null);};fr.readAsDataURL(file);}
   function askScr(){setDoor('wrong');navTo(function(){wrongScr();});try{history.replaceState(null,'',location.pathname+'?m=ask');}catch(e){}var bks=grBooks();
     out.innerHTML='<div class="card"><div class="row" style="margin:0 0 6px"><h2 style="margin:0">✉️ 수업 때 물어볼 것</h2><button class="back" id="akBack" style="margin-left:auto;padding:6px 10px;font-size:13px">← 오답</button></div><div class="hint" style="margin-bottom:10px">집에서 막힌 문제를 찍어 두면 <b>다음 수업 때 쌤이 같이 풀어 줘</b> (여기서 답을 받는 건 아니야)</div>'+
       '<div class="row" style="margin:0 0 8px"><button class="back" id="akCam" style="flex:1">📷 문제 사진 찍기</button><button class="back" id="akAlb" style="flex:1">🖼 앨범에서</button></div>'+
@@ -549,7 +549,7 @@ input.w{width:100%;max-width:520px}
   /* ===== v0.28 💪 응원 한 줄 + 📈 내 현황 (§HQ-3 · 2026-11-09) — 실제 기록 있을 때만 · 하루 1개 · 같은 문구 연속 X ===== */
   var STV=null,STV_LOADING=false;
   function stvLoad(){if(STV||STV_LOADING||!SB||!CODE)return;STV_LOADING=true;var t0=Date.now();
-    SB.rpc('stu_status',{p_code:CODE}).then(function(r){STV_LOADING=false;if(r.error||!r.data||r.data.err){STV={_bad:1};}else STV=r.data;try{if(window.perfLog)perfLog('stv',Date.now()-t0);}catch(e){}var el=document.getElementById('stv');if(el)el.innerHTML=stvHtml();stvBind();});}
+    SB.rpc('stu_status',{p_code:CODE}).then(function(r){STV_LOADING=false;if(r.error||!r.data||r.data.err){STV={_bad:1};}else STV=r.data;try{if(window.perfLog)perfLog('stv',Date.now()-t0);}catch(e){}var el=document.getElementById('stv');if(el)el.innerHTML=stvHtml();stvBind();var gb=document.getElementById('goalBox');if(gb){gb.innerHTML=goalHtml();goalBind();}});}
   function stvDone(p){return p!=null&&+p>=75;}
   function stvStreak(){/* 숙제 연속: 최근부터 거꾸로, 결석·기록 없음(p null) 은 건너뜀 */var a=(STV.hwh||[]).filter(function(x){return !x.abs&&x.p!=null;}),cur=0,best=0,run=0,i;
     for(i=a.length-1;i>=0;i--){if(stvDone(a[i].p))cur++;else break;}
@@ -881,7 +881,7 @@ input.w{width:100%;max-width:520px}
     var h='<div class="card"><div class="row" style="margin:0"><div class="big">'+esc(CTX.name)+'</div><button class="back" id="notMe" style="margin-left:auto;padding:6px 10px;font-size:13px">내가 아니야</button></div><div class="pcts" style="margin-top:10px">'+
       '<button class="pc'+(MODE==='start'?' on':'')+'" data-md="start" style="flex:1">🏁 수업 시작'+(doneS?' ✅':'')+'<br><small>지난 숙제 확인</small></button>'+
       '<button class="pc'+(MODE==='end'?' on':'')+'" data-md="end" style="flex:1">🏠 집에 가기 전'+(doneE?' ✅':'')+'<br><small>오늘 진도·숙제</small></button></div><div style="text-align:right;margin-top:8px"><button class="back" id="svOpen" style="font-size:13px;padding:6px 12px'+(svDue()?';border-color:#f2b21b;background:#fff6dc':'')+'">📝 나 소개(설문)'+(svDue()?' — 다시 할 때!':CTX.survey_last?' ✅':'')+'</button></div><button class="send" id="grOpen" style="margin-top:10px;padding:12px">✅ 교재 채점하기 ⭕❌</button></div>';
-    h+='<div id="exmBan">'+exmBan()+'</div>';
+    h+='<div id="exmBan">'+exmBan()+'</div><div id="shotBan">'+shotBan()+'</div>';
     if(MODE==='start'&&firstBooks()){FIRSTB=true;
       h+='<div class="card" style="border-color:#f2b21b;background:#fff9e8"><h2>📚 처음이구나! 내 책부터 알려 줘 <small>한 번만 하면 돼</small></h2><div class="hint">학원에서 쓰는 책을 칸마다 골라 줘 — 안 쓰는 칸은 「🚫 지금 안 함」</div></div>';
       SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k],bl=bookList(sl[3]);
@@ -891,6 +891,8 @@ input.w{width:100%;max-width:520px}
     } else if(MODE==='start'){FIRSTB=false;
       var ARR=[[0,'✅ 정시 도착'],[5,'5분 늦음'],[10,'10분'],[15,'15분'],[20,'20분 넘게'],[-1,'🚶 아직 가는 중']];if(F.arr==null&&(CTX.mine||{}).arr)F.arr=CTX.mine.arr.late;
       h+='<div class="card" style="padding:12px 14px"><h2 style="margin-bottom:8px">🏫 오늘 도착 <small>오자마자 한 번 — 알림장 출석에 들어가요</small></h2><div class="pcts">'+ARR.map(function(a){return '<button class="pc'+(a[0]>0?' z':'')+(F.arr===a[0]?' on':'')+'" data-arr="'+a[0]+'" style="flex:1 1 30%;padding:9px 4px;font-size:14px">'+a[1]+'</button>';}).join('')+'</div>'+(function(){var L=schedRows();return L.length?'<div class="hint" style="margin-top:8px">🗓 '+esc(schedTxt(L))+' <button class="back" id="wdOpen" style="font-size:12px;padding:3px 9px;margin-left:4px">바꾸기</button></div>':'<div style="margin-top:10px;padding:8px 10px;border-radius:10px;background:#fff6dc;border:1px solid #f2d98a"><b>🗓 학원 오는 요일을 아직 몰라</b> <span class="hint">한 번만 알려 주면 돼 (30초)</span><button class="send" id="wdOpen" style="margin-top:6px;padding:10px;font-size:15px">요일·시간 고르기</button></div>';})()+'</div>';
+      var SCH=[['none','없어'],['exam','📝 수학 시험 봤어'],['perf','📋 수행평가 했어'],['perf_soon','📅 수행 곧 있어']],PLN=[['hw','📌 숙제 확인'],['learn','📖 진도'],['wrong','📕 오답'],['exam','📝 시험 대비'],['ask','❓ 질문 있어']];if(F.school==null)F.school=((CTX.mine||{}).school||[]).slice();if(F.plan==null)F.plan=((CTX.mine||{}).plan||[]).slice();
+      h+='<div class="card" style="padding:12px 14px"><h2 style="margin-bottom:6px">🏫 오늘 학교에서 <small>안 골라도 돼</small></h2><div class="pcts">'+SCH.map(function(a){return '<button class="pc'+(F.school.indexOf(a[0])>=0?' on':'')+'" data-sch="'+a[0]+'" style="flex:1 1 40%;padding:8px 4px;font-size:14px">'+a[1]+'</button>';}).join('')+'</div><h2 style="margin:12px 0 6px">🎯 오늘 학원에서 할 것 <small>여러 개 · 쌤이 바로 봐요</small></h2><div class="pcts">'+PLN.map(function(a){return '<button class="pc'+(F.plan.indexOf(a[0])>=0?' on':'')+'" data-pln="'+a[0]+'" style="flex:1 1 30%;padding:8px 4px;font-size:14px">'+a[1]+'</button>';}).join('')+'</div></div>';
       h+='<div class="card"><h2>📌 지난 숙제 얼마나 했어? <small>솔직하게 — 쌤이 같이 확인해요</small></h2>';
       if(!F.hwc.length)h+='<div class="hint">지난 숙제 기록이 없어요 — 그냥 보내도 돼요</div>';
       F.hwc.forEach(function(i,ix){h+='<div class="ent"><div class="lbl">'+esc(i.book)+' <span class="prev">'+esc(i.range)+'</span></div><div class="pcts" style="margin-top:8px">'+P.map(function(p){return '<button class="pc'+(p[0]===0?' z':'')+(i.pct===p[0]?' on':'')+'" data-hp="'+ix+'" data-v="'+p[0]+'">'+p[1]+'<br><small>'+p[0]+'%</small></button>';}).join('')+'</div></div>';});
@@ -906,6 +908,7 @@ input.w{width:100%;max-width:520px}
         if(!shut)h+='<div class="bk">'+bl.map(function(bk){return '<button class="bkc'+(!x.none&&x.book===bk?' on':'')+'" data-sb="'+k+'" data-v="'+esc(bk)+'">'+esc(bk)+'</button>';}).join('')+'<button class="bkc" data-sbx="'+k+'">✍ 다른 책</button>'+(sl[4]?'<button class="bkc'+(x.none?' on':'')+'" data-sn="'+k+'" style="'+(x.none?'background:#6b7585;border-color:#6b7585;color:#fff':'')+'">🚫 지금 안 함</button>':'')+'</div>';
         if(!x.none)h+='<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽 번호"> <span>'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div>';
         h+='</div>';});
+      h+='<div id="hardBox">'+hardHtml()+'</div><div id="chgBox">'+chgHtml()+'</div>';
       h+='<div class="card"><h2>📝 오늘 테스트 봤어? <small>안 봤으면 넘어가요</small></h2>';
       F.tests.forEach(function(t,ix){h+='<div class="row"><input class="t w" style="max-width:260px" data-tn="'+ix+'" value="'+esc(t.name)+'" placeholder="무슨 테스트"><input class="t" type="number" inputmode="numeric" data-ts="'+ix+'" value="'+esc(t.score)+'" placeholder="점수"> 점 <button class="x" data-tdel="'+ix+'">✕</button></div>';});
       h+='<button class="add" id="tAdd">+ 테스트 점수 넣기</button></div>';
@@ -916,7 +919,91 @@ input.w{width:100%;max-width:520px}
     out.innerHTML=h;window.scrollTo(0,0);bind();
     out.querySelectorAll('[data-arr]').forEach(function(b){b.onclick=function(){F.arr=+b.getAttribute('data-arr');out.querySelectorAll('[data-arr]').forEach(function(x){x.classList.toggle('on',x===b);});if(F.arr===0){var st=schedNow(),d=new Date(),now=d.getHours()*60+d.getMinutes();if(st!=null&&now>st+10&&now<st+180)toast('수업 '+Math.floor(st/60)+':'+('0'+st%60).slice(-2)+' 시작인데 지금 '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2)+' — 정시 맞아?');}};});
     var wo=document.getElementById('wdOpen');if(wo)wo.onclick=function(){schedEdit();};
-    out.querySelectorAll('[data-self]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-self');F.self=F.self===v?null:v;out.querySelectorAll('[data-self]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-self')===F.self);});};});}
+    out.querySelectorAll('[data-self]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-self');F.self=F.self===v?null:v;out.querySelectorAll('[data-self]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-self')===F.self);});};});
+    out.querySelectorAll('[data-sch]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-sch'),L=F.school||[];if(v==='none')L=L.indexOf('none')>=0?[]:['none'];else{L=L.filter(function(x){return x!=='none';});var i=L.indexOf(v);if(i>=0)L.splice(i,1);else{L.push(v);if(v==='exam')toast('📸 보내고 나면 시험지 올리는 화면이 떠');}}F.school=L;out.querySelectorAll('[data-sch]').forEach(function(x){x.classList.toggle('on',L.indexOf(x.getAttribute('data-sch'))>=0);});};});
+    out.querySelectorAll('[data-pln]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-pln'),L=F.plan||[],i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);F.plan=L;b.classList.toggle('on',i<0);};});
+    var c2=out.querySelector('[data-st2="concept"]');if(c2)c2.addEventListener('input',function(){F.slots.concept.to=c2.value;var hb=document.getElementById('hardBox');if(hb){hb.innerHTML=hardHtml();hardBind();}});
+    hardBind();chgBind();shotBind(document.getElementById('shotBan'));if(!SHOT_DID){SHOT_DID=1;shotLoad();}}
+
+  /* v0.38 원장 11-10 03:0x 「학생 기입쪽 왠만한거 다 구현」: 📸 학교 시험지(시험 D-7 알림 → 끝나면 사진·점수 낼 때까지 맨 위 · 필수) · 🏫 오늘 학교에서 · 🎯 오늘 할 것 · 😵 어려웠던 쪽 · 📅 일정 바뀜(보강·결석·시간·다른 일정) · 🎯 이번 주 목표 */
+  var SHOT=null,SHOT_DID=false;
+  function shotNeed(){return !!SHOT&&SHOT.phase!=='before'&&!(+SHOT.n>0)&&!SHOT.no_paper;}
+  function shotBan(){if(!SHOT)return '';var s=SHOT,n=+s.n||0,ph=s.phase,nm=esc(s.name||'학교 시험');
+    if(ph==='before')return '<div class="card" style="padding:11px 14px;background:#fff6dc;border-color:#f2b21b"><div style="font-size:16px;font-weight:700">📸 '+nm+' '+(+s.dday>0?'D-'+s.dday:'D-DAY')+' — 시험 끝나면 시험지 꼭 찍어 와!</div><div class="hint" style="margin-top:3px">수학 시험지 앞·뒤 전부 + 점수 · 쌤이 틀린 문제 같이 봐 줘</div></div>';
+    if(n>0&&s.score!=null)return '<div class="card" style="padding:10px 14px;background:#e9f7ef;border-color:#9fd8b5"><div class="row" style="margin:0"><span>✅ '+nm+' 시험지 '+n+'장 · '+esc(s.score)+'점 냈어</span><button class="back" data-shot="1" style="margin-left:auto;font-size:13px;padding:5px 10px">보기·추가</button></div></div>';
+    if(s.no_paper&&n===0)return '<div class="card" style="padding:10px 14px;background:#fff6dc;border-color:#f2b21b"><div class="row" style="margin:0"><span>📸 '+nm+' 시험지 — 「'+esc(s.no_paper)+'」</span><button class="back" data-shot="1" style="margin-left:auto;font-size:13px;padding:5px 10px">지금 올리기</button></div></div>';
+    return '<div class="card" style="padding:14px;color:#fff;background:'+(n>0?'linear-gradient(135deg,#e08a00,#b35c00)':'linear-gradient(135deg,#d6453a,#9e1f17)')+';border:0"><div style="font-size:19px;font-weight:800">📸 '+(n>0?'점수도 넣어 줘!':ph==='during'?'오늘 수학 시험 봤으면 시험지 찍어 줘!':'시험지 사진 아직이야!')+'</div><div style="margin-top:4px;opacity:.9;font-size:14px">'+nm+(n>0?' · 시험지 '+n+'장 받았어':' · 앞·뒤 전부 찍기 + 점수')+'</div><button class="send" data-shot="1" style="margin-top:10px;padding:13px;background:#fff;color:#9e1f17">📸 지금 올리기</button></div>';}
+  function shotLoad(){if(!SB||!CODE)return;SB.rpc('stu_shot',{p_code:CODE}).then(function(r){if(r.error)return;SHOT=r.data||null;var el=document.getElementById('shotBan');if(el){el.innerHTML=shotBan();shotBind(el);}});}
+  function shotBind(el){if(!el)return;el.querySelectorAll('[data-shot]').forEach(function(b){b.onclick=function(){try{sync();}catch(e){}shotScr();};});}
+  function shotScr(after){var s=SHOT||{name:'학교 시험',n:0},back=function(){if(F&&F.slots)form();else open0(MODE);};navTo(back);
+    var ST={score:s.score==null?'':String(s.score),total:+s.total||100,np:s.no_paper||'',ph:[],busy:0,loaded:false};
+    function draw(){
+      out.innerHTML='<div class="card"><div class="row" style="margin:0 0 6px"><h2 style="margin:0">📸 '+esc(s.name||'학교 시험')+' 수학 시험지</h2><button class="back" id="shBack" style="margin-left:auto;padding:6px 10px;font-size:13px">← 기록</button></div><div class="hint">시험지 <b>앞·뒤 전부</b> 찍어 줘 — 글씨 보이게 반듯하게 · 쌤만 봐요</div>'+
+        '<div class="row" style="margin:10px 0 0"><button class="back" id="shCam" style="flex:1;padding:12px">📷 찍기</button><button class="back" id="shAlb" style="flex:1;padding:12px">🖼 앨범에서 (여러 장)</button></div><input type="file" accept="image/*" capture="environment" id="shF1" style="display:none"><input type="file" accept="image/*" multiple id="shF2" style="display:none">'+
+        (ST.busy?'<div class="hint" style="margin-top:8px">⏳ 올리는 중… '+ST.busy+'장 남음</div>':'')+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px">'+ST.ph.map(function(p,i){return '<div style="position:relative"><img src="'+p+'" data-shv="'+i+'" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line)"><button data-shd="'+i+'" style="position:absolute;top:3px;right:3px;border:0;border-radius:50%;width:28px;height:28px;background:rgba(0,0,0,.6);color:#fff;font-size:14px">✕</button><div style="position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border-radius:6px;padding:1px 6px">'+(i+1)+'</div></div>';}).join('')+'</div>'+
+        (ST.loaded?(ST.ph.length?'<div class="hint" style="margin-top:6px">'+ST.ph.length+'장 · 더 있으면 계속 찍어 줘</div>':'<div class="hint" style="margin-top:6px">아직 0장</div>'):'<div class="hint" style="margin-top:6px">불러오는 중…</div>')+
+        '</div><div class="card"><h2>💯 수학 점수</h2><div class="row"><input class="t" id="shSc" type="number" inputmode="decimal" value="'+esc(ST.score)+'" placeholder="점수" style="width:110px;font-size:20px;text-align:center"><span>점 /</span><select id="shTo" style="font-size:16px;padding:6px">'+[100,50,200].map(function(t){return '<option'+(ST.total===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select><span>점 만점</span></div><div class="hint">점수 아직 모르면 비워 두고, 나오면 다시 넣어 줘</div></div>'+
+        '<div class="card"><h2>시험지가 없어? <small>사진이 없을 때만</small></h2><div class="pcts">'+['집에 두고 왔어','학교가 안 돌려줘','아직 안 받았어','잃어버렸어'].map(function(x){return '<button class="pc'+(ST.np===x?' on':'')+'" data-np="'+x+'" style="flex:1 1 45%;font-size:14px;padding:9px 4px">'+x+'</button>';}).join('')+'</div></div>'+
+        '<button class="send" id="shOk">저장 ✅</button><div style="height:30px"></div>';
+      var sc=document.getElementById('shSc');sc.oninput=function(){ST.score=sc.value;};var to=document.getElementById('shTo');to.onchange=function(){ST.total=+to.value;};
+      document.getElementById('shBack').onclick=back;
+      var f1=document.getElementById('shF1'),f2=document.getElementById('shF2');document.getElementById('shCam').onclick=function(){f1.click();};document.getElementById('shAlb').onclick=function(){f2.click();};
+      f1.onchange=f2.onchange=function(){var fs=[].slice.call(this.files||[]);this.value='';if(!fs.length)return;ST.busy+=fs.length;draw();
+        (function nx(){var f=fs.shift();if(!f){return;}shrinkImg(f,function(d){if(!d){ST.busy--;toast('사진 하나를 못 읽었어');draw();nx();return;}
+          SB.rpc('stu_shot_add',{p_code:CODE,p_photo:d}).then(function(r){ST.busy--;if(r.error||!(+r.data>0)){toast('사진 저장 안 됨 — 다시');}else{ST.ph.push(d);s.n=+r.data;if(SHOT)SHOT.n=s.n;ST.np='';}draw();nx();});},1500);})();};
+      out.querySelectorAll('[data-shd]').forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-shd');if(!confirm((i+1)+'번 사진 뺄까?'))return;SB.rpc('stu_shot_del',{p_code:CODE,p_idx:i}).then(function(r){if(r.error){toast('안 됨 — 다시');return;}ST.ph.splice(i,1);s.n=ST.ph.length;if(SHOT)SHOT.n=s.n;draw();});};});
+      out.querySelectorAll('[data-shv]').forEach(function(im){im.onclick=function(){var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:70;display:flex;align-items:center;justify-content:center';d.innerHTML='<img src="'+im.src+'" style="max-width:100%;max-height:100%">';d.onclick=function(){d.remove();};document.body.appendChild(d);};});
+      out.querySelectorAll('[data-np]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-np');ST.np=ST.np===v?'':v;draw();};});
+      document.getElementById('shOk').onclick=function(){if(ST.busy){toast('⏳ 사진 올리는 중이야 — 잠깐만');return;}
+        var v=String(ST.score).trim(),scv=v===''?null:+v;if(v!==''&&(isNaN(scv)||scv<0||scv>ST.total)){toast('점수를 다시 봐 줘 (0~'+ST.total+')');return;}
+        if(!ST.ph.length&&!ST.np){toast('📸 시험지를 찍거나, 없는 이유를 골라 줘');return;}
+        var b=this;b.disabled=true;SB.rpc('stu_shot_save',{p_code:CODE,p_score:scv,p_total:ST.total,p_no_paper:ST.ph.length?null:ST.np}).then(function(r){if(r.error||r.data!==true){b.disabled=false;toast('저장 안 됨 — 다시');return;}
+          SHOT=SHOT||{name:s.name,phase:'manual'};SHOT.n=ST.ph.length;SHOT.score=scv;SHOT.total=ST.total;SHOT.no_paper=ST.ph.length?null:ST.np;toast(ST.ph.length?'📸 시험지 '+ST.ph.length+'장'+(scv!=null?' · '+scv+'점':'')+' 저장!':'알겠어 — 시험지 생기면 꼭 올려 줘');setTimeout(shotLoad,600);if(after)after();else back();});};
+      window.scrollTo(0,0);}
+    draw();SB.rpc('stu_shot_photos',{p_code:CODE}).then(function(r){ST.loaded=true;if(!r.error&&Array.isArray(r.data))ST.ph=r.data;draw();});}
+  /* 😵 오늘 어려웠던 쪽 — 개념서 오늘 나간 쪽에서 고르기 */
+  function hardRange(){var x=F.slots&&F.slots.concept;if(!x||x.none||!x.book||!String(x.to).trim())return [];var to=+x.to,st=startOfS('concept',x);if(isNaN(to))return [];if(st==null)st=Math.max(1,to-9);if(st>to)st=to;if(to-st>29)st=to-29;var L=[];for(var p=st;p<=to;p++)L.push(p);return L;}
+  function hardHtml(){var R=hardRange();if(!F.hard){var o=(CTX.mine||{}).hard;F.hard=o?{pages:(o.pages||[]).slice(),ok:!!o.ok}:{pages:[],ok:false};}
+    if(!R.length)return '';
+    return '<div class="card" style="padding:12px 14px"><h2 style="margin-bottom:6px">😵 오늘 어려웠던 쪽 <small>'+esc(F.slots.concept.book)+' · 여러 개 · 다음 테스트에 넣어 줘</small></h2><div class="pcts">'+R.map(function(p){return '<button class="pc z'+(F.hard.pages.indexOf(p)>=0?' on':'')+'" data-hd="'+p+'" style="flex:0 0 auto;min-width:52px;padding:8px 6px;font-size:14px">'+p+'쪽</button>';}).join('')+'<button class="pc'+(F.hard.ok?' on':'')+'" data-hd="ok" style="flex:1 1 100%;padding:8px 4px;font-size:14px">😎 다 괜찮았어</button></div></div>';}
+  function hardBind(){out.querySelectorAll('[data-hd]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-hd'),H=F.hard;if(v==='ok'){H.ok=!H.ok;if(H.ok)H.pages=[];}else{var p=+v,i=H.pages.indexOf(p);if(i>=0)H.pages.splice(i,1);else{H.pages.push(p);H.ok=false;}}var hb=document.getElementById('hardBox');if(hb){hb.innerHTML=hardHtml();hardBind();}};});}
+  /* 📅 일정 바뀜 — 보강·결석·시간 바뀜·다른 일정 (작게) */
+  var SCE=null,SCK=[['bo','➕ 보강'],['ab','🚫 결석'],['tm','⏰ 시간 바뀜'],['etc','📌 다른 일정']];
+  function ymdL(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+  function mdW(s){var d=new Date(s+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()+'('+'일월화수목금토'[d.getDay()]+')';}
+  function sckL(k){for(var i=0;i<SCK.length;i++)if(SCK[i][0]===k)return SCK[i][1];return k;}
+  function chgHtml(){if(!F.sc){var td=ymdL(new Date());F.sc=((CTX.mine||{}).sched_chg||[]).filter(function(x){return x&&x.d>=td;}).slice();}
+    var h='<div class="card" style="padding:10px 14px">'+F.sc.map(function(x,i){return '<div class="row" style="margin:0 0 6px"><span style="font-weight:700">📅 '+sckL(x.k)+' '+mdW(x.d)+(x.t?' '+esc(x.t):'')+'</span>'+(x.m?'<span class="hint">'+esc(x.m)+'</span>':'')+'<button class="x" data-scx="'+i+'" style="margin-left:auto">✕</button></div>';}).join('');
+    if(!SCE)return h+'<div class="row" style="margin:0;gap:5px"><span class="hint" style="width:100%">📅 다음 수업 일정이 바뀌어? <small>(있을 때만)</small></span>'+SCK.map(function(a){return '<button class="bkc" data-sck="'+a[0]+'" style="padding:6px 10px;font-size:13px">'+a[1]+'</button>';}).join('')+'</div></div>';
+    var D=[],t0=new Date();for(var i=0;i<14;i++){var d=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+i);D.push(ymdL(d));}
+    var TM=[''];for(var hh=13;hh<=22;hh++){TM.push(hh+':00');TM.push(hh+':30');}
+    h+='<h2 style="margin:4px 0 6px">'+sckL(SCE.k)+' <small>언제?</small></h2><div class="pcts">'+D.map(function(s,i){return '<button class="pc'+(SCE.d===s?' on':'')+'" data-scd="'+s+'" style="flex:0 0 auto;padding:7px 8px;font-size:13px">'+(i===0?'오늘':i===1?'내일':mdW(s))+'</button>';}).join('')+'</div>';
+    if(SCE.k==='bo'||SCE.k==='tm')h+='<div class="row" style="margin:8px 0 0"><span class="hint">몇 시?</span><select id="scT" style="font-size:15px;padding:6px">'+TM.map(function(m){return '<option value="'+m+'"'+(SCE.t===m?' selected':'')+'>'+(m||'모름')+'</option>';}).join('')+'</select></div>';
+    h+='<input class="t w" id="scM" value="'+esc(SCE.m||'')+'" placeholder="'+(SCE.k==='etc'?'예: 영어학원 시간 바뀜 · 수학여행':'한 줄 (안 써도 돼)')+'" style="margin-top:8px">';
+    return h+'<div class="row" style="justify-content:flex-end;margin:8px 0 0"><button class="back" id="scNo">닫기</button><button class="back" id="scOk" style="background:var(--navy);color:#fff;border-color:var(--navy)">추가</button></div></div>';}
+  function chgDraw(){var el=document.getElementById('chgBox');if(el){el.innerHTML=chgHtml();chgBind();}}
+  function chgBind(){var el=document.getElementById('chgBox');if(!el)return;
+    el.querySelectorAll('[data-sck]').forEach(function(b){b.onclick=function(){SCE={k:b.getAttribute('data-sck'),d:'',t:'',m:''};chgDraw();};});
+    el.querySelectorAll('[data-scx]').forEach(function(b){b.onclick=function(){F.sc.splice(+b.getAttribute('data-scx'),1);chgDraw();};});
+    el.querySelectorAll('[data-scd]').forEach(function(b){b.onclick=function(){var m=document.getElementById('scM');if(m)SCE.m=m.value;var t=document.getElementById('scT');if(t)SCE.t=t.value;SCE.d=b.getAttribute('data-scd');chgDraw();};});
+    var no=document.getElementById('scNo');if(no)no.onclick=function(){SCE=null;chgDraw();};
+    var ok=document.getElementById('scOk');if(ok)ok.onclick=function(){if(!SCE.d){toast('📅 날짜를 골라 줘');return;}var m=document.getElementById('scM'),t=document.getElementById('scT');var it={k:SCE.k,d:SCE.d};if(t&&t.value)it.t=t.value;if(m&&m.value.trim())it.m=m.value.trim().slice(0,60);F.sc.push(it);SCE=null;chgDraw();toast('📅 '+sckL(it.k)+' '+mdW(it.d)+' — 보내기 누르면 쌤한테 가');};}
+  /* 🎯 이번 주 목표 (내 현황) */
+  var GOAL=null,GOALE=false,GL=[['hw100','📌 숙제 다 해 오기'],['wrong0','📕 안 고친 오답 0개'],['pages10','📖 진도 10쪽'],['grade3','✅ 채점 3일 하기']];
+  function goalLoad(){if(!SB||!CODE)return;SB.rpc('stu_goal',{p_code:CODE}).then(function(r){if(r.error||!r.data)return;GOAL=r.data;var gb=document.getElementById('goalBox');if(gb){gb.innerHTML=goalHtml();goalBind();}});}
+  function goalProg(g){var G=GOAL||{};
+    if(g==='hw100'){var a=+G.hw_days||0,b=+G.hw_total||0;return {v:a,t:Math.max(1,b),txt:b?'숙제 확인 '+b+'번 중 '+a+'번 100%':'아직 숙제 확인 없음',ok:b>0&&a===b};}
+    if(g==='wrong0'){var o=STV&&STV.wr?+STV.wr.open:null;return {v:o===0?1:0,t:1,txt:o==null?'불러오는 중…':'남은 오답 '+o+'개',ok:o===0};}
+    if(g==='pages10'){var p=+G.pages||0;return {v:Math.min(p,10),t:10,txt:'진도 '+p+'쪽 / 10쪽',ok:p>=10};}
+    var d=+G.graded_days||0;return {v:Math.min(d,3),t:3,txt:'채점한 날 '+d+'일 / 3일',ok:d>=3};}
+  function goalHtml(){if(!GOAL)return '';var g=GOAL.goal,lb='';GL.forEach(function(x){if(x[0]===g)lb=x[1];});
+    if(!g||GOALE)return '<div class="card" style="padding:12px 14px"><h2 style="margin-bottom:6px">🎯 이번 주 목표 하나 <small>월~일 · 하면 저절로 채워져</small></h2><div class="pcts">'+GL.map(function(x){return '<button class="pc'+(g===x[0]?' on':'')+'" data-gl="'+x[0]+'" style="flex:1 1 45%;padding:9px 4px;font-size:14px">'+x[1]+'</button>';}).join('')+'</div>'+(GOALE?'<div style="text-align:right;margin-top:6px"><button class="back" data-gle="0" style="font-size:12px;padding:4px 10px">닫기</button></div>':'')+'</div>';
+    var P=goalProg(g),pc=Math.round(P.v/P.t*100),left=7-(+GOAL.dow||1);
+    return '<div class="card" style="padding:12px 14px'+(P.ok?';background:#e9f7ef;border-color:#9fd8b5':'')+'"><div class="row" style="margin:0 0 6px"><b>🎯 이번 주: '+lb+'</b><button class="back" data-gle="1" style="margin-left:auto;font-size:12px;padding:4px 10px">바꾸기</button></div><div style="height:12px;border-radius:6px;background:#e6e9ef;overflow:hidden"><div style="height:100%;width:'+pc+'%;background:'+(P.ok?'#1a8a4a':'#4b7bec')+'"></div></div><div class="hint" style="margin-top:5px">'+(P.ok?'🎉 달성! ':'')+esc(P.txt)+(P.ok?'':' · 이번 주 '+(left>0?left+'일 남음':'오늘까지'))+'</div></div>';}
+  function goalBind(){var gb=document.getElementById('goalBox');if(!gb)return;
+    gb.querySelectorAll('[data-gle]').forEach(function(b){b.onclick=function(){GOALE=b.getAttribute('data-gle')==='1';gb.innerHTML=goalHtml();goalBind();};});
+    gb.querySelectorAll('[data-gl]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-gl');SB.rpc('stu_goal_set',{p_code:CODE,p_goal:v}).then(function(r){if(r.data!==true){toast('저장 안 됨 — 다시');return;}GOAL.goal=v;GOALE=false;gb.innerHTML=goalHtml();goalBind();toast('🎯 이번 주 목표 정했어!');});};});}
 
   /* v0.36 🗓 학원 오는 요일 */
   var WD='월화수목금토일';
@@ -970,17 +1057,18 @@ input.w{width:100%;max-width:520px}
     var sy=document.getElementById('say');if(sy)F.say=sy.value;}
   function send(){sync();var data;
     if(MODE==='start'&&FIRSTB){var c0=F.slots.concept;if(!c0||!c0.book){toast('📖 개념서(진도 책)를 골라 줘');return;}var b0={};SLOTS.forEach(function(sl){var x=F.slots[sl[0]];b0[sl[0]]=(x.none||!x.book)?{none:1}:{book:x.book};});data={books0:b0,at_start:new Date().toISOString()};}
+    else if(shotNeed()&&SHOT.phase!=='during'){toast('📸 학교 시험지부터 올려 줘 (없으면 이유 고르기)');shotScr(function(){form();setTimeout(send,60);});return;}
     else if(MODE==='start'){if(F.hwc.some(function(i){return i.pct==null;})){toast('📌 숙제마다 얼마나 했는지 눌러 줘');return;}
       if(F.arr==null){toast('🏫 오늘 도착부터 눌러 줘');return;}
-      data={hwc:F.hwc.map(function(i){return {book:i.book,range:i.range,pct:i.pct};}),at_start:new Date().toISOString(),arr:{late:F.arr,at:new Date().toISOString()}};}
+      data={hwc:F.hwc.map(function(i){return {book:i.book,range:i.range,pct:i.pct};}),at_start:new Date().toISOString(),arr:{late:F.arr,at:new Date().toISOString()}};if(F.school&&F.school.length)data.school=F.school;if(F.plan&&F.plan.length)data.plan=F.plan;}
     else{var c=F.slots.concept;if(!c.book||!String(c.to).trim()){toast('📖 개념서 — 어떤 책 몇 쪽까지 나갔는지 넣어 줘');return;}
       var miss=SLOTS.filter(function(sl){var x=F.slots[sl[0]];return !x.none&&x.book&&!String(x.to).trim();})[0];if(miss){toast(miss[1]+' — 쪽 번호 넣어 줘 (안 하면 「🚫 지금 안 함」)');return;}
       var slots={},learn=[],hw=[];SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k];if(x.none||!x.book){slots[k]={none:1};return;}var st=startOfS(k,x),to=+x.to,it={book:x.book,to:to,range:(st!=null&&st<=to?st+'~':'')+to+'쪽'};slots[k]=it;(sl[3]==='learn'?learn:hw).push(it);});
-      data={slots:slots,learn:learn,hw:hw,tests:F.tests.filter(function(t){return t.name||t.score!=='';}).map(function(t){return {name:t.name||'테스트',score:t.score===''?'':+t.score};}),say:(F.say||'').trim(),at_end:new Date().toISOString()};if(F.self)data.self=F.self;if(F.done&&F.done.length)data.book_done=F.done;if(F.chg&&F.chg.length)data.book_change=F.chg;}
+      data={slots:slots,learn:learn,hw:hw,tests:F.tests.filter(function(t){return t.name||t.score!=='';}).map(function(t){return {name:t.name||'테스트',score:t.score===''?'':+t.score};}),say:(F.say||'').trim(),at_end:new Date().toISOString()};if(F.self)data.self=F.self;if(F.done&&F.done.length)data.book_done=F.done;if(F.chg&&F.chg.length)data.book_change=F.chg;if(F.hard&&(F.hard.ok||F.hard.pages.length)){var hc=F.slots.concept,hr=hardRange();data.hard={book:hc.book,pages:(F.hard.pages||[]).filter(function(p){return hr.indexOf(p)>=0;}),ok:!!F.hard.ok};}if(F.sc)data.sched_chg=F.sc;}
     var b=document.getElementById('send');b.disabled=true;b.textContent='보내는 중…';
     (data.dev=DEV,SB.rpc('stu_submit',{p_code:CODE,p_data:data})).then(function(r){
       if(r.error||r.data!==true){b.disabled=false;b.textContent='보내기 ✅';toast('저장 안 됨 — 다시 눌러 줘'+(r.error?' ('+r.error.message+')':''));return;}
-      var m=CTX.mine||{};Object.keys(data).forEach(function(k){m[k]=data[k];});CTX.mine=m;var st=MODE==='start';setTimeout(function(){gLoad(true);},500);if(data.books0){toast('📚 내 책 저장! 이제 채점도 이 책으로 떠');FIRSTB=false;form();return;}
+      var m=CTX.mine||{};Object.keys(data).forEach(function(k){m[k]=data[k];});CTX.mine=m;var st=MODE==='start';if(st&&data.school&&data.school.indexOf('exam')>=0&&!(SHOT&&+SHOT.n>0)){toast('👍 보냈어! 이제 시험지 올려 줘');shotScr(function(){form();toast('📸 고마워! 수업 잘 듣자');});return;}setTimeout(function(){gLoad(true);},500);if(data.books0){toast('📚 내 책 저장! 이제 채점도 이 책으로 떠');FIRSTB=false;form();return;}
       out.innerHTML='<div class="card done-scr"><div class="e">'+(st?'👍':'👋')+'</div><div class="m">'+esc(given(CTX.name))+(st?', 확인 끝! 수업 잘 듣자':', 보냈어! 조심히 가~')+'</div><div class="hint" style="margin-top:10px">'+(st?'수업 끝나면 「🏠 집에 가기 전」도 잊지 마':'쌤이 확인하고 부모님께 알림장 보내요')+' · 고칠 게 있으면 다시 열면 돼</div><button class="back" style="margin-top:20px" id="again">✏️ 고치기</button></div>';
       document.getElementById('again').onclick=function(){open0(MODE);};});}
   load();
