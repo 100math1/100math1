@@ -88,6 +88,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
+/* 백수학_학생폰 v0.60 (원장 11-10 18:27 「월별 목표에 책 끝까지 선택지 — 그달에 책 끝내면 그냥 끝을 선택」 → 🗓 목표 칸마다 [📕 끝까지] · 저장하면 서버가 그 책 마지막 쪽을 채움(최근 채점한 같은 책) · 표시 「책 끝까지 (112쪽)」) */
 /* 백수학_학생폰 v0.59 (원장 11-10 18:13 채점이 몇 쪽까지 들어갔는지 → ✅ 교재 채점 첫 화면 위 📚 내 채점 기록: 책마다 쪽 범위·진행 막대·🆕 오늘 +n쪽·빠진 쪽) */
 /* 백수학_학생폰 v0.58 (원장 11-10 17:13 고등 「사인 코사인 탄젠트 지수 로그 미분 적분 리미트 시그마 등등 — 정답에 맞게 자동 활성화」 → 정답 글자에서 자동: sin cos tan log ln lim ′ ∫ Σ ∞ θ + 중등 기호 · 버튼 많으면 줄바꿈) */
 /* 백수학_학생폰 v0.57 (원장 11-10 17:12 중학교 입력 어려운 주관식 = 문자 식 거듭제곱·순환소수·무리수·원 π → 답마다 다른 기호 버튼: ² ³ ⁴ ⁵ ⁿ · 순환점(숫자 위 점) · √ · π · ° ≤ ≥ ± ∠ △ · DB _ans_norm ⁴⁵…ⁿ → ^ · 안내 「x^2·루트3·파이로 써도 맞게」) */
@@ -117,7 +118,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.59';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.60';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -1155,12 +1156,12 @@ input.w{width:100%;max-width:520px}
   function mgCur(k){var x=F&&F.slots&&F.slots[k];if(!x||!x.book)return null;if(String(x.to).trim()&&!isNaN(+x.to))return +x.to;var e=lastEnd(x.book);return e;}
   function mgSlots(){return SLOTS.filter(function(sl){var x=F&&F.slots&&F.slots[sl[0]];return x&&x.book&&!x.none;});}
   function mgHtml(){if(!MG||FIRSTB)return '';var g=MG.goal,mo=+String(MG.ym).slice(5),left=Math.max(0,(+MG.last_day)-(+MG.day));
-    if(g&&!MGE){var parts=(g.items||[]).map(function(i){var c=mgCur(i.slot);if(c==null)c=i.from;var rem=(+i.to)-(+c||0),pc=(i.from!=null&&c!=null&&+i.to>+i.from)?Math.max(0,Math.min(100,Math.round(((+c)-(+i.from))/((+i.to)-(+i.from))*100))):null;return esc(i.book)+' '+i.to+'쪽까지 <span class="hint">(지금 '+(c!=null?c:'?')+'쪽'+(pc!=null?' · <b>'+pc+'%</b>':'')+(rem>0?' · '+rem+'쪽 남음':' · 🎉 달성')+')</span>';});
+    if(g&&!MGE){var parts=(g.items||[]).map(function(i){var c=mgCur(i.slot);if(c==null)c=i.from;var rem=i.to?(+i.to)-(+c||0):1,pc=(i.from!=null&&c!=null&&+i.to>+i.from)?Math.max(0,Math.min(100,Math.round(((+c)-(+i.from))/((+i.to)-(+i.from))*100))):null;return esc(i.book)+' '+(i.end?'<b>책 끝까지</b>'+(i.to?' ('+i.to+'쪽)':''):i.to+'쪽까지')+' <span class="hint">(지금 '+(c!=null?c:'?')+'쪽'+(pc!=null?' · <b>'+pc+'%</b>':'')+(rem>0?' · '+rem+'쪽 남음':' · 🎉 달성')+')</span>';});
       return '<div class="card" style="padding:10px 14px"><div class="row" style="margin:0"><b>🗓 '+mo+'월 목표</b>'+(g.with_t?'':' <span class="hint">(쌤 확인 전)</span>')+'<button class="back" id="mgEd" style="margin-left:auto;font-size:12px;padding:4px 10px">바꾸기</button></div><div style="margin-top:4px;line-height:1.6">'+parts.join('<br>')+'</div><div class="hint">이번 달 '+left+'일 남음</div></div>';}
-    var S=mgSlots();if(!S.length)return '';if(!MGT){MGT={wt:!!(g&&g.with_t)};(g&&g.items||[]).forEach(function(i){MGT[i.slot]=i.to;});}
+    var S=mgSlots();if(!S.length)return '';if(!MGT){MGT={wt:!!(g&&g.with_t)};(g&&g.items||[]).forEach(function(i){MGT[i.slot]=i.end?'end':i.to;});}
     var early=+MG.day<=10||MGE;
     return '<div class="card" style="padding:12px 14px;'+(early?'background:#fff6dc;border-color:#f2b21b':'')+'"><h2 style="margin-bottom:4px">🗓 '+mo+'월 목표 — 쌤이랑 같이 정하자 <small>이번 달 어디까지 나갈까?</small></h2><div class="hint" style="margin-bottom:8px">쌤한테 「이번 달 목표 정해요」 하고 같이 정해 줘 · 한 달에 한 번</div>'+
-      S.map(function(sl){var k=sl[0],c=mgCur(k);return '<div class="row" style="margin:0 0 6px;flex-wrap:nowrap"><span style="flex:1;min-width:0"><b>'+sl[1]+'</b> '+esc(F.slots[k].book)+'<br><span class="hint">지금 '+(c!=null?c+'쪽':'?')+'</span></span><input class="t" type="number" inputmode="numeric" data-mgt="'+k+'" value="'+esc(MGT[k]==null?'':MGT[k])+'" placeholder="쪽" style="width:80px;text-align:center"><span>쪽까지</span></div>';}).join('')+
+      S.map(function(sl){var k=sl[0],c=mgCur(k);return '<div class="row" style="margin:0 0 6px;flex-wrap:nowrap"><span style="flex:1;min-width:0"><b>'+sl[1]+'</b> '+esc(F.slots[k].book)+'<br><span class="hint">지금 '+(c!=null?c+'쪽':'?')+'</span></span>'+(MGT[k]==='end'?'<b style="width:80px;text-align:center;color:#1a7a3e">책 끝</b>':'<input class="t" type="number" inputmode="numeric" data-mgt="'+k+'" value="'+esc(MGT[k]==null?'':MGT[k])+'" placeholder="쪽" style="width:70px;text-align:center"><span>쪽</span>')+'<button class="pc'+(MGT[k]==='end'?' on':'')+'" data-mgend="'+k+'" style="flex:0 0 auto;padding:7px 8px;font-size:13px">📕 끝까지</button></div>';}).join('')+
       '<div class="pcts" style="margin-top:6px"><button class="pc'+(MGT.wt?' on':'')+'" id="mgWt" style="flex:1;padding:9px 4px;font-size:14px">👩‍🏫 쌤이랑 같이 정했어</button></div><div class="row" style="justify-content:flex-end;margin:8px 0 0">'+(MGE?'<button class="back" id="mgNo">닫기</button>':'')+'<button class="back" id="mgOk" style="background:var(--navy);color:#fff;border-color:var(--navy)">목표 저장</button></div></div>';}
   function mgDraw(){var el=document.getElementById('mgBox');if(el){el.innerHTML=mgHtml();mgBind();}}
   function mgLoad(){if(!SB||!CODE)return;SB.rpc('stu_mgoal',{p_code:CODE}).then(function(r){if(r.error||!r.data)return;MG=r.data;mgDraw();});}
@@ -1168,10 +1169,11 @@ input.w{width:100%;max-width:520px}
     var ed=document.getElementById('mgEd');if(ed)ed.onclick=function(){MGE=true;MGT=null;mgDraw();};
     var no=document.getElementById('mgNo');if(no)no.onclick=function(){MGE=false;mgDraw();};
     el.querySelectorAll('[data-mgt]').forEach(function(i){i.oninput=function(){MGT[i.getAttribute('data-mgt')]=i.value;};});
+    el.querySelectorAll('[data-mgend]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-mgend');MGT[k]=MGT[k]==='end'?'':'end';mgDraw();};});
     var wt=document.getElementById('mgWt');if(wt)wt.onclick=function(){MGT.wt=!MGT.wt;wt.classList.toggle('on',MGT.wt);};
-    var ok=document.getElementById('mgOk');if(ok)ok.onclick=function(){var it=[],bad=null;mgSlots().forEach(function(sl){var k=sl[0],v=String(MGT[k]==null?'':MGT[k]).trim();if(!v)return;var c=mgCur(k);if(isNaN(+v)||(c!=null&&+v<=c)){bad=sl[1];return;}it.push({slot:k,book:F.slots[k].book,from:c,to:+v});});
-      if(bad){toast(bad+' — 지금 쪽보다 뒤로 정해 줘');return;}if(!it.length){toast('📖 한 권이라도 「몇 쪽까지」 넣어 줘');return;}if(!MGT.wt&&!confirm('쌤이랑 같이 정한 거 아니야? 그래도 저장할까?'))return;
-      ok.disabled=true;SB.rpc('stu_mgoal_set',{p_code:CODE,p_items:it,p_with_t:!!MGT.wt}).then(function(r){if(r.data!==true){ok.disabled=false;toast('저장 안 됨 — 다시');return;}MG.goal={ym:MG.ym,items:it,with_t:!!MGT.wt};MGE=false;MGT=null;mgDraw();toast('🗓 이번 달 목표 저장!');});};}
+    var ok=document.getElementById('mgOk');if(ok)ok.onclick=function(){var it=[],bad=null;mgSlots().forEach(function(sl){var k=sl[0],v=String(MGT[k]==null?'':MGT[k]).trim();if(!v)return;var c=mgCur(k);if(v==='end'){it.push({slot:k,book:F.slots[k].book,from:c,to:null,end:true});return;}if(isNaN(+v)||(c!=null&&+v<=c)){bad=sl[1];return;}it.push({slot:k,book:F.slots[k].book,from:c,to:+v});});
+      if(bad){toast(bad+' — 지금 쪽보다 뒤로 정해 줘');return;}if(!it.length){toast('📖 한 권이라도 「몇 쪽까지」 또는 「끝까지」 넣어 줘');return;}if(!MGT.wt&&!confirm('쌤이랑 같이 정한 거 아니야? 그래도 저장할까?'))return;
+      ok.disabled=true;SB.rpc('stu_mgoal_set',{p_code:CODE,p_items:it,p_with_t:!!MGT.wt}).then(function(r){if(r.data!==true){ok.disabled=false;toast('저장 안 됨 — 다시');return;}MG.goal={ym:MG.ym,items:it,with_t:!!MGT.wt};MGE=false;MGT=null;mgDraw();mgLoad();toast('🗓 이번 달 목표 저장!');});};}
   /* v0.36 🗓 학원 오는 요일 */
   var WD='월화수목금토일';
   function schedRows(){var s2=CTX.sched2;if(Array.isArray(s2)&&s2.length)return s2;var raw=String(CTX.sched||''),L=[];raw.split(/\n+/).forEach(function(line){var d=null;for(var i=0;i<7;i++)if(line.indexOf(WD[i])>=0){d=WD[i];break;}var m=line.match(/(\d{1,2}):?(\d{2})?\s*[~\-–]\s*(\d{1,2}):?(\d{2})?/);if(d&&m)L.push({d:d,s:m[1]+':'+(m[2]||'00'),e:m[3]+':'+(m[4]||'00')});});return L;}
