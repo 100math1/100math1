@@ -88,6 +88,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
+/* 백수학_학생폰 v0.63 (원장 11-12 04:00~04:01 학생으로 써 보니 「진도 박스·유형서1 박스·유형서2 박스가 좀 커 — 그래서 전체적으로 위아래로 스크롤을 많이 해야 해」): 🏠 집 가기 전 — 책이 정해진 칸은 한 카드 안에 두 줄씩(이름·책 / n쪽부터 [ ] 쪽까지) · 🎉 다 끝냈어·🔄 책 바꾸기는 [⋯] 안으로(기능 그대로) · 책 고르는 중·바꾸는 중인 칸만 예전 큰 카드 */
 /* 백수학_학생폰 v0.62 (원장 11-12 03:45~03:47, 문제은행 창에서 말함 → 쪽지): ① 📚 내 채점 기록 「⚠ 빠진 쪽」 누르면 그 쪽 채점으로 바로(학년·쪽 고르기 건너뜀) · 「…」 누르면 다 펼침 ② 🎮 ⚔️ 오늘의 퀘스트 안 된 줄 누르면 그 퀘스트 하러 바로 — 📗 숙제 채점 = 지난 숙제 책·범위 채운 채점(숙제 책 여러 권이면 책 고르기에서 📌 숙제 책 맨 위) · 📕 오답 · 📄 시험지 · 🏠 집 가기 전 */
 /* 백수학_학생폰 v0.61 (원장 11-11 00:1x 비서 열일곱 번째 창 · 열린 약속 확인): 채점 저장 뒤 「📕 고칠 오답」 카드 안내가 「책에서 풀고 ⭕ 누르면 돼」였는데 오답 탭은 답 적는 방식(11-10 17:04) → 오답 = 「책에서 다시 풀고 답 적으면 돼」 · 덜 한 숙제 = 「마저 풀고 채점처럼 고르면 돼」 한 줄씩 */
 /* 백수학_학생폰 v0.60 (원장 11-10 18:27 「월별 목표에 책 끝까지 선택지 — 그달에 책 끝내면 그냥 끝을 선택」 → 🗓 목표 칸마다 [📕 끝까지] · 저장하면 서버가 그 책 마지막 쪽을 채움(최근 채점한 같은 책) · 표시 「책 끝까지 (112쪽)」) */
@@ -120,7 +121,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.62';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.63';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -1043,14 +1044,21 @@ input.w{width:100%;max-width:520px}
       h+='<div class="card" id="tdBox" style="padding:10px 14px;border:2px solid #2fa35a"><h2 style="margin:0 0 4px">📋 오늘 한 것 <small>자동 — 안 고쳐도 돼</small></h2><div id="tdSum" class="hint">불러오는 중…</div>'+'</div>';
       h+='<div class="hint" style="margin:0 4px 8px">쪽 번호만 쓰면 돼 · 책이 바뀌었으면 「🔄 책 바꾸기」 · 진도 안 나간 날(오답·시험 대비만)은 비워 두고 보내도 돼</div>';
       var HIDS=[];/* v0.39b 원장 04:02~04:03 「유형서1만 하는 친구는 유형서2 탭이 안 보이게 — 학부모가 보기에 비교될 수 있어서」: 안 하는 칸은 숨김 → 맨 아래 작은 줄 */
+      var CG='';function cgFlush(){if(CG){h+='<div class="card" style="padding:8px 12px"><h2 style="margin:2px 0 4px;font-size:16px">📚 오늘 진도·숙제 <small>쪽 번호만</small></h2>'+CG+'</div>';CG='';}}
       SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k],bl=bookList(sl[3]),st=startOfS(k,x);if(x.none&&!BKOPEN[k]){HIDS.push(sl);return;}
+        /* v0.63 책 정해진 칸 = 두 줄 */
+        if(x.book&&!x.none&&!BKOPEN[k]&&BKWHY!==k&&!x.done_prev){var nm=sl[1].replace(/^\S+\s/,'');
+          CG+='<div style="padding:7px 0;border-top:1px solid #eef0f4"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-weight:800;white-space:nowrap">'+sl[1].split(' ')[0]+' '+esc(nm)+'</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1c2163">📗 '+esc(x.book)+'</span><button class="bkc" data-bkm="'+k+'" style="padding:3px 10px;font-size:15px" title="다 끝냈어 · 책 바꾸기">⋯</button></div>'+
+            '<div id="bkm_'+k+'" style="display:none;margin:5px 0 2px;gap:6px"><button class="bkc" data-bdn="'+k+'" style="border-color:#1a8a4a;color:#1a8a4a">🎉 이 책 다 끝냈어</button> <button class="bkc" data-bch="'+k+'">🔄 책 바꾸기</button></div>'+
+            '<div class="row" style="margin:4px 0 0;gap:6px">'+(st!=null?'<span class="prev" style="font-size:14px">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽" style="max-width:90px"> <span style="font-size:14px">'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div></div>';return;}
+        cgFlush();
         h+='<div class="card"'+(x.none?' style="opacity:.75"':'')+'><h2>'+sl[1]+' <small>'+sl[2]+'</small></h2>';
         var shut=(x.book||x.none)&&!BKOPEN[k];/* v0.21: 책이 정해져 있으면 목록 접기 */
         h+=(x.none?'<div class="row" style="margin:0 0 6px"><span class="hint">🚫 지금 안 하고 있음</span>'+(shut?'<button class="bkc" data-bko="'+k+'" style="margin-left:auto">다시 하기</button>':'')+'</div>':x.book?'<div class="row" style="margin:0 0 6px"><span class="lbl" style="font-size:18px">📗 '+esc(x.book)+'</span>'+(shut?'<span style="margin-left:auto;display:flex;gap:4px"><button class="bkc" data-bdn="'+k+'" style="border-color:#1a8a4a;color:#1a8a4a">🎉 다 끝냈어</button><button class="bkc" data-bch="'+k+'">🔄 책 바꾸기</button></span>':'')+'</div>'+(BKWHY===k?'<div style="margin:4px 0 8px;padding:8px;border-radius:10px;background:#fff6dc"><div class="hint" style="margin-bottom:4px">왜 바꿔? <small>(쌤이 봐요)</small></div><div class="bk">'+CHGWHY.map(function(w){return '<button class="bkc" data-bwy="'+k+'" data-v="'+w+'">'+w+'</button>';}).join('')+'<button class="bkc" data-bwx="'+k+'" style="opacity:.7">취소</button></div></div>':''):'<div class="hint" style="margin-bottom:6px">책을 골라 줘 👇</div>');
         if(x.done_prev)h+='<div class="row" style="margin:0 0 6px"><span class="hint" style="color:#1a8a4a;font-weight:700">🎉 '+esc(x.done_prev)+' 끝! 다음 책을 골라 줘</span><button class="bkc" data-bun="'+k+'" style="margin-left:auto;font-size:12px">↩ 잘못 눌렀어</button></div>';
         if(!shut)h+='<div class="bk">'+bl.map(function(bk){return '<button class="bkc'+(!x.none&&x.book===bk?' on':'')+'" data-sb="'+k+'" data-v="'+esc(bk)+'">'+esc(bk)+'</button>';}).join('')+'<button class="bkc" data-sbx="'+k+'">✍ 다른 책</button>'+(sl[4]?'<button class="bkc'+(x.none?' on':'')+'" data-sn="'+k+'" style="'+(x.none?'background:#6b7585;border-color:#6b7585;color:#fff':'')+'">🚫 지금 안 함</button>':'')+'</div>';
         if(!x.none)h+='<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽 번호"> <span>'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div>';
-        h+='</div>';});
+        h+='</div>';});cgFlush();
       if(HIDS.length)h+='<div class="row" style="margin:-4px 6px 10px;gap:5px"><span class="hint">➕ 다른 책도 해?</span>'+HIDS.map(function(sl){return '<button class="bkc" data-bko="'+sl[0]+'" style="padding:5px 10px;font-size:13px">'+sl[1]+'</button>';}).join('')+'</div>';
       h+='<div id="prepBox">'+prepHtml()+'</div><div id="hardBox">'+hardHtml()+'</div><div id="chgBox">'+chgHtml()+'</div>';
       h+='<div class="card"><h2>📝 오늘 테스트 봤어? <small>안 봤으면 넘어가요</small></h2>';
@@ -1061,6 +1069,7 @@ input.w{width:100%;max-width:520px}
       h+='<div class="card"><h2>💬 쌤한테 한마디 <small>어려웠던 거 · 질문 — 쌤만 봐요 (부모님께 안 가요)</small></h2><input class="t w" id="say" value="'+esc(F.say||'')+'" placeholder="예: 3번 유형이 헷갈려요"></div>';
       h+='<button class="send" id="send">보내기 ✅</button><div style="height:30px"></div>';}
     out.innerHTML=h;window.scrollTo(0,0);bind();
+    out.querySelectorAll('[data-bkm]').forEach(function(b){b.onclick=function(){var el=document.getElementById('bkm_'+b.getAttribute('data-bkm'));if(el)el.style.display=el.style.display==='none'?'flex':'none';};});
     out.querySelectorAll('[data-arr]').forEach(function(b){b.onclick=function(){F.arr=+b.getAttribute('data-arr');out.querySelectorAll('[data-arr]').forEach(function(x){x.classList.toggle('on',x===b);});if(F.arr===0){var st=schedNow(),d=new Date(),now=d.getHours()*60+d.getMinutes();if(st!=null&&now>st+10&&now<st+180)toast('수업 '+Math.floor(st/60)+':'+('0'+st%60).slice(-2)+' 시작인데 지금 '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2)+' — 정시 맞아?');}};});
     var wo=document.getElementById('wdOpen');if(wo)wo.onclick=function(){schedEdit();};
     out.querySelectorAll('[data-self]').forEach(function(b){b.onclick=function(){var v=b.getAttribute('data-self');F.self=F.self===v?null:v;out.querySelectorAll('[data-self]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-self')===F.self);});};});
