@@ -163,7 +163,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.69a';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.69b';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -1210,7 +1210,7 @@ input.w{width:100%;max-width:520px}
       h+='<div class="hint" style="text-align:center;margin:-4px 0 10px">다 고르면 바로 저장돼 → 다음은 ✅ 채점</div><button class="send" id="send" style="font-size:18px;padding:13px">저장 ✅</button><div style="height:30px"></div>';if(STEP==='arr')h=hArr+'<div style="height:20px"></div>';
     } else {
       var HIDS=[];/* v0.39b 원장 04:02~04:03 「유형서1만 하는 친구는 유형서2 탭이 안 보이게 — 학부모가 보기에 비교될 수 있어서」: 안 하는 칸은 숨김 → 맨 아래 작은 줄 */
-      var CG='';function cgFlush(){if(CG){h+='<div class="card" style="padding:8px 12px"><h2 style="margin:2px 0 2px;font-size:16px">📚 오늘 끝난 쪽 번호만 <small>다 적으면 맨 아래 「다 적었어」</small></h2>'+CG+'</div>';CG='';}}
+      var CG='';function cgFlush(){if(CG){h+='<div class="card" style="padding:8px 12px"><h2 style="margin:2px 0 2px;font-size:16px">📚 오늘 끝난 쪽 번호</h2>'+CG+'</div>';CG='';}}
       SLOTS.forEach(function(sl){var k=sl[0],x=F.slots[k],bl=bookList(sl[3]),st=startOfS(k,x);if(x.none&&!BKOPEN[k]){HIDS.push(sl);return;}
         /* v0.63 책 정해진 칸 = 두 줄 */
         if(x.book&&!x.none&&!BKOPEN[k]&&BKWHY!==k&&!x.done_prev){var nm=sl[1].replace(/^\S+\s/,'');
@@ -1225,15 +1225,14 @@ input.w{width:100%;max-width:520px}
         if(!x.none)h+='<div class="row">'+(st!=null?'<span class="prev">'+st+'쪽부터</span>':'')+'<input class="t" type="number" inputmode="numeric" data-st2="'+k+'" value="'+esc(x.to==null?'':x.to)+'" placeholder="쪽 번호"> <span>'+(sl[3]==='learn'?'쪽까지 나갔어':'쪽까지 풀어 올게')+'</span></div>';
         h+='</div>';});cgFlush();
       h+='<div id="prepBox">'+prepHtml()+'</div>';
-      var xHard=hardHtml(),xChg=chgHtml(),xT='<div class="card" style="padding:10px 14px"><h2 style="margin:0 0 6px;font-size:16px">📝 오늘 테스트 점수</h2>';
-      F.tests.forEach(function(t,ix){xT+='<div class="row" style="margin:4px 0"><input class="t w" style="max-width:200px" data-tn="'+ix+'" value="'+esc(t.name)+'" placeholder="무슨 테스트"><input class="t" type="number" inputmode="numeric" data-ts="'+ix+'" value="'+esc(t.score)+'" placeholder="점수" style="width:80px"> 점 <button class="x" data-tdel="'+ix+'">✕</button></div>';});
-      xT+='<button class="add" id="tAdd">+ 테스트 점수 넣기</button></div>';
-      var SELF=[['good','😀 집중 잘했어'],['ok','🙂 보통'],['tired','😴 졸렸어'],['hard','😵 어려웠어']];if(F.self==null&&(CTX.mine||{}).self)F.self=CTX.mine.self;
-      var xSelf='<div class="card" style="padding:10px 14px"><h2 style="margin:0 0 6px;font-size:16px">🙋 오늘 나는? <small>쌤만 봐요</small></h2><div class="pcts">'+SELF.map(function(a){return '<button class="pc'+(F.self===a[0]?' on':'')+'" data-self="'+a[0]+'" style="flex:1 1 22%;padding:9px 2px;font-size:13px">'+a[1]+'</button>';}).join('')+'</div></div>';
-      var xSay='<div class="card" style="padding:10px 14px"><h2 style="margin:0 0 6px;font-size:16px">💬 쌤한테 한마디 <small>쌤만 봐요 (부모님께 안 가요)</small></h2><input class="t w" id="say" value="'+esc(F.say||'')+'" placeholder="예: 3번 유형이 헷갈려요"></div>';
-      var XS=[['hard','😵 어려웠던 쪽',xHard,!!(F.hard&&F.hard.pg&&Object.keys(F.hard.pg).some(function(k){return (F.hard.pg[k]||[]).length;})),'hardBox'],['chg','📅 일정 바뀜',xChg,!!((F.sc&&F.sc.length)||F.scOk),'chgBox'],['test','📝 테스트 점수',xT,F.tests.length>0,''],['self','🙋 오늘 나는',xSelf,!!F.self,''],['say','💬 한마디',xSay,!!String(F.say||'').trim(),'']].filter(function(x){return x[2];});
-      h+='<div class="card" style="padding:8px 10px"><div class="hint" style="margin:0 2px 6px">➕ 더 적을 것 <b>안 해도 돼</b> — 누르면 펼쳐져</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">'+XS.map(function(x){var op=XO[x[0]]!=null?XO[x[0]]:x[3];return '<button class="bkc'+(op?' on':'')+'" data-xo="'+x[0]+'" style="padding:7px 2px;font-size:13px;border-radius:12px;white-space:nowrap;overflow:hidden">'+x[1]+(x[3]?' ✓':'')+'</button>';}).join('')+'</div></div>';
-      XS.forEach(function(x){var op=XO[x[0]]!=null?XO[x[0]]:x[3];h+='<div data-xob="'+x[0]+'"'+(x[4]?' id="'+x[4]+'"':'')+(op?'':' style="display:none"')+'>'+x[2]+'</div>';});
+      var SELF=[['good','😀 집중'],['ok','🙂 보통'],['tired','😴 졸림'],['hard','😵 어려움']];if(F.self==null&&(CTX.mine||{}).self)F.self=CTX.mine.self;
+      var LB='style="flex:0 0 58px;font-size:13px;font-weight:800;color:#1c2163"';
+      h+='<div class="card" style="padding:8px 12px">';
+      h+='<div id="chgBox" style="padding:4px 0 8px;border-bottom:1px solid #eef0f4">'+chgHtml()+'</div>';
+      h+='<div style="padding:8px 0;border-bottom:1px solid #eef0f4"><div style="font-size:12px;font-weight:800;color:#1c2163;margin-bottom:4px">🙋 오늘 수업 때 나는? <small style="font-weight:400;color:#6b7280">쌤만 봐요</small></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">'+SELF.map(function(a){return '<button class="pc'+(F.self===a[0]?' on':'')+'" data-self="'+a[0]+'" style="min-width:0;padding:8px 0;font-size:13px;border-radius:10px;white-space:nowrap">'+a[1]+'</button>';}).join('')+'</div></div>';
+      h+='<div style="display:flex;align-items:center;gap:6px;padding:8px 0 2px"><span style="flex:0 0 auto;font-size:12px;font-weight:800;color:#1c2163">💬 쌤한테</span><input class="t" id="say" value="'+esc(F.say||'')+'" placeholder="쌤한테만 · 안 써도 돼" style="flex:1;min-width:0;width:auto;padding:8px 10px;font-size:15px"></div>';
+      h+='</div>';
+      var hx=hardHtml();if(hx)h+='<div style="text-align:right;margin:-4px 4px 8px"><button class="bkc'+(XO.hard?' on':'')+'" data-xo="hard" style="padding:4px 10px;font-size:12px">😵 어려웠던 쪽 (안 해도 돼)</button></div><div data-xob="hard" id="hardBox"'+(XO.hard?'':' style="display:none"')+'>'+hx+'</div>';
       h+='<button class="send" id="send">'+((CTX.mine||{}).at_end?'고쳤어 → 📤 다시 보내기로':'다 적었어 → 📤 보내기로')+'</button><div style="height:30px"></div>';}
     out.innerHTML=h;window.scrollTo(0,0);bind();
     out.querySelectorAll('[data-bkm]').forEach(function(b){b.onclick=function(){var el=document.getElementById('bkm_'+b.getAttribute('data-bkm'));if(el)el.style.display=el.style.display==='none'?'flex':'none';};});
@@ -1314,15 +1313,15 @@ input.w{width:100%;max-width:520px}
   function mdW(s){var d=new Date(s+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()+'('+'일월화수목금토'[d.getDay()]+')';}
   function sckL(k){for(var i=0;i<SCK.length;i++)if(SCK[i][0]===k)return SCK[i][1];return k;}
   function chgHtml(){if(!F.sc){var td=ymdL(new Date());F.sc=((CTX.mine||{}).sched_chg||[]).filter(function(x){return x&&x.d>=td;}).slice();}
-    var h='<div class="card" style="padding:10px 14px">'+F.sc.map(function(x,i){return '<div class="row" style="margin:0 0 6px"><span style="font-weight:700">📅 '+sckL(x.k)+' '+mdW(x.d)+(x.t?' '+esc(x.t):'')+'</span>'+(x.m?'<span class="hint">'+esc(x.m)+'</span>':'')+'<button class="x" data-scx="'+i+'" style="margin-left:auto">✕</button></div>';}).join('');
+    var h='<div>'+F.sc.map(function(x,i){return '<div class="row" style="margin:0 0 6px"><span style="font-weight:700">📅 '+sckL(x.k)+' '+mdW(x.d)+(x.t?' '+esc(x.t):'')+'</span>'+(x.m?'<span class="hint">'+esc(x.m)+'</span>':'')+'<button class="x" data-scx="'+i+'" style="margin-left:auto">✕</button></div>';}).join('');
     if(F.scOk==null)F.scOk=!!(CTX.mine||{}).sched_ok&&!F.sc.length;
-    if(!SCE)return h+'<div class="row" style="margin:0;gap:5px"><span class="hint" style="width:100%">📅 다음 수업 일정이 바뀌어?</span>'+(F.sc.length?'':'<button class="bkc'+(F.scOk?' on':'')+'" data-scok="1" style="padding:6px 10px;font-size:13px">👌 그대로야</button>')+SCK.map(function(a){return '<button class="bkc" data-sck="'+a[0]+'" style="padding:6px 10px;font-size:13px">'+a[1]+'</button>';}).join('')+'</div></div>';
+    if(!SCE)return h+'<div style="font-size:12px;font-weight:800;color:#1c2163;margin-bottom:4px">📅 다음 수업 일정 바뀌어?</div><div style="display:grid;grid-template-columns:repeat('+(F.sc.length?4:5)+',1fr);gap:4px">'+(F.sc.length?'':'<button class="bkc'+(F.scOk?' on':'')+'" data-scok="1" style="padding:7px 0;font-size:13px;white-space:nowrap">👌 그대로</button>')+SCK.map(function(a){return '<button class="bkc" data-sck="'+a[0]+'" style="padding:7px 0;font-size:13px;white-space:nowrap">'+a[1].replace('📌 다른 일정','📌 기타').replace('⏰ 시간 바뀜','⏰ 시간')+'</button>';}).join('')+'</div></div>';
     var D=[],t0=new Date();for(var i=0;i<14;i++){var d=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+i);D.push(ymdL(d));}
     var TM=[''];for(var hh=13;hh<=22;hh++){TM.push(hh+':00');TM.push(hh+':30');}
-    h+='<h2 style="margin:4px 0 6px">'+sckL(SCE.k)+' <small>언제?</small></h2><div class="pcts">'+D.map(function(s,i){return '<button class="pc'+(SCE.d===s?' on':'')+'" data-scd="'+s+'" style="flex:0 0 auto;padding:7px 8px;font-size:13px">'+(i===0?'오늘':i===1?'내일':mdW(s))+'</button>';}).join('')+'</div>';
+    h+='<div style="font-size:13px;font-weight:800;color:#1c2163;margin:2px 0 5px">'+sckL(SCE.k)+' — 언제?</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">'+D.map(function(s,i){var d=new Date(s+'T00:00:00');return '<button class="pc'+(SCE.d===s?' on':'')+'" data-scd="'+s+'" style="min-width:0;padding:4px 0;font-size:12px;border-radius:8px;line-height:1.2">'+(i===0?'오늘':i===1?'내일':(d.getMonth()+1)+'/'+d.getDate())+'<br><small>'+'일월화수목금토'[d.getDay()]+'</small></button>';}).join('')+'</div>';
     if(SCE.k==='bo'||SCE.k==='tm')h+='<div class="row" style="margin:8px 0 0"><span class="hint">몇 시?</span><select id="scT" style="font-size:15px;padding:6px">'+TM.map(function(m){return '<option value="'+m+'"'+(SCE.t===m?' selected':'')+'>'+(m||'모름')+'</option>';}).join('')+'</select></div>';
-    h+='<input class="t w" id="scM" value="'+esc(SCE.m||'')+'" placeholder="'+(SCE.k==='etc'?'예: 영어학원 시간 바뀜 · 수학여행':'한 줄 (안 써도 돼)')+'" style="margin-top:8px">';
-    return h+'<div class="row" style="justify-content:flex-end;margin:8px 0 0"><button class="back" id="scNo">닫기</button><button class="back" id="scOk" style="background:var(--navy);color:#fff;border-color:var(--navy)">추가</button></div></div>';}
+    h+='<input class="t w" id="scM" value="'+esc(SCE.m||'')+'" placeholder="'+(SCE.k==='etc'?'예: 영어학원 시간 바뀜 · 수학여행':'한 줄 (안 써도 돼)')+'" style="margin-top:6px;padding:7px 10px;font-size:15px">';
+    return h+'<div class="row" style="justify-content:flex-end;margin:6px 0 0"><button class="back" id="scNo">닫기</button><button class="back" id="scOk" style="background:var(--navy);color:#fff;border-color:var(--navy)">추가</button></div></div>';}
   function chgDraw(){var el=document.getElementById('chgBox');if(el){el.innerHTML=chgHtml();chgBind();}}
   function chgBind(){var el=document.getElementById('chgBox');if(!el)return;
     el.querySelectorAll('[data-sck]').forEach(function(b){b.onclick=function(){F.scOk=false;SCE={k:b.getAttribute('data-sck'),d:'',t:'',m:''};chgDraw();};});
