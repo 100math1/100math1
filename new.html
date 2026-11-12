@@ -161,7 +161,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.68j';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.68k';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -169,7 +169,7 @@ input.w{width:100%;max-width:520px}
   function lastNum(r){var m=String(r||'').match(/(\d+)\D*$/);return m?+m[1]:null;}
   var q=new URLSearchParams(location.search),k=q.get('k'),SVQ=q.get('sv')==='1'||q.get('m')==='survey',QM=q.get('m')||'';/* v0.10: 카카오 채널 하단 메뉴용 — ?m=start(수업 시작)·end(집에 가기 전)·survey(설문)·wrong(오답) 으로 바로 그 화면 */
   if(k){LS('bzs_code',k.trim());try{history.replaceState(null,'',location.pathname+(QM?'?m='+QM:''));}catch(e){}}
-  CODE=LS('bzs_code')||'';
+  CODE=LS('bzs_code')||'';if(CODE&&(CODE.length<8||CODE.length>20)){var mk0=CODE.match(/[?&]k=([^&#]+)/);CODE=mk0?decodeURIComponent(mk0[1]):'';LS('bzs_code',CODE||null);}
   /* v0.67 원장 11-12 18:59 「폰 없는 학생 — 공용 태블릿에서 이름만 넣으면 바로 들어가게(코드 입력 복잡하면 안 씀)」: 데일리 [🙋 공용 태블릿]으로 한 번 열면 그 기기 = 공용 모드(?pub= 열쇠 기억) · 이름 두 글자 → 고르기 → 바로 · 학생 코드는 기기에 안 남김(탭 안에서만) · [👋 다음 학생] / 5분 손 안 대면 처음으로 · 폰 번호는 학생마다 새로(같은 폰 경고 안 뜨게) */
   var PUBQ=q.get('pub');if(PUBQ)LS('bzs_pub',PUBQ.trim());
   var PUB=LS('bzs_pub')||'';
@@ -197,7 +197,7 @@ input.w{width:100%;max-width:520px}
   function notMe(){if(!confirm('이 폰에서 지금 이름을 지우고 내 카드로 다시 들어갈까?'))return;LS('bzs_code',null);LS('bzs_ok',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');}
   function nocode(msg){out.innerHTML='<div class="card done-scr"><div class="e">📷</div><div class="m">'+(msg||'쌤이 준 QR 카드를 폰 카메라로 찍어 줘')+'</div><div class="hint" style="margin-top:10px">한 번 하면 이 폰에 기억돼서 다음부턴 바로 열려요</div>'+
       '<div style="margin-top:22px;font-size:15px">또는 카드 아래 <b>코드</b>를 그대로 입력 (대소문자 그대로)</div><div class="row" style="justify-content:center"><input class="t" id="cdIn" style="width:200px;text-align:center;letter-spacing:1px" placeholder="예: Qvdqt3F9wM" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="back" id="cdGo">확인</button></div><div class="hint" style="margin-top:16px">부모님이신가요? 이 칸은 학생용입니다 — 채팅방 <b>아랫줄 메뉴</b>(아이설문 · 학습현황 · 요청하기)를 눌러 주세요.</div></div>';
-    document.getElementById('cdGo').onclick=function(){var v=(document.getElementById('cdIn').value||'').replace(/\s/g,'');if(v.length<8){toast('코드를 다시 확인해 줘');return;}LS('bzs_code',v);CODE=v;load();};}
+    document.getElementById('cdGo').onclick=function(){var v=(document.getElementById('cdIn').value||'').replace(/\s/g,'');var mk=v.match(/[?&]k=([^&#]+)/);if(mk)v=decodeURIComponent(mk[1]);if(v.length<8||v.length>20){toast('코드를 다시 확인해 줘 (카드 아래 글자만)');return;}LS('bzs_code',v);CODE=v;load();};}
   /* v0.12 원장 18:16: 학생용 사용법 (?m=help — 코드 없어도 보임, 카카오 메뉴 「사용법」) */
   function helpScr(){var C='style="margin:0 0 6px;font-size:18px;color:var(--navy)"',L='style="margin:6px 0 0 18px;padding:0;line-height:1.8;font-size:16px"';
     out.innerHTML='<div class="card"><div class="big">❓ 백수학 — 사용법</div><div class="hint" style="margin-top:6px">카톡 채팅방 아래 메뉴, 또는 홈 화면 아이콘으로 열면 <b>홈 한 화면</b>이 떠요</div></div>'+
@@ -522,7 +522,7 @@ input.w{width:100%;max-width:520px}
       '</div>';
     window.scrollTo(0,0);document.getElementById('gP1').onclick=function(){gGo('preg');};document.getElementById('gP2').onclick=function(){gGo('pstat');};document.getElementById('gP3').onclick=function(){gGo('pask');};}
   function load(){if(PUB&&!CODE&&QM!=='help'){pubScr('');return;}if(PUB)pubBtn();if(PQ.indexOf(QM)>=0){/* v0.14 카카오 아랫줄=학부모 (parent·preg·pnote·pask) */setDoor('parent');if(CODE&&!PCODES.length){gStu();return;}pLoad();return;}if(QM!=='help'&&!CODE&&PCODES.length){setDoor('parent');gPar();return;}if(QM==='help'){setDoor('help');helpScr();return;}setDoor(doorOf(QM));if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
-    SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
+    SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span><div class="row" style="margin-top:14px"><button class="back" id="erRe">🔄 다시 열기</button><button class="back" id="erCd">코드 다시 넣기</button></div></div>';document.getElementById('erRe').onclick=function(){load();};document.getElementById('erCd').onclick=function(){LS('bzs_code',null);LS('bzs_ok',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');};return;}
       CTX=r.data;if(!CTX&&PUB){pubOut('그 학생은 지금 못 들어가요 — 쌤한테 말해 줘');return;}if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
       if(LS('bzs_ok')!==CODE){out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">'+esc(CTX.name)+' 맞아?</div><div class="hint" style="margin-top:8px">'+esc(CTX.class_name||'')+'</div><div class="row" style="justify-content:center;margin-top:18px"><button class="send" style="width:auto;padding:14px 30px" id="okY">응, 나야</button><button class="back" id="okN">아니야</button></div><div class="hint" style="margin-top:12px">친구 카드면 「아니야」 — 친구 이름으로 기록돼요</div></div>';
         document.getElementById('okY').onclick=function(){LS('bzs_ok',CODE);load();};document.getElementById('okN').onclick=function(){LS('bzs_code',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');};return;}
