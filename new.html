@@ -161,7 +161,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.68g';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.68i';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -204,7 +204,7 @@ input.w{width:100%;max-width:520px}
       '<div class="card"><h2 '+C+'>처음 한 번만</h2><ol '+L+'><li>아무 메뉴나 누르기</li><li>쌤이 준 카드의 <b>코드</b> 입력 (또는 카드 QR 찍기)</li><li>「<b>내 이름 맞아?</b>」 → 내 이름이면 [응, 나야]</li><li><b>📝 나 소개</b>(설문) 3~5분 — 쌤들이 나한테 맞게 가르치려고 물어보는 거야</li></ol><div class="hint" style="margin-top:8px">한 번 하면 이 폰이 기억해서 다음부턴 바로 열려요</div></div>'+
       '<div class="card"><h2 '+C+'>홈 화면 보는 법</h2><ul '+L+'><li><b>👉 노란 칸</b> — 지금 할 것 하나. 누르면 바로 가요</li><li><b>📚 내 책 6칸</b> — ✅ 채점에 들어가면 보여요(진도·유형서1·유형서2 / 심화·복습·시험대비). 책을 누르면 그 책 채점 · 빈 칸 ＋ 는 책 고르기 · 진도를 두 개 이상 나가면 위에 [진도1·진도2] 가 떠요</li><li><b>🎯 큰 칸 6개</b> — 오늘 할 일 순서. 끝낸 건 흐리게 ✅ · 지금 할 건 노란색</li><li><b>🏠 홈</b> — 어느 화면이든 왼쪽 위. 누르면 홈으로</li></ul></div>'+
       '<div class="card"><h2 '+C+'>매 수업 순서 (1→6)</h2><table style="width:100%;border-collapse:collapse;font-size:15px">'+
-        [['🏫 도착','오자마자 한 번 — 누르면 바로 저장'],['📌 지난 숙제','책마다 얼마나 했는지 버튼 하나씩 → 저장'],['✅ 채점','정답 보고 ⭕❌ → 채점 저장'],['📕 오답','틀린 문제 다시 풀기 · 모르면 ❓ 쌤한테'],['🏠 집에 가기 전','오늘 진도·숙제 — 책은 골라져 있어서 <b>쪽 번호만</b>'],['📤 보내기','적은 것 확인하고 [쌤께 보내기] — <b>이걸 눌러야 쌤이 봐요</b>']].map(function(r,i){return '<tr><td style="padding:7px 6px;border-bottom:1px solid #eee;white-space:nowrap"><b>'+(i+1)+'. '+r[0]+'</b></td><td style="padding:7px 6px;border-bottom:1px solid #eee">'+r[1]+'</td></tr>';}).join('')+'</table></div>'+
+        [['🏫 도착','오자마자 한 번 — 누르면 바로 저장'],['📌 숙제 확인','지난 숙제를 얼마나 했는지 책마다 버튼 하나씩 → 저장'],['✅ 채점','정답 보고 ⭕❌ → 채점 저장'],['📕 오답','틀린 문제 다시 풀기 · 모르면 ❓ 쌤한테'],['🏠 집에 가기 전','오늘 진도·숙제 — 책은 골라져 있어서 <b>쪽 번호만</b>'],['📤 보내기','적은 것 확인하고 [쌤께 보내기] — <b>이걸 눌러야 쌤이 봐요</b>']].map(function(r,i){return '<tr><td style="padding:7px 6px;border-bottom:1px solid #eee;white-space:nowrap"><b>'+(i+1)+'. '+r[0]+'</b></td><td style="padding:7px 6px;border-bottom:1px solid #eee">'+r[1]+'</td></tr>';}).join('')+'</table></div>'+
       '<div class="card"><h2 '+C+'>아래 작은 칸</h2><ul '+L+'><li><b>🎮 내 현황</b> — 레벨·퀘스트·이번 달 시즌·도감 · 📈 내 기록</li><li><b>📄 시험지</b> — 기출 시험지 풀기</li><li><b>📢 공지</b> — 휴원·보강·내 학교 시험 날짜</li><li><b>📝 나 소개</b> — 설문(새 학기마다 다시)</li><li><b>💡</b> (왼쪽 아래) — 이거 불편해요</li><li><b>❓</b> (오른쪽 아래) — 이 사용법</li><li>🔁 연습문제 요청 · ✉️ 수업 때 물어볼 것 = <b>📕 오답</b> 안에 있어요</li></ul></div>'+
       '<div class="card"><h2 '+C+'>이럴 땐</h2><ul '+L+'><li><b>친구 이름이 떠요</b> → 위 [내가 아니야] → 내 코드 다시</li><li><b>책이 바뀌었어요</b> → 새 책 버튼 누르기 (없으면 ✍ 다른 책)</li><li><b>안 하는 책이에요</b> → 「🚫 지금 안 함」</li><li><b>잘못 보냈어요</b> → 다시 열어서 고치고 보내면 돼요</li><li><b>카드 잃어버렸어요</b> → 쌤한테 말하면 새 코드</li><li><b>내 코드는 나만!</b> 친구 기록을 대신 적지 마요</li></ul></div>'+
       '<button class="send" id="hGo">'+(CODE?'🏠 홈으로 →':'시작하기 → 코드 넣기')+'</button><div style="height:30px"></div>';
@@ -389,7 +389,7 @@ input.w{width:100%;max-width:520px}
   /* ===== v0.68 홈 (화면 틀 원칙 8개) ===== */
   var STEP='',HM={td:null,log:null,ti:0,nt:0,help:false},HMQ=false;
   var HMK=[['concept','진도'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습'],['','시험대비']];
-  var HMQS=[['arr','🏫','학원 도착'],['hw','📌','지난 숙제'],['gr','✅','채점'],['wr','📕','오답'],['end','🏠','집에 가기 전'],['send','📤','보내기']];
+  var HMQS=[['arr','🏫','학원 도착'],['hw','📌','숙제 확인'],['gr','✅','채점'],['wr','📕','오답'],['end','🏠','집에 가기 전'],['send','📤','보내기']];
   function hmT(t){var h=document.getElementById('hTtl');if(h)h.textContent=t;}
   function hmHM(at){var t=new Date(at);return isNaN(t)?'':t.getHours()+':'+('0'+t.getMinutes()).slice(-2);}
   function hmDraft(){var d=FDR.end;return (d&&d.code===CODE&&d.day===String((CTX&&CTX.today)||''))?d.F:null;}
@@ -415,18 +415,18 @@ input.w{width:100%;max-width:520px}
   function hmQ(){var m=CTX.mine||{},hp=hwPrev().filter(function(i){return i&&(i.book||i.range);}),td=HM.td,wo=(STV&&STV.wr)?+STV.wr.open:null,Q={},d=hmDraft();
     Q.arr=(m.arr&&m.arr.at&&!(+m.arr.late<0))?{c:'ok',t:hmHM(m.arr.at)+' 도착'+(+m.arr.late>0?' · '+m.arr.late+'분 늦음':'')}:{c:'',t:(m.arr&&+m.arr.late<0)?'가는 중 — 오면 다시 눌러':'오자마자 바로 누르기'};
     var di=null;try{di=hp.length?hwDueInfo():null;}catch(e){}
-    Q.hw=m.hwc?{c:'ok',t:m.hwc.length?m.hwc.length+'개 확인':'숙제 없음 ✓'}:(!hp.length?{c:'skip',t:'숙제 없음 ✓'}:{c:'',t:'숙제 '+hp.length+'개'+(di?(di.today?' · 마감 오늘':di.mid?' · 마감 '+di.wd+'요일':''):'')});
+    Q.hw=m.hwc?{c:'ok',t:m.hwc.length?m.hwc.length+'개 확인':'숙제 없음 ✓'}:(!hp.length?{c:'skip',t:'숙제 없음 ✓'}:{c:'',t:'얼마나 했는지 체크 · '+hp.length+'개'});
     var gb=(HM.log||[]).filter(function(b){return +b.tp>0;}).length,nb=hmGear().filter(function(g){return g.book;}).length;if(hmTracks().length){var sn={};hmTracks().forEach(function(t){['concept','type','type2'].forEach(function(k){if(t[k])sn[hmBk(t[k])]=1;});});var S0=(F&&F.slots)||{};['review','recap'].forEach(function(k){var x=S0[k];if(x&&x.book&&!x.none)sn[x.book]=1;});nb=Object.keys(sn).length;}
-    Q.gr=(td&&+td.graded>0)?{c:'ok',t:(gb&&nb?Math.min(gb,nb)+' / '+nb+'권 · ':'오늘 ')+td.graded+'문제'}:{c:'',t:nb?'0 / '+nb+'권':'책 고르고 ⭕❌'};
-    Q.wr=(wo===0)?{c:'skip',t:'오답 없음 ✓'}:(td&&+td.fixed>0)?{c:'ok',t:'오늘 '+td.fixed+'개 고침'+(wo?' · 남은 '+wo:'')}:{c:'',t:wo==null?'확인 중…':'안 고친 오답 '+wo};
-    Q.end=m.learn?{c:'ok',t:'적었어'}:(d&&d._rdy)?{c:'ok',t:'적었어 — 이제 보내기'}:{c:'',t:d?'적는 중 ✍':'오늘 진도·숙제'};
+    Q.gr=(td&&+td.graded>0)?{c:'ok',t:(gb&&nb?Math.min(gb,nb)+' / '+nb+'권 · ':'오늘 ')+td.graded+'문제'}:{c:'',t:'정답 보고 ⭕❌ 누르기'};
+    Q.wr=(wo===0)?{c:'skip',t:'오답 없음 ✓'}:(td&&+td.fixed>0)?{c:'ok',t:'오늘 '+td.fixed+'개 고침'+(wo?' · 남은 '+wo:'')}:{c:'',t:'틀린 문제 다시 풀기'+(wo?' · '+wo+'개':'')};
+    Q.end=m.learn?{c:'ok',t:'적었어'}:(d&&d._rdy)?{c:'ok',t:'적었어 — 이제 보내기'}:{c:'',t:d?'적는 중 ✍':'오늘 끝난 쪽 번호 적기'};
     Q.send=m.at_end?{c:'ok',t:hmHM(m.at_end)+' 보냄'}:{c:'',t:'쌤께 보내기'};
     var cur='';if(!m.at_end)HMQS.some(function(q){if(Q[q[0]].c===''){cur=q[0];return true;}return false;});Q._cur=cur;return Q;}
   function hmGo(k){if(firstBooks()){gGo('hw');return;}
     if(k==='arr'||k==='hw'||k==='end'||k==='send')gGo(k);else if(k==='wr')gGo('wrong');
     else if(k==='gr'){if(hwPrev().some(function(i){return i&&i.book;})){GPEND='hw';}gGo('grade');}
     else gGo('');}
-  var HMB={arr:['🏫 도착 누르기','누르면 바로 저장돼 · 그다음 지난 숙제'],hw:['📌 지난 숙제 확인','책마다 얼마나 했는지 한 번씩'],gr:['✅ 채점하기','정답 보고 ⭕❌'],wr:['📕 오답 다시 풀기','틀린 문제 다시 · 모르면 쌤께'],end:['🏠 집에 가기 전','오늘 진도·숙제 — 쪽 번호만'],send:['📤 쌤께 보내기','눌러야 쌤이 봐요']};
+  var HMB={arr:['🏫 도착 누르기','누르면 바로 저장돼 · 그다음 지난 숙제'],hw:['📌 숙제 확인','책마다 얼마나 했는지 체크'],gr:['✅ 채점하기','정답 보고 ⭕❌'],wr:['📕 오답 다시 풀기','틀린 문제 다시 · 모르면 쌤께'],end:['🏠 집에 가기 전','오늘 진도·숙제 — 쪽 번호만'],send:['📤 쌤께 보내기','눌러야 쌤이 봐요']};
   function hmHtml(){var Q=hmQ(),cur=Q._cur,G=hmGear(),T=hmTracks(),ti=T.length?Math.min(HM.ti,T.length-1):0,fb=firstBooks();
     var bt=fb?['📚 처음이구나! 내 책부터 알려 줘','한 번만 하면 돼']:cur?[HMB[cur][0],(cur==='arr'||cur==='end'||cur==='send')?HMB[cur][1]:Q[cur].t+' · '+HMB[cur][1]]:['오늘 끝! 조심히 가~','쌤이 확인하고 부모님께 알림장 보내요'];
     var h='<div class="hm" id="hmRoot">';
@@ -1159,7 +1159,7 @@ input.w{width:100%;max-width:520px}
   function open0(m){build0(m);form();}
   function form(){NAVBACK=null;var dr0=FDR[MODE];if(dr0&&dr0.code===CODE&&dr0.day===String((CTX&&CTX.today)||'')){var a0=F&&F.arr;F=dr0.F;if(F.arr==null&&a0!=null)F.arr=a0;}FDR[MODE]=null;FDRAFT=null;var bl=bookList(),P=[[100,'다 했어'],[75,'거의'],[50,'반쯤'],[25,'조금'],[0,'못 했어']],mine=CTX.mine||{},doneS=!!mine.hwc,doneE=!!mine.learn;
     var fb0=(MODE==='start'&&firstBooks()),stp=(MODE==='start')?(STEP==='arr'?'arr':'hw'):'end';if(MODE==='start'&&!fb0&&STEP!=='arr')STEP='hw';
-    hmT(fb0?'📚 내 책 고르기':stp==='arr'?'🏫 도착':stp==='hw'?'📌 지난 숙제':'🏠 집에 가기 전');
+    hmT(fb0?'📚 내 책 고르기':stp==='arr'?'🏫 도착':stp==='hw'?'📌 숙제 확인':'🏠 집에 가기 전');
     var h=fb0?'':'<div class="hmband stat"><span class="f">👉</span><span><b>'+(stp==='arr'?'하나만 눌러 줘':stp==='hw'?'책마다 얼마나 했는지 눌러 줘':'오늘 진도·숙제 — 쪽 번호만')+'</b><small>'+(stp==='arr'?'누르면 바로 저장돼':stp==='hw'?'다 누르면 맨 아래 「저장」 → 다음은 ✅ 채점':'다 적으면 맨 아래 「다 적었어」 → 📤 보내기')+'</small></span></div>';
     if(stp!=='arr'||fb0)
     h+='<div id="exmBan">'+exmBan()+'</div><div id="shotBan">'+shotBan()+'</div><div id="mgBox">'+mgHtml()+'</div>';
@@ -1408,7 +1408,7 @@ input.w{width:100%;max-width:520px}
     (data.dev=DEV,SB.rpc('stu_submit',{p_code:CODE,p_data:data})).then(function(r){
       if(r.error||r.data!==true){b.disabled=false;b.textContent='보내기 ✅';toast('저장 안 됨 — 다시 눌러 줘'+(r.error?' ('+r.error.message+')':''));return;}
       var m=CTX.mine||{};Object.keys(data).forEach(function(k){m[k]=data[k];});CTX.mine=m;var st=MODE==='start';if(st&&data.school&&data.school.indexOf('exam')>=0&&!(SHOT&&+SHOT.n>0)){toast('👍 보냈어! 이제 시험지 올려 줘');shotScr(function(){form();toast('📸 고마워! 수업 잘 듣자');});return;}setTimeout(function(){gLoad(true);},500);if(data.books0){toast('📚 내 책 저장! 이제 채점도 이 책으로 떠');FIRSTB=false;form();return;}
-      if(st){FDR.start=null;toast('📌 지난 숙제 저장! 다음은 ✅ 채점');QM='';try{history.replaceState(null,'',location.pathname);}catch(e){}load();return;}FDR.end=null;FDRAFT=null;hmT('📤 보냈어');
+      if(st){FDR.start=null;toast('📌 숙제 확인 저장! 다음은 ✅ 채점');QM='';try{history.replaceState(null,'',location.pathname);}catch(e){}load();return;}FDR.end=null;FDRAFT=null;hmT('📤 보냈어');
       out.innerHTML='<div class="card done-scr" style="padding:44px 20px"><div class="e">'+(st?'👍':'👋')+'</div><div class="m">'+esc(given(CTX.name))+(st?', 확인 끝! 수업 잘 듣자':', 보냈어! 조심히 가~')+'</div><div class="hint" style="margin-top:10px">'+(st?'수업 끝나면 「🏠 집에 가기 전」도 잊지 마':'쌤이 확인하고 부모님께 알림장 보내요')+' · 고칠 게 있으면 다시 열면 돼</div><button class="send" style="margin-top:22px" id="hmGoB">🏠 홈으로</button><button class="back" style="margin-top:14px" id="again">✏️ 고치기</button></div>';
       document.getElementById('again').onclick=function(){gGo('end');};document.getElementById('hmGoB').onclick=function(){gGo('');};});}
   load();
