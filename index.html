@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
 <meta name="theme-color" content="#1c2163">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="백수학 기록">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
 <style>
@@ -135,8 +135,10 @@ input.w{width:100%;max-width:520px}
   if(k){LS('bzs_code',k.trim());try{history.replaceState(null,'',location.pathname+(QM?'?m='+QM:''));}catch(e){}}
   CODE=LS('bzs_code')||'';
   /* v0.67 원장 11-12 18:59 「폰 없는 학생 — 공용 태블릿에서 이름만 넣으면 바로 들어가게(코드 입력 복잡하면 안 씀)」: 데일리 [🙋 공용 태블릿]으로 한 번 열면 그 기기 = 공용 모드(?pub= 열쇠 기억) · 이름 두 글자 → 고르기 → 바로 · 학생 코드는 기기에 안 남김(탭 안에서만) · [👋 다음 학생] / 5분 손 안 대면 처음으로 · 폰 번호는 학생마다 새로(같은 폰 경고 안 뜨게) */
-  var PUBQ=q.get('pub');if(PUBQ){LS('bzs_pub',PUBQ.trim());try{history.replaceState(null,'',location.pathname);}catch(e){}}
+  var PUBQ=q.get('pub');if(PUBQ)LS('bzs_pub',PUBQ.trim());
   var PUB=LS('bzs_pub')||'';
+  /* 원장 19:04 「태블릿에 바로 가기」: 아이패드 홈 화면 앱은 사파리와 저장 공간이 따로 → 주소에 pub= 열쇠를 계속 붙여 둠(홈 화면에 추가할 때 그대로 담기게) */
+  if(PUB){try{var _rs=history.replaceState.bind(history);history.replaceState=function(st,t,u){if(u!=null){u=String(u);if(u.indexOf('pub=')<0)u+=(u.indexOf('?')>=0?'&':'?')+'pub='+encodeURIComponent(PUB);}return _rs(st,t,u);};if(!PUBQ)history.replaceState(null,'',location.pathname+location.search);}catch(e){}}
   function SS(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
   if(PUB){CODE=SS('bzs_pcode')||'';}
   /* v0.11 원장 17:10 「다른 사람 기록으로 들어갈 일 없게」: ① 처음 등록 때 「○○ 맞아?」 확인 ② 이름 크게 + 「내가 아니야」 ③ 폰 번호(무작위)를 같이 보내 한 폰에서 두 학생이 보내면 쌤 화면 ⚠ */
