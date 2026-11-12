@@ -88,6 +88,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
+/* 백수학_학생폰 v0.67 (원장 11-12 18:59 폰 없는 학생 = 공용 태블릿: 이름 두 글자 → 고르기 → 바로 들어감 · stu_pub_find(태블릿 열쇠) · 코드 기기에 안 남김 · 👋 다음 학생 · 5분 자동 처음으로) */
 /* 백수학_학생폰 v0.66 + 18:53 「도착은 누르면 바로 한 번 저장 → 그다음 지난 숙제로」(arrSave) · (원장 11-12 18:52 정 새벽: 🏁 다시 고쳐 보내면 도착 「누른 시각」이 그때로 덮여 18:27까지 밀림 → 도착 칸 그대로면 처음 누른 시각 유지 · 도착을 바꿨을 때만 새 시각) */
 /* 백수학_학생폰 v0.65 (원장 11-12 「숙제 마감일」 §II · 데일리 v2.44 짝): 🏁 지난 숙제 — 정규 수업 요일(프로필 reg_days, stu_ctx로 받음)이 있으면 숙제 낸 날 다음 정규 요일 = 마감 · 마감 전이면 「📅 마감 ○요일(M/D) — 오늘은 중간 점검 · 지금까지 한 만큼만」, 마감 당일 「오늘이 마감」 · 요일 없는 학생은 그대로 */
 /* 백수학_학생폰 v0.64 (원장 11-12 04:04 「지난 숙제 얼마나 했어? — 이거도 칸 고르는 게 너무 커, 페이지 많이 잡아먹어」): 🏁 지난 숙제 — 책마다 한 줄(책·범위) + 5칸 한 줄(다 했어·거의·반쯤·조금·못 했어, % 글씨 뺌 — 누르면 위에 n%) · 카드 여백 줄임 */
@@ -124,7 +125,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.66';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.67';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -133,8 +134,28 @@ input.w{width:100%;max-width:520px}
   var q=new URLSearchParams(location.search),k=q.get('k'),SVQ=q.get('sv')==='1'||q.get('m')==='survey',QM=q.get('m')||'';/* v0.10: 카카오 채널 하단 메뉴용 — ?m=start(수업 시작)·end(집에 가기 전)·survey(설문)·wrong(오답) 으로 바로 그 화면 */
   if(k){LS('bzs_code',k.trim());try{history.replaceState(null,'',location.pathname+(QM?'?m='+QM:''));}catch(e){}}
   CODE=LS('bzs_code')||'';
+  /* v0.67 원장 11-12 18:59 「폰 없는 학생 — 공용 태블릿에서 이름만 넣으면 바로 들어가게(코드 입력 복잡하면 안 씀)」: 데일리 [🙋 공용 태블릿]으로 한 번 열면 그 기기 = 공용 모드(?pub= 열쇠 기억) · 이름 두 글자 → 고르기 → 바로 · 학생 코드는 기기에 안 남김(탭 안에서만) · [👋 다음 학생] / 5분 손 안 대면 처음으로 · 폰 번호는 학생마다 새로(같은 폰 경고 안 뜨게) */
+  var PUBQ=q.get('pub');if(PUBQ){LS('bzs_pub',PUBQ.trim());try{history.replaceState(null,'',location.pathname);}catch(e){}}
+  var PUB=LS('bzs_pub')||'';
+  function SS(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
+  if(PUB){CODE=SS('bzs_pcode')||'';}
   /* v0.11 원장 17:10 「다른 사람 기록으로 들어갈 일 없게」: ① 처음 등록 때 「○○ 맞아?」 확인 ② 이름 크게 + 「내가 아니야」 ③ 폰 번호(무작위)를 같이 보내 한 폰에서 두 학생이 보내면 쌤 화면 ⚠ */
   var DEV=LS('bzs_dev');if(!DEV){DEV='d'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);LS('bzs_dev',DEV);}
+  if(PUB)DEV=SS('bzs_pdev')||'pub';
+  function pubOut(msg){SS('bzs_pcode',null);SS('bzs_pdev',null);CODE='';CTX=null;F=null;try{FDRAFT=null;}catch(e){}QM='';pubScr(msg);}
+  var PUBT=null;function pubIdle(){if(!PUB)return;clearTimeout(PUBT);PUBT=setTimeout(function(){if(CODE)pubOut('5분 동안 아무것도 안 눌러서 처음으로 돌아왔어요');},5*60*1000);}
+  if(PUB){['click','touchstart','keydown'].forEach(function(ev){document.addEventListener(ev,pubIdle,{passive:true});});}
+  function pubBtn(){var b=document.getElementById('pubNext');if(!PUB||!CODE){if(b)b.remove();return;}if(b)return;b=document.createElement('button');b.id='pubNext';b.textContent='👋 다 했어 · 다음 학생';b.style.cssText='position:fixed;left:10px;bottom:12px;z-index:50;padding:10px 14px;border-radius:22px;border:0;background:#1c2163;color:#fff;font-size:15px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25)';b.onclick=function(){if(confirm('이 학생 끝내고 처음 화면으로 갈까?\n(보내기 안 누른 건 저장 안 돼요)'))pubOut('');};document.body.appendChild(b);}
+  function pubScr(msg){pubBtn();var cn=document.getElementById('cn');if(cn)cn.textContent='공용 태블릿';try{setDoor('lobby');}catch(e){}
+    out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">이름을 써 줘</div><div class="hint" style="margin-top:6px">두 글자만 써도 돼 (예: 새벽)</div>'+(msg?'<div class="hint" style="margin-top:8px;color:#b8860b">'+esc(msg)+'</div>':'')+
+      '<input class="t" id="pubIn" style="margin-top:16px;width:80%;max-width:320px;font-size:22px;text-align:center;padding:12px" placeholder="이름" autocomplete="off" autocorrect="off" spellcheck="false"><div id="pubL" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;align-items:center"></div></div>';
+    var inp=document.getElementById('pubIn'),L=document.getElementById('pubL'),tm=null,seq=0;setTimeout(function(){try{inp.focus();}catch(e){}},200);
+    inp.oninput=function(){clearTimeout(tm);var v=inp.value.replace(/\s/g,'');if(v.length<2){L.innerHTML='';return;}tm=setTimeout(function(){var my=++seq;if(!SB){L.innerHTML='<div class="hint">인터넷 연결을 확인해 줘</div>';return;}L.innerHTML='<div class="hint">찾는 중…</div>';
+      SB.rpc('stu_pub_find',{p_tok:PUB,p_name:v}).then(function(r){if(my!==seq)return;var d=r.data;if(r.error||!d){L.innerHTML='<div class="hint">잠깐 문제가 있어 — 다시 써 줘</div>';return;}
+        if(d.error==='tablet'){L.innerHTML='<div class="hint" style="color:#c0392b">이 태블릿 열쇠가 바뀌었어요 — 쌤이 데일리에서 [🙋 공용 태블릿]으로 다시 열어 주세요</div>';return;}
+        if(!d.length){L.innerHTML='<div class="hint">그 이름은 없어 — 다시 확인해 줘</div>';return;}
+        L.innerHTML=d.map(function(x,i){return '<button class="send" data-pi="'+i+'" style="width:80%;max-width:320px;padding:12px;font-size:18px">'+esc(x.n)+' <small style="font-weight:400;opacity:.85">'+esc(x.cls)+'</small></button>';}).join('');
+        L.querySelectorAll('[data-pi]').forEach(function(b){b.onclick=function(){var x=d[+b.getAttribute('data-pi')];CODE=x.c;SS('bzs_pcode',CODE);DEV='pub_'+Math.random().toString(36).slice(2,9);SS('bzs_pdev',DEV);LS('bzs_ok',CODE);QM='';pubIdle();load();};});});},250);};}
   function notMe(){if(!confirm('이 폰에서 지금 이름을 지우고 내 카드로 다시 들어갈까?'))return;LS('bzs_code',null);LS('bzs_ok',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');}
   function nocode(msg){out.innerHTML='<div class="card done-scr"><div class="e">📷</div><div class="m">'+(msg||'쌤이 준 QR 카드를 폰 카메라로 찍어 줘')+'</div><div class="hint" style="margin-top:10px">한 번 하면 이 폰에 기억돼서 다음부턴 바로 열려요</div>'+
       '<div style="margin-top:22px;font-size:15px">또는 카드 아래 <b>코드</b>를 그대로 입력 (대소문자 그대로)</div><div class="row" style="justify-content:center"><input class="t" id="cdIn" style="width:200px;text-align:center;letter-spacing:1px" placeholder="예: Qvdqt3F9wM" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="back" id="cdGo">확인</button></div><div class="hint" style="margin-top:16px">부모님이신가요? 이 칸은 학생용입니다 — 채팅방 <b>아랫줄 메뉴</b>(아이설문 · 학습현황 · 요청하기)를 눌러 주세요.</div></div>';
@@ -397,9 +418,9 @@ input.w{width:100%;max-width:520px}
       '<div class="row" style="justify-content:center;margin-top:18px;gap:8px;flex-wrap:wrap"><button class="send" style="width:auto;padding:13px 16px" id="gP1">📋 아이설문</button><button class="send" style="width:auto;padding:13px 16px" id="gP2">📈 학습현황</button><button class="send" style="width:auto;padding:13px 16px" id="gP3">✉️ 요청하기</button></div>'+
       '</div>';
     window.scrollTo(0,0);document.getElementById('gP1').onclick=function(){gGo('preg');};document.getElementById('gP2').onclick=function(){gGo('pstat');};document.getElementById('gP3').onclick=function(){gGo('pask');};}
-  function load(){if(PQ.indexOf(QM)>=0){/* v0.14 카카오 아랫줄=학부모 (parent·preg·pnote·pask) */setDoor('parent');if(CODE&&!PCODES.length){gStu();return;}pLoad();return;}if(QM!=='help'&&!CODE&&PCODES.length){setDoor('parent');gPar();return;}if(QM==='help'){setDoor('help');helpScr();return;}setDoor(doorOf(QM));if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
+  function load(){if(PUB&&!CODE&&QM!=='help'){pubScr('');return;}if(PUB)pubBtn();if(PQ.indexOf(QM)>=0){/* v0.14 카카오 아랫줄=학부모 (parent·preg·pnote·pask) */setDoor('parent');if(CODE&&!PCODES.length){gStu();return;}pLoad();return;}if(QM!=='help'&&!CODE&&PCODES.length){setDoor('parent');gPar();return;}if(QM==='help'){setDoor('help');helpScr();return;}setDoor(doorOf(QM));if(!SB){out.innerHTML='<div class="card">인터넷 연결을 확인해 줘</div>';return;}if(!CODE){nocode();return;}
     SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error){out.innerHTML='<div class="card">잠깐 문제가 있어 — 다시 열어 줘<br><span class="hint">'+esc(r.error.message)+'</span></div>';return;}
-      CTX=r.data;if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
+      CTX=r.data;if(!CTX&&PUB){pubOut('그 학생은 지금 못 들어가요 — 쌤한테 말해 줘');return;}if(!CTX){LS('bzs_code',null);CODE='';nocode('이 카드는 이제 안 써요 — 쌤한테 새 QR 카드 받아 줘');return;}
       if(LS('bzs_ok')!==CODE){out.innerHTML='<div class="card done-scr"><div class="e">🙋</div><div class="m">'+esc(CTX.name)+' 맞아?</div><div class="hint" style="margin-top:8px">'+esc(CTX.class_name||'')+'</div><div class="row" style="justify-content:center;margin-top:18px"><button class="send" style="width:auto;padding:14px 30px" id="okY">응, 나야</button><button class="back" id="okN">아니야</button></div><div class="hint" style="margin-top:12px">친구 카드면 「아니야」 — 친구 이름으로 기록돼요</div></div>';
         document.getElementById('okY').onclick=function(){LS('bzs_ok',CODE);load();};document.getElementById('okN').onclick=function(){LS('bzs_code',null);CODE='';nocode('내 QR 카드를 찍거나 코드를 넣어 줘');};return;}
       document.getElementById('cn').textContent=CTX.class_name||'';LASTN=(CTX.notes||[]).map(function(n){return {note_date:n.d,hw_items:n.hw||[],learned:n.learn||[]};});var td=new Date().toISOString().slice(0,10);var DR=doorOf(QM);setDoor(DR);if(DR==='lobby'){lobby();return;}if(DR==='me'){meScr();return;}if(DR==='notice'){noticeScr();return;}if(DR==='wrong'){if(QM==='exam'){xFresh();examScr();}else if(QM==='ask')askScr();else wrongScr();return;}if(SVQ){survey();}else if(QM==='exam'){xFresh();examScr();}else if(QM==='grade'){if(GPEND==='hw'){GPEND='';grHw();}else grScr();}else if(QM==='start'||QM==='end'){open0(QM);}else if(svDue()&&LS('bzs_svask')!==td){LS('bzs_svask',td);survey();}else open0();});}
