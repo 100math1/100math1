@@ -317,7 +317,9 @@ input.w{width:100%;max-width:520px}
   /* v0.13: 카카오 「사용법」 메뉴를 빼도 되게 — 화면 오른쪽 아래 ❓ */
   (function(){try{var b=document.createElement('button');b.id='qHelp';b.textContent='❓';b.setAttribute('aria-label','사용법');b.style.cssText='position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:22px;border:0;background:var(--navy,#1f2a5a);color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:50';b.onclick=function(){QM='help';helpScr();};document.body.appendChild(b);}catch(e){}})();
 /* v0.16 원장 23:17: 폰에 학생 코드만 있는데 아랫줄(학부모) / 학부모 코드만 있는데 윗줄(학생)을 누르면 — 누가 적는 칸인지 안내 */
-  function gGo(m){QM=m;try{history.replaceState(null,'',location.pathname+(m?'?m='+m:''));}catch(e){}load();}
+  /* v0.66 원장 11-12 18:54 「도착 누르고 → 다른 것도 누르다가 → 채점하러 가서 채점 → 돌아와서 보내기」 흐름: 보내기 전에 다른 화면 갔다 와도 고른 것 그대로(같은 날·같은 화면만) */
+  var FDRAFT=null;
+  function gGo(m){try{if(F&&MODE&&document.getElementById('send')&&!document.getElementById('again'))FDRAFT={mode:MODE,day:String((CTX&&CTX.today)||''),code:CODE,F:F};}catch(e){}QM=m;try{history.replaceState(null,'',location.pathname+(m?'?m='+m:''));}catch(e){}load();}
 
   /* ===== v0.32 현관·문 3개 (원장 11-10 00:00 「카톡 메뉴 윗줄 3개 중 왼쪽만 쓰게 됨 → 재설계」 · 「서로 막아놔야」 · 카톡 없는 애도 같은 문 3개) ===== */
   var DOORS={today:'📱 오늘 기록',me:'🎮 내 현황',wrong:'📕 오답·시험지',notice:'📢 공지·일정',lobby:'🙋 백수학',parent:'👪 백수학 학부모',help:'❓ 사용법'};
@@ -1032,7 +1034,7 @@ input.w{width:100%;max-width:520px}
       F.slots[k]={book:b,to:'',none:!b&&sl[4]};});
     if(tChg.length)setTimeout(function(){toast('📚 쌤이 책을 바꿨어 — '+tChg.join(' · '));},400);
     form();}
-  function form(){NAVBACK=null;var bl=bookList(),P=[[100,'다 했어'],[75,'거의'],[50,'반쯤'],[25,'조금'],[0,'못 했어']],mine=CTX.mine||{},doneS=!!mine.hwc,doneE=!!mine.learn;
+  function form(){NAVBACK=null;if(FDRAFT&&FDRAFT.mode===MODE&&FDRAFT.code===CODE&&FDRAFT.day===String((CTX&&CTX.today)||'')){var a0=F&&F.arr;F=FDRAFT.F;if(F.arr==null&&a0!=null)F.arr=a0;FDRAFT=null;}else if(FDRAFT&&FDRAFT.mode!==MODE)FDRAFT=null;var bl=bookList(),P=[[100,'다 했어'],[75,'거의'],[50,'반쯤'],[25,'조금'],[0,'못 했어']],mine=CTX.mine||{},doneS=!!mine.hwc,doneE=!!mine.learn;
     var h='<div class="card"><div class="row" style="margin:0"><div class="big">'+esc(CTX.name)+'</div><button class="back" id="notMe" style="margin-left:auto;padding:6px 10px;font-size:13px">내가 아니야</button></div><div class="pcts" style="margin-top:10px">'+
       '<button class="pc'+(MODE==='start'?' on':'')+'" data-md="start" style="flex:1">🏁 수업 시작'+(doneS?' ✅':'')+'<br><small>지난 숙제 확인</small></button>'+
       '<button class="pc'+(MODE==='end'?' on':'')+'" data-md="end" style="flex:1">🏠 집에 가기 전'+(doneE?' ✅':'')+'<br><small>오늘 진도·숙제</small></button></div><div style="text-align:right;margin-top:8px"><button class="back" id="svOpen" style="font-size:13px;padding:6px 12px'+(svDue()?';border-color:#f2b21b;background:#fff6dc':'')+'">📝 나 소개(설문)'+(svDue()?' — 다시 할 때!':CTX.survey_last?' ✅':'')+'</button></div><button class="send" id="grOpen" style="margin-top:10px;padding:12px">✅ 교재 채점하기 ⭕❌</button></div>';
