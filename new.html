@@ -164,7 +164,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.69s';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.69t';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -425,7 +425,7 @@ input.w{width:100%;max-width:520px}
     Q.end=m.learn?{c:'ok',t:'적었어'}:(d&&d._rdy)?{c:'ok',t:'적었어 — 이제 보내기'}:{c:'',t:d?'적는 중 ✍':'집 가기 전에 쪽 번호 적기'};
     Q.send=m.at_end?{c:'ok',t:hmHM(m.at_end)+' 보냄'}:{c:'',t:'쌤께 보내기'};
     var SCN=m.sched_chg||[];Q.sch=SCN.length?{c:'ok',t:SCN.map(function(x){return sckL(x.k).replace(/^\S+\s/,'')+' '+mdW(x.d);}).join(' · ')}:m.sched_ok?{c:'ok',t:'변경 없음'}:{c:'',t:'다음 수업 못 오면 누르기'};
-    var SFL={};SELF9.forEach(function(a){SFL[a[0]]=a[1]+' '+a[2];});Q.self=(m.self&&!m.self_auto)?{c:'ok',t:SFL[m.self]||m.self}:{c:'',t:'오늘 어땠는지 하나 고르기'};
+    var SFL={};SELF9.forEach(function(a){SFL[a[0]]=a[1]+' '+a[2];});Q.self=(m.self&&!m.self_auto)?{c:'ok',t:(m.selfs&&m.selfs.length>1)?m.selfs.map(function(k){return (SFL[k]||'').split(' ')[0];}).join(' ')+' '+(SFL[m.selfs[0]]||'').replace(/^\S+\s/,'')+' 외':(SFL[m.self]||m.self)}:{c:'',t:'오늘 어땠는지 하나 고르기'};
     if(m.at_end)Q.end={c:'ok',t:hmHM(m.at_end)+' 저장'};
     var cur='';if(!m.at_end)HMQS.some(function(q){if(q[0]!=='sch'&&Q[q[0]].c===''){cur=q[0];return true;}return false;});Q._cur=cur;return Q;}
   function hmGo(k){if(firstBooks()){gGo('hw');return;}
@@ -470,9 +470,12 @@ input.w{width:100%;max-width:520px}
       el.querySelectorAll('[data-sck],[data-scx],[data-scd],#scNo,#scOk').forEach(function(b){var f=b.onclick;b.onclick=function(e){if(f)f.call(b,e);setTimeout(bind0,0);};});};bind0();
     document.getElementById('schSave').onclick=function(){if(SCE){toast('날짜 고르고 「추가」 먼저 눌러 줘');return;}qSave({sched_chg:F.sc,sched_ok:!F.sc.length},F.sc.length?'📅 저장! 쌤이 확인할게':'👌 그대로 오는 걸로 저장');};}
   var SELF9=[['good','😀','집중 잘했어'],['ask','🙋','질문 많이 했어'],['persist','💪','끝까지 풀었어'],['ok','🙂','보통이었어'],['confused','🤔','헷갈렸어'],['weary','😓','피곤했어'],['tired','😴','졸렸어'],['hard','😵','어려웠어'],['distract','💭','딴생각 했어']];
-  function selfScr(){SCBIG=false;setDoor('today');hmT('🙋 나의 수업 태도');NAVBACK=null;var m=CTX.mine||{},cur=m.self_auto?'':(m.self||''),S=SELF9;
-    out.innerHTML='<div class="card" style="padding:12px 14px"><div style="font-size:15px;font-weight:800;color:#1c2163">오늘 수업 때 나는 어땠어?</div><div class="hint" style="margin:2px 0 10px">하나만 누르면 끝 · 쌤만 봐요</div><div style="display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:6px">'+S.map(function(a){return '<button class="pc'+(cur===a[0]?' on':'')+'" data-sf="'+a[0]+'" style="padding:10px 2px;font-size:min(13.5px,3.7vw);border-radius:12px;min-width:0;white-space:nowrap;overflow:hidden;line-height:1.3"><span style="font-size:22px;display:block">'+a[1]+'</span>'+a[2]+'</button>';}).join('')+'</div></div>';
-    window.scrollTo(0,0);out.querySelectorAll('[data-sf]').forEach(function(b){b.onclick=function(){out.querySelectorAll('[data-sf]').forEach(function(x){x.classList.toggle('on',x===b);});qSave({self:b.getAttribute('data-sf'),self_auto:false},'🙋 저장!');};});}
+  function selfScr(){SCBIG=false;setDoor('today');hmT('🙋 나의 수업 태도');NAVBACK=null;var m=CTX.mine||{},S=SELF9,sel=m.self_auto?[]:((m.selfs&&m.selfs.length)?m.selfs.slice():(m.self?[m.self]:[]));
+    function draw(){out.innerHTML='<div class="card" style="padding:12px 14px"><div style="font-size:15px;font-weight:800;color:#1c2163">오늘 수업 때 나는 어땠어?</div><div class="hint" style="margin:2px 0 10px">1개~3개까지 골라도 돼 · 쌤만 봐요</div><div style="display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:6px">'+S.map(function(a){var on=sel.indexOf(a[0])>=0;return '<button class="pc'+(on?' on':'')+'" data-sf="'+a[0]+'" style="position:relative;padding:10px 2px;font-size:min(13.5px,3.7vw);border-radius:12px;min-width:0;white-space:nowrap;overflow:hidden;line-height:1.3"><span style="font-size:22px;display:block">'+a[1]+'</span>'+a[2]+(on?'<b style="position:absolute;top:3px;right:6px;font-size:11px">'+(sel.indexOf(a[0])+1)+'</b>':'')+'</button>';}).join('')+'</div></div>'+
+      '<button class="send" id="sfSave" style="font-size:18px;padding:12px'+(sel.length?'':';opacity:.45')+'">'+(sel.length?'저장 ✅ ('+sel.length+'개)':'하나 이상 골라 줘')+'</button><div style="height:20px"></div>';
+      out.querySelectorAll('[data-sf]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-sf'),i=sel.indexOf(k);if(i>=0)sel.splice(i,1);else{if(sel.length>=3){toast('3개까지만 — 하나 빼고 골라 줘');return;}sel.push(k);}draw();};});
+      document.getElementById('sfSave').onclick=function(){if(!sel.length){toast('하나 이상 골라 줘');return;}qSave({self:sel[0],selfs:sel.slice(),self_auto:false},'🙋 저장!');};}
+    draw();window.scrollTo(0,0);}
   /* 📤 보내기 — 따로 (원장 11-13 01:58 「따로 둬서 보냈다가 보이는 게 좋은 거 같아」) : 오늘 한 것 한눈에 + 큰 보내기 버튼 하나 */
   function sendScr(){setDoor('today');hmT('📤 보내기');NAVBACK=null;STEP='';var d=hmDraft();if(d){F=d;MODE='end';}else{HMQ=true;try{build0('end');}catch(e){}HMQ=false;}FIRSTB=false;
     var m=CTX.mine||{},Q=hmQ(),sent=!!m.at_end,rows='';
