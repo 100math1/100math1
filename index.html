@@ -88,6 +88,7 @@ input.w{width:100%;max-width:520px}
 <div class="wrap" id="out"><div class="card">불러오는 중…</div></div>
 <div class="toast" id="toast"></div>
 <script>
+/* 백수학_학생폰 v0.66 (원장 11-12 18:52 정 새벽: 🏁 다시 고쳐 보내면 도착 「누른 시각」이 그때로 덮여 18:27까지 밀림 → 도착 칸 그대로면 처음 누른 시각 유지 · 도착을 바꿨을 때만 새 시각) */
 /* 백수학_학생폰 v0.65 (원장 11-12 「숙제 마감일」 §II · 데일리 v2.44 짝): 🏁 지난 숙제 — 정규 수업 요일(프로필 reg_days, stu_ctx로 받음)이 있으면 숙제 낸 날 다음 정규 요일 = 마감 · 마감 전이면 「📅 마감 ○요일(M/D) — 오늘은 중간 점검 · 지금까지 한 만큼만」, 마감 당일 「오늘이 마감」 · 요일 없는 학생은 그대로 */
 /* 백수학_학생폰 v0.64 (원장 11-12 04:04 「지난 숙제 얼마나 했어? — 이거도 칸 고르는 게 너무 커, 페이지 많이 잡아먹어」): 🏁 지난 숙제 — 책마다 한 줄(책·범위) + 5칸 한 줄(다 했어·거의·반쯤·조금·못 했어, % 글씨 뺌 — 누르면 위에 n%) · 카드 여백 줄임 */
 /* 백수학_학생폰 v0.63 (원장 11-12 04:00~04:01 학생으로 써 보니 「진도 박스·유형서1 박스·유형서2 박스가 좀 커 — 그래서 전체적으로 위아래로 스크롤을 많이 해야 해」): 🏠 집 가기 전 — 책이 정해진 칸은 한 카드 안에 두 줄씩(이름·책 / n쪽부터 [ ] 쪽까지) · 🎉 다 끝냈어·🔄 책 바꾸기는 [⋯] 안으로(기능 그대로) · 책 고르는 중·바꾸는 중인 칸만 예전 큰 카드 */
@@ -123,7 +124,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.65';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.66';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -1265,7 +1266,7 @@ input.w{width:100%;max-width:520px}
     else if(shotNeed()&&SHOT.phase!=='during'){toast('📸 학교 시험지부터 올려 줘 (없으면 이유 고르기)');shotScr(function(){form();setTimeout(send,60);});return;}
     else if(MODE==='start'){if(F.hwc.some(function(i){return i.pct==null;})){toast('📌 숙제마다 얼마나 했는지 눌러 줘');return;}
       if(F.arr==null){toast('🏫 오늘 도착부터 눌러 줘');return;}
-      data={hwc:F.hwc.map(function(i){return {book:i.book,range:i.range,pct:i.pct};}),at_start:new Date().toISOString(),arr:{late:F.arr,at:new Date().toISOString()}};if(F.school&&F.school.length)data.school=F.school;if(F.plan&&F.plan.length)data.plan=F.plan;}
+      data={hwc:F.hwc.map(function(i){return {book:i.book,range:i.range,pct:i.pct};}),at_start:new Date().toISOString(),arr:(function(){var oa=(CTX.mine||{}).arr;/* v0.66 원장 11-12 18:52 「다시 고쳐 보내면 도착 누른 시각이 계속 밀림(18:27)」 → 도착 칸을 안 바꿨으면 처음 누른 시각 그대로 */return (oa&&oa.at&&oa.late===F.arr)?{late:F.arr,at:oa.at}:{late:F.arr,at:new Date().toISOString()};})()};if(F.school&&F.school.length)data.school=F.school;if(F.plan&&F.plan.length)data.plan=F.plan;}
     else if(!SLOTS.some(function(sl){var x=F.slots[sl[0]];return !x.none&&x.book&&String(x.to).trim();})&&TDD&&(+TDD.graded||+TDD.fixed||+TDD.exams)){/* 원장 16:39 「굳이 누르지 않아도」 — 진도 비었고 오늘 기록 있으면 자동으로 진도 없는 날 */data={no_prog:true,learn:[],hw:[],at_end:new Date().toISOString(),today_done:TDD};if(F.prep&&F.prep.length)data.prep=F.prep;if(F.hard){var hd0=hardData();if(hd0)data.hard=hd0;}if(F.sc){data.sched_chg=F.sc;data.sched_ok=!F.sc.length&&!!F.scOk;}}
     else{var c=F.slots.concept;if(!c.book||!String(c.to).trim()){toast('📖 개념서 — 어떤 책 몇 쪽까지 나갔는지 넣어 줘');return;}
       var miss=SLOTS.filter(function(sl){var x=F.slots[sl[0]];return !x.none&&x.book&&!String(x.to).trim();})[0];if(miss){toast(miss[1]+' — 쪽 번호 넣어 줘 (안 하면 「🚫 지금 안 함」)');return;}
