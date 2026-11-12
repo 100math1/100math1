@@ -161,7 +161,7 @@ input.w{width:100%;max-width:520px}
   var SB=null;try{SB=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr',{auth:{persistSession:false}});}catch(e){}
   var out=document.getElementById('out'),CODE='',CTX=null,LASTN=[],F=null,BOOKS0=['개념+유형 개념','개념+유형 라이트','개념+유형 파워','개념원리','RPM','쎈','개념쎈','유형만렙','일품','블랙라벨','최상위','마플시너지','자이스토리','디딤돌','교과서','학교기출','자체교재'];
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.68f';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.68g';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -389,7 +389,7 @@ input.w{width:100%;max-width:520px}
   /* ===== v0.68 홈 (화면 틀 원칙 8개) ===== */
   var STEP='',HM={td:null,log:null,ti:0,nt:0,help:false},HMQ=false;
   var HMK=[['concept','진도'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습'],['','시험대비']];
-  var HMQS=[['arr','🏫','도착'],['hw','📌','지난 숙제'],['gr','✅','채점'],['wr','📕','오답'],['end','🏠','집에 가기 전'],['send','📤','보내기']];
+  var HMQS=[['arr','🏫','학원 도착'],['hw','📌','지난 숙제'],['gr','✅','채점'],['wr','📕','오답'],['end','🏠','집에 가기 전'],['send','📤','보내기']];
   function hmT(t){var h=document.getElementById('hTtl');if(h)h.textContent=t;}
   function hmHM(at){var t=new Date(at);return isNaN(t)?'':t.getHours()+':'+('0'+t.getMinutes()).slice(-2);}
   function hmDraft(){var d=FDR.end;return (d&&d.code===CODE&&d.day===String((CTX&&CTX.today)||''))?d.F:null;}
@@ -413,7 +413,7 @@ input.w{width:100%;max-width:520px}
       if(!g.k){toast('📘 시험대비 책은 쌤이 정해 주면 여기에 떠요');return;}if(g.alt){toast('진도'+(HM.ti+1)+' 책은 쌤이 정해요');return;}
       try{BKOPEN[g.k]=1;}catch(e){}gGo('end');setTimeout(function(){toast('📚 '+g.nm+' — 책을 골라 줘');},500);};});}
   function hmQ(){var m=CTX.mine||{},hp=hwPrev().filter(function(i){return i&&(i.book||i.range);}),td=HM.td,wo=(STV&&STV.wr)?+STV.wr.open:null,Q={},d=hmDraft();
-    Q.arr=(m.arr&&m.arr.at&&!(+m.arr.late<0))?{c:'ok',t:hmHM(m.arr.at)+' 도착'+(+m.arr.late>0?' · '+m.arr.late+'분 늦음':'')}:{c:'',t:(m.arr&&+m.arr.late<0)?'가는 중 — 오면 다시 눌러':'아직 안 누름'};
+    Q.arr=(m.arr&&m.arr.at&&!(+m.arr.late<0))?{c:'ok',t:hmHM(m.arr.at)+' 도착'+(+m.arr.late>0?' · '+m.arr.late+'분 늦음':'')}:{c:'',t:(m.arr&&+m.arr.late<0)?'가는 중 — 오면 다시 눌러':'오자마자 바로 누르기'};
     var di=null;try{di=hp.length?hwDueInfo():null;}catch(e){}
     Q.hw=m.hwc?{c:'ok',t:m.hwc.length?m.hwc.length+'개 확인':'숙제 없음 ✓'}:(!hp.length?{c:'skip',t:'숙제 없음 ✓'}:{c:'',t:'숙제 '+hp.length+'개'+(di?(di.today?' · 마감 오늘':di.mid?' · 마감 '+di.wd+'요일':''):'')});
     var gb=(HM.log||[]).filter(function(b){return +b.tp>0;}).length,nb=hmGear().filter(function(g){return g.book;}).length;if(hmTracks().length){var sn={};hmTracks().forEach(function(t){['concept','type','type2'].forEach(function(k){if(t[k])sn[hmBk(t[k])]=1;});});var S0=(F&&F.slots)||{};['review','recap'].forEach(function(k){var x=S0[k];if(x&&x.book&&!x.none)sn[x.book]=1;});nb=Object.keys(sn).length;}
@@ -432,7 +432,7 @@ input.w{width:100%;max-width:520px}
     var h='<div class="hm" id="hmRoot">';
     if(fb||!cur)h+='<button class="hmband'+((!cur&&!fb)?' done':'')+'" id="hmBand"><span class="f">'+((!cur&&!fb)?'🎉':'👉')+'</span><span style="min-width:0"><b>'+esc(bt[0])+'</b><small>'+esc(bt[1])+'</small></span></button>';
     h+='<div class="hmtiles">'+HMQS.map(function(q,i){var x=Q[q[0]],c=x.c||(q[0]===cur?'cur':'wait');if(fb)c='wait';
-      return '<button class="hmtl '+c+'" data-hq="'+q[0]+'"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span style="min-width:0"><b>'+((q[0]==='arr'&&x.c!=='ok')?'학원 도착 후<br>바로 누르기':q[2])+'</b><small>'+esc(x.t)+'</small></span></button>';}).join('')+'</div>';
+      return '<button class="hmtl '+c+'" data-hq="'+q[0]+'"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span style="min-width:0"><b>'+q[2]+'</b><small>'+esc(x.t)+'</small></span></button>';}).join('')+'</div>';
     h+='<div class="hmdock'+(PUB?'':' fab')+'"><button class="hmdk" data-hd="me"><span class="i">🎮</span>내 현황</button><button class="hmdk" data-hd="exam"><span class="i">📄</span>시험지</button><button class="hmdk" data-hd="notice"><span class="i">📢</span>공지'+(HM.nt?'<span class="bg">'+HM.nt+'</span>':'')+'</button><button class="hmdk" data-hd="sv"'+(svDue()?' style="border-color:#f2b21b;background:#fff6dc"':'')+'><span class="i">📝</span>나 소개'+(svDue()?'<span class="bg">!</span>':'')+'</button></div>';
     return h+'</div>';}
   function hmFit(){var r=document.getElementById('hmRoot');if(!r)return;var top=r.getBoundingClientRect().top+(window.scrollY||0),hh=(window.innerHeight||640)-top-(PUB?64:8);r.style.height=Math.max(430,hh)+'px';}
