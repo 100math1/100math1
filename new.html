@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.78b';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.78c';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -384,7 +384,7 @@ input.w{width:100%;max-width:520px}
      원칙: 숫자·기록만(자동 칭찬·약속 X) · 비교는 우리 아이 지난달과만 · 아이가 넣은 건 「아이 입력」 · 순위표 X */
   var PSUB='',PDOOR='',PST=null,PSC=null,PMO=null,PRF={};
   function prpc(n,a){if(PCUR==='DEMO')return Promise.resolve({data:pDemo(n,a)});return SB.rpc(n,a);}
-  function pTiles(L){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px">'+L.map(function(t){return '<button data-psub="'+t[0]+'" style="text-align:left;border:1px solid var(--line,#dfe3ec);background:#fff;border-radius:16px;padding:14px 12px;min-height:104px;box-shadow:0 1px 3px rgba(20,30,70,.06);font:inherit;color:inherit"><div style="font-size:28px;line-height:1">'+t[1]+'</div><div style="font-size:17px;font-weight:800;color:var(--navy);margin-top:8px">'+t[2]+'</div><div style="font-size:12.5px;color:#6b7280;margin-top:3px;line-height:1.35;word-break:keep-all">'+(t[3]||'')+'</div></button>';}).join('')+'</div>';}
+  function pTiles(L){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px">'+L.map(function(t){return '<button data-psub="'+t[0]+'" style="text-align:left;border:1px solid var(--line,#dfe3ec);background:#fff;border-radius:16px;padding:12px 12px;min-height:96px;box-shadow:0 1px 3px rgba(20,30,70,.06);font:inherit;color:inherit"><div style="font-size:28px;line-height:1">'+t[1]+'</div><div style="font-size:17px;font-weight:800;color:var(--navy);margin-top:8px">'+t[2]+'</div><div style="font-size:12.5px;color:#6b7280;margin-top:3px;line-height:1.35;word-break:keep-all">'+(t[3]||'')+'</div></button>';}).join('')+'</div>';}
   function pSubHead(t,sub){return '<div class="card" style="padding:8px 12px;display:flex;align-items:center;gap:8px"><button class="back" data-psub="" style="padding:6px 12px;font-size:14px;white-space:nowrap">🏠 홈</button><div style="flex:1;min-width:0;font-size:18px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t+'</div><span class="hint" style="white-space:nowrap">'+esc((PCTX&&PCTX.name)||'')+'</span></div>'+(sub?'<div class="hint" style="margin:-4px 6px 8px">'+sub+'</div>':'');}
   function pMd(x){if(!x)return '';var W=['일','월','화','수','목','금','토'],t=new Date(String(x).slice(0,10)+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()+'('+W[t.getDay()]+')';}
   var PRT=[['today','📅','오늘 수업'],['hw','📌','숙제'],['book','📚','진도'],['exam','📝','시험'],['wrong','📕','오답'],['habit','⏱','공부 습관']];
@@ -401,7 +401,7 @@ input.w{width:100%;max-width:520px}
     if(k==='habit'){var a=d.att||{};return a.n?'출석 '+a.ok+'/'+a.n+' (4주)'+(mo.study?'<br>혼공 '+Math.round(mo.study/6)/10+'시간 (이번 달)':''):'출결 기록 전';}
     return '';}
   function pRep(box){var d=PST,S=PSC||{},me=(PMO&&PMO.me)||{},M=me.mo||[{},{}],a=M[0]||{},b=M[1]||{},E=function(t){return '<div class="card"><div class="hint">'+t+'</div></div>';},h='';
-    if(!PSUB){h='<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">📈 학습리포트</h2><div class="hint">쌤과 아이가 남긴 기록 그대로 보여 드려요</div></div>'+pTiles(PRT.map(function(t){return [t[0],t[1],t[2],pSum(t[0])];}));
+    if(!PSUB){h=pTiles(PRT.map(function(t){return [t[0],t[1],t[2],pSum(t[0])];}));
       box.innerHTML=h;pBind();return;}
     var T=PRT.filter(function(t){return t[0]===PSUB;})[0]||['','',''];h=pSubHead(T[1]+' '+T[2]);
     if(PSUB==='today')h+=(S.today||'')+(S.recent||E('최근 수업 기록이 아직 없습니다.'));
@@ -459,7 +459,7 @@ input.w{width:100%;max-width:520px}
       time:{kind:'시간 변경',G:[['기간','p',['이번 주만','계속'],0]],ph:'바꾸고 싶은 요일·시간을 적어 주세요',need:1},
       ask:{kind:'질문·건의',G:[['주제','t',['숙제 양','진도','시험 대비','수업 방식','기타'],0]],ph:'원장에게 전할 내용을 적어 주세요',need:1},
       doc:{kind:'서류',G:[['서류','s',['교육비 납입증명서','재원증명서','기타'],1]],ph:'필요한 기간·용도 (예: 2026년 1~12월, 연말정산)'}}[k];}
-  function pReqHome(){if(!PSUB)return '<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">✉️ 학원에 말하기</h2><div class="hint">골라서 보내시면 원장에게 바로 전달됩니다.</div></div>'+pTiles(PRQ);
+  function pReqHome(){if(!PSUB)return pTiles(PRQ);
     var T=PRQ.filter(function(t){return t[0]===PSUB;})[0];var h=pSubHead(T[1]+' '+T[2]);
     if(PSUB==='sent'){var rs=PCTX.reqs||[];return h+(rs.length?'<div class="card">'+rs.map(function(x){return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><b>'+esc(x.kind)+'</b> <span class="hint">'+esc(String(x.at||'').slice(5,10).replace('-','/'))+' · '+(x.done?'✅ 원장 확인함':'전달됨')+'</span><br>'+esc(x.body).replace(/\n/g,'<br>')+'</div>';}).join('')+'</div>':'<div class="card"><div class="hint">보낸 요청이 아직 없습니다.</div></div>');}
     var F=pRqDef(PSUB),V=PRF[PSUB]=PRF[PSUB]||{};
@@ -469,7 +469,7 @@ input.w{width:100%;max-width:520px}
   /* 📋 우리 아이·설정 — 6칸 */
   var PSVT=[['sv','📝','설문','우리 아이에 대해 알려 주세요'],['cn','✅','동의 관리','개인정보 · 사진 · 안내'],['sib','👨‍👩‍👧','형제 추가','다른 자녀 보기'],['nt','📢','공지·일정','방학 · 보강 · 시험'],['al','🔔','알림','무엇을 받고 계신지'],['help','❓','사용법','처음 쓰시는 분']];
   function pSvHome(due){if(!PSUB){var T=PSVT.map(function(t){var x=t.slice();if(x[0]==='sv')x[3]=PCTX.psv_last?'마지막 작성 '+pMd(PCTX.psv_last)+(due?' · 다시 부탁드려요':''):'아직 안 쓰셨어요';if(x[0]==='cn'&&PCTX.consent)x[3]='동의 ✔ '+esc(PCTX.consent.date||'');if(x[0]==='sib')x[3]=PCODES.length>1?PCODES.length+'명 등록':'다른 자녀 코드 넣기';return x;});
-      return '<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">📋 우리 아이 · 설정</h2></div>'+pTiles(T);}
+      return pTiles(T);}
     var T0=PSVT.filter(function(t){return t[0]===PSUB;})[0],h=pSubHead(T0[1]+' '+T0[2]);
     if(PSUB==='sv')return h+pSvHtml(due);
     if(PSUB==='cn'){var c=PCTX.consent||{},yn=function(v){return v?'<b style="color:#1e7e45">동의함</b>':'<b style="color:#8a90a0">안 함</b>';};return h+'<div class="card" style="font-size:15.5px;line-height:2">필수 개인정보 '+(c.required?yn(1):yn(0))+'<br>건강 정보 '+yn(c.health)+'<br>사진·영상 '+yn(c.photo)+'<br>특강·행사 안내 '+yn(c.promo)+(c.date?'<div class="hint">마지막 동의 '+esc(c.date)+'</div>':'')+'<button class="send" id="pCnRe" style="margin-top:10px;font-size:17px;padding:12px">동의 내용 바꾸기</button></div>';}
@@ -498,7 +498,7 @@ input.w{width:100%;max-width:520px}
     return true;}
   function pMain(){var C='style="margin:0 0 6px;font-size:18px;color:var(--navy)"';
     var sw=PCODES.length>1?'<div class="pcts" style="margin-top:10px">'+PCODES.map(function(x){return '<button class="pc'+(x.c===PCUR?' on':'')+'" data-pc="'+esc(x.c)+'">'+esc(x.n||'아이')+'</button>';}).join('')+'</div>':'';
-    var h=PSUB?'':'<div class="card" style="padding:10px 14px"><div class="big" style="font-size:20px">'+esc(PCTX.name)+' 학부모님</div>'+sw+'</div>';if(0)h+=(PCTX.consent?'<div class="hint" style="margin-top:4px">개인정보 동의 ✔ '+esc(PCTX.consent.date||'')+(PCTX.consent.health?' · 건강':'')+(PCTX.consent.photo?' · 사진':'')+(PCTX.consent.promo?' · 안내':'')+' <span style="opacity:.7">(바꾸기: ✉️ 상담요청 → 동의 변경)</span></div>':'')+'</div>';
+    var _dt=QM==='pask'?['✉️','학원에 말하기']:(QM==='pnote'||QM==='pstat')?['📈','학습리포트']:['📋','우리 아이 · 설정'];var h=PSUB?'':'<div class="card" style="padding:9px 14px;display:flex;align-items:center;gap:10px"><span style="font-size:26px;line-height:1">'+_dt[0]+'</span><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_dt[1]+'</div><div class="hint" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(PCTX.name)+' 학부모님</div></div></div>'+(sw?'<div style="margin:-4px 0 8px">'+sw+'</div>':'');if(0)h+=(PCTX.consent?'<div class="hint" style="margin-top:4px">개인정보 동의 ✔ '+esc(PCTX.consent.date||'')+(PCTX.consent.health?' · 건강':'')+(PCTX.consent.photo?' · 사진':'')+(PCTX.consent.promo?' · 안내':'')+' <span style="opacity:.7">(바꾸기: ✉️ 상담요청 → 동의 변경)</span></div>':'')+'</div>';
     /* v0.15 원장 22:58: 아랫줄 메뉴 3개가 다 같은 화면 → 메뉴마다 한 가지만 (탭 없음) */
     var due=pSvDue(),pg=QM==='pask'?'req':(QM==='pnote'||QM==='pstat')?'stat':'sv';
     if(PDOOR!==pg){PDOOR=pg;PSUB='';}
