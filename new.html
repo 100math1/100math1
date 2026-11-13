@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.77r';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.77t';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -393,15 +393,15 @@ input.w{width:100%;max-width:520px}
     Promise.all([prpc('par_status',{p_code:PCUR}),prpc('par_more',{p_code:PCUR})]).then(function(R){var r=R[0];if(r.error||!r.data||r.data.err){box.innerHTML='<div class="card">잠깐 문제가 있어요 — 다시 열어 주세요</div>';return;}
       PST=r.data;PST._c=PCUR;PST._t=Date.now();PMO=(R[1]&&R[1].data)||{};try{PSC=pStatSec(PST);}catch(e){PSC={};}pRep(box);},function(){box.innerHTML='<div class="card">인터넷 연결을 확인해 주세요</div>';});}
   function pSum(k){var d=PST||{},me=(PMO&&PMO.me)||{},mo=(me.mo||[])[0]||{};
-    if(k==='today'){var tn=d.tn;return tn?(tn.att?'✔ '+esc(tn.att)+' · ':'')+'오늘 기록 있음':'오늘 기록 전';}
+    if(k==='today'){var tn=d.tn;return tn?(tn.att?'✔ '+esc(tn.att)+'<br>':'')+'오늘 기록 있음':'오늘 기록 전';}
     if(k==='hw')return d.hw&&d.hw.avg!=null?'최근 '+d.hw.n+'번 평균 '+d.hw.avg+'%':'숙제 기록 전';
     if(k==='book'){var x=(d.slots||{}).concept;return x&&x.book?esc(x.book)+(x.to!=null&&x.to!==''?' '+esc(x.to)+'쪽까지':''):'진도 기록 전';}
-    if(k==='exam'){var e=d.exam;return e?esc(e.title)+' · '+(e.dday>0?'D-'+e.dday:e.dday===0?'D-DAY':'시험 기간'):'다가오는 학교 시험 일정 없음';}
-    if(k==='wrong'){var WR=(PMO&&PMO.wr)||{},f=function(nm,o){return o&&+o.n?nm+' '+Math.round(100*(+o.x)/(+o.n))+'%':'';},L=[f('교재',WR.bk),f('기출',WR.ex),f('테스트',WR.ts)].filter(Boolean);return L.length?'오답률 '+L.join(' · '):'최근 1개월 기록 전';}
-    if(k==='habit'){var a=d.att||{};return a.n?'최근 4주 출석 '+a.ok+'/'+a.n+(mo.study?' · 혼공 '+Math.round(mo.study/6)/10+'시간':''):'출결 기록 전';}
+    if(k==='exam'){var e=d.exam;return e?'<b style="color:#c0392b">'+(e.dday>0?'D-'+e.dday:e.dday===0?'D-DAY':'시험 기간')+'</b><br>'+esc(e.title):'다가오는 학교 시험 일정 없음';}
+    if(k==='wrong'){var WR=(PMO&&PMO.wr)||{},f=function(nm,o){return o&&+o.n?nm+' '+Math.round(100*(+o.x)/(+o.n))+'%':'';},L=[f('교재',WR.bk),f('기출',WR.ex),f('테스트',WR.ts)].filter(Boolean);return L.length?L.join('<br>'):'최근 1개월 기록 전';}
+    if(k==='habit'){var a=d.att||{};return a.n?'출석 '+a.ok+'/'+a.n+' (4주)'+(mo.study?'<br>혼공 '+Math.round(mo.study/6)/10+'시간 (이번 달)':''):'출결 기록 전';}
     return '';}
   function pRep(box){var d=PST,S=PSC||{},me=(PMO&&PMO.me)||{},M=me.mo||[{},{}],a=M[0]||{},b=M[1]||{},E=function(t){return '<div class="card"><div class="hint">'+t+'</div></div>';},h='';
-    if(!PSUB){h='<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">📈 학습리포트</h2><div class="hint">쌤과 아이가 남긴 기록을 그대로, 지금 기준으로 보여 드립니다.</div></div>'+pTiles(PRT.map(function(t){return [t[0],t[1],t[2],pSum(t[0])];}));
+    if(!PSUB){h='<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">📈 학습리포트</h2><div class="hint">쌤과 아이가 남긴 기록 그대로 보여 드려요</div></div>'+pTiles(PRT.map(function(t){return [t[0],t[1],t[2],pSum(t[0])];}));
       box.innerHTML=h;pBind();return;}
     var T=PRT.filter(function(t){return t[0]===PSUB;})[0]||['','',''];h=pSubHead(T[1]+' '+T[2]);
     if(PSUB==='today')h+=(S.today||'')+(S.recent||E('최근 수업 기록이 아직 없습니다.'));
@@ -487,7 +487,7 @@ input.w{width:100%;max-width:520px}
     if(pg==='stat')h+='<div id="pStat"><div class="card">불러오는 중…</div></div>';
     else if(pg==='req')h+=pReqHome();
     else h+=pSvHome(due);
-    if(!PSUB)h+='<div class="card"><div class="hint" style="line-height:1.7">채팅방 메뉴 <b>윗줄</b>(🏁 수업시작 · 🏠 집가기전 · 👤 나소개)은 <b>학생용</b>, <b>아랫줄</b>은 학부모님용입니다. 급한 일은 채팅방에 바로 남겨 주세요.</div></div><div style="height:30px"></div>';
+    if(!PSUB)h+='<div class="card" style="padding:10px 14px"><div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:14px;color:#4b5563;line-height:1.45"><span>👪</span><span>채팅방 <b>아랫줄 메뉴</b>는 학부모님용</span><span>🙋</span><span>채팅방 <b>윗줄 메뉴</b>는 학생용</span><span>💬</span><span>급한 일은 채팅방에 바로 남겨 주세요</span></div></div><div style="height:30px"></div>';
     out.innerHTML=h;window.scrollTo(0,0);pBind();if(pg==='stat')pStat();if(pg==='sv'&&PSUB==='nt')pNt();}
   var PA={};
   function pSvHtml(due){var h='<div class="card"><h2 style="margin:0 0 4px;font-size:18px;color:var(--navy)">📋 부모님이 보시는 우리 아이</h2><div class="hint">'+(PCTX.psv_last?'마지막 작성: '+esc(PCTX.psv_last)+(due?' · 새 학기라 한 번 더 부탁드려요':''):'4분쯤 걸립니다. 수업을 아이에게 맞추는 데 씁니다.')+'</div></div>';
