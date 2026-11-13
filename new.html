@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.77';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.77a';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -328,7 +328,7 @@ input.w{width:100%;max-width:520px}
   /* v0.26 (11-04 04:4x 비서, 원장 「그대로·순서 바꿀 것도 뺄 것도 없음」): 📈 학습현황 개선안 — 📍 오늘 · 🔥 시험대비(4주 전부터) · ✏️ 숙제 점 · 📚 교재 진도 · 📝 최근 수업 기록 · ✅ 출결 · 📝 학원 테스트 · 🏫 학교 점수. 사실(기록 숫자)만, 칭찬·약속 문구 없음. 수업 시간 = 시간표상(원장 04:06, 분 단위 실제 시각 X) */
   function pStatSec(d){var C='style="margin:0 0 8px;font-size:17px;color:var(--navy)"',E=function(t){return '<div class="hint">'+t+'</div>';},W=['일','월','화','수','목','금','토'],OK='#1e7e45',BAD='#c0392b',MID='#d39e00';
     function md(x){if(!x)return '';var t=new Date(String(x).slice(0,10)+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()+'('+W[t.getDay()]+')';}
-    function items(a){return (Array.isArray(a)?a:[]).filter(function(i){return i&&i.book;}).map(function(i){return esc(i.book)+(i.range?' '+esc(i.range):'');}).join(' · ');}
+    function items(a){var L=(Array.isArray(a)?a:[]).filter(function(i){return i&&i.book;});if(!L.length)return '';return '<div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;margin-top:4px;align-items:baseline">'+L.map(function(i){return '<span style="min-width:0;word-break:keep-all">'+esc(i.book)+'</span><span style="text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums">'+(i.range?esc(i.range):'')+'</span>';}).join('')+'</div>';}
     function num(v){return v===null||v===undefined||v===''||isNaN(+v)?null:+v;}
     /* 시간표(프로필 「🗓 수업 요일·시간」 글자) → 요일별 시간 */
     var SM=null;(function(){var raw=String(d.sched||'').trim(),M={},any=false;if(raw){raw.split(/[,·\/\n;]+/).forEach(function(part){var ds=part.match(/[월화수목금토일]/g)||[],tm=part.match(/(\d{1,2})(?::(\d{2}))?\s*[~\-–]\s*(\d{1,2})(?::(\d{2}))?/),t='';if(tm){var h1=+tm[1],h2=+tm[3];if(h1<9)h1+=12;if(h2<9)h2+=12;t=h1+':'+(tm[2]||'00')+'~'+h2+':'+(tm[4]||'00');}ds.forEach(function(x){M[x]=t;any=true;});});}
@@ -342,7 +342,7 @@ input.w{width:100%;max-width:520px}
       var lt=items(tn.learn),ht=items(tn.hw);
       oh+='<div style="font-size:16px">'+at+((clsT||(bo&&bo.t))?' · 수업 '+esc(bo&&bo.t?bo.t:clsT):'')+'</div>'+
         (lt?'<div style="margin-top:8px;font-size:15px"><span class="hint">오늘 한 곳'+(tn.src==='phone'?' (아이가 폰으로 남긴 것)':'')+'</span><br>'+lt+'</div>':'')+
-        (ht?'<div style="margin-top:8px;background:#fff6dc;border-radius:10px;padding:8px 10px;font-size:15px">📌 <b>숙제</b> '+ht+'</div>':'');}
+        (ht?'<div style="margin-top:8px;background:#fff6dc;border-radius:10px;padding:8px 10px;font-size:15px">📌 <b>숙제</b>'+ht+'</div>':'');}
     else if(onDay||bo)oh+='<div style="font-size:16px">오늘 수업'+((bo&&bo.t)||clsT?' '+esc(bo&&bo.t?bo.t:clsT):'')+'</div><div class="hint" style="margin-top:4px">수업이 끝나면 오늘 한 곳·숙제가 여기에 보입니다.</div>';
     else if(!SM)oh+='<div class="hint">오늘 기록은 아직 없습니다.</div>';
     else{var nx='';if(SM){for(var i=1;i<=7;i++){var x=new Date(String(td)+'T00:00:00');x.setDate(x.getDate()+i);var w=W[x.getDay()];if(SM.hasOwnProperty(w)){nx=(x.getMonth()+1)+'/'+x.getDate()+'('+w+')'+(SM[w]?' '+SM[w]:'');break;}}}
@@ -370,7 +370,7 @@ input.w{width:100%;max-width:520px}
     K('book');/* 5. 📝 최근 수업 기록 — 📖 수업 + ✏️ 숙제(다음 시간 확인한 해 옴 %) */
     var rc=d.recent||[];if(rc.length)h+='<div class="card"><h2 '+C+'>📝 최근 수업 기록</h2>'+rc.map(function(n){var l=items(n.learn),w=items(n.hw),p=num(n.hwp);
       var tg=p!==null?' <span style="display:inline-block;font-size:12px;border-radius:8px;padding:1px 7px;margin-left:4px;background:'+(p>=90?'#e5f4ea;color:'+OK:p>=50?'#fff3d6;color:#a77b00':'#fdeceb;color:'+BAD)+'">해 옴 '+p+'%</span>':'';
-      return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><div class="hint">'+md(n.d)+(n.att&&!/^출석/.test(n.att)?' · '+esc(n.att):'')+'</div>'+(l?'<div>📖 <b>수업</b> '+l+'</div>':'')+(w?'<div style="margin-top:2px">✏️ <b>숙제</b> '+w+tg+'</div>':'')+(!l&&!w&&(!n.att||/^출석/.test(n.att))?'<div class="hint">'+esc(n.att||'기록')+'</div>':'')+'</div>';}).join('')+'</div>';
+      return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><div class="hint">'+md(n.d)+(n.att&&!/^출석/.test(n.att)?' · '+esc(n.att):'')+'</div>'+(l?'<div>📖 <b>수업</b>'+l+'</div>':'')+(w?'<div style="margin-top:6px">✏️ <b>숙제</b>'+tg+w+'</div>':'')+(!l&&!w&&(!n.att||/^출석/.test(n.att))?'<div class="hint">'+esc(n.att||'기록')+'</div>':'')+'</div>';}).join('')+'</div>';
     K('recent');/* 6. ✅ 최근 4주 출결 */
     var a=d.att||{};h+='<div class="card"><h2 '+C+'>✅ 최근 4주 출결</h2>'+(a.n?'<div style="font-size:16px">수업 '+a.n+'회 · 출석 '+a.ok+' · 지각 '+(a.late||0)+' · <b style="color:'+(a.abs?BAD:'inherit')+'">결석 '+(a.abs||0)+'</b></div>':E('최근 4주 수업 기록이 아직 없습니다.'))+'</div>';
     K('att');/* 7. 📝 학원 테스트 */
