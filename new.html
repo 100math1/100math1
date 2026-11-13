@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.77v';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.77x';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -441,7 +441,7 @@ input.w{width:100%;max-width:520px}
       time:{kind:'시간 변경',G:[['기간','p',['이번 주만','계속'],0]],ph:'바꾸고 싶은 요일·시간을 적어 주세요',need:1},
       ask:{kind:'질문·건의',G:[['주제','t',['숙제 양','진도','시험 대비','수업 방식','기타'],0]],ph:'원장에게 전할 내용을 적어 주세요',need:1},
       doc:{kind:'서류',G:[['서류','s',['교육비 납입증명서','재원증명서','기타'],1]],ph:'필요한 기간·용도 (예: 2026년 1~12월, 연말정산)'}}[k];}
-  function pReqHome(){if(!PSUB)return '<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">✉️ 학원에 말하기</h2><div class="hint">원장에게 바로 전달됩니다. 급한 일은 채팅방에 바로 남겨 주세요.</div></div>'+pTiles(PRQ);
+  function pReqHome(){if(!PSUB)return '<div class="card" style="padding:10px 14px"><h2 style="margin:0;font-size:18px;color:var(--navy)">✉️ 학원에 말하기</h2><div class="hint">골라서 보내시면 원장에게 바로 전달됩니다.</div></div>'+pTiles(PRQ);
     var T=PRQ.filter(function(t){return t[0]===PSUB;})[0];var h=pSubHead(T[1]+' '+T[2]);
     if(PSUB==='sent'){var rs=PCTX.reqs||[];return h+(rs.length?'<div class="card">'+rs.map(function(x){return '<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:15px"><b>'+esc(x.kind)+'</b> <span class="hint">'+esc(String(x.at||'').slice(5,10).replace('-','/'))+' · '+(x.done?'✅ 원장 확인함':'전달됨')+'</span><br>'+esc(x.body).replace(/\n/g,'<br>')+'</div>';}).join('')+'</div>':'<div class="card"><div class="hint">보낸 요청이 아직 없습니다.</div></div>');}
     var F=pRqDef(PSUB),V=PRF[PSUB]=PRF[PSUB]||{};
@@ -488,6 +488,7 @@ input.w{width:100%;max-width:520px}
     else if(pg==='req')h+=pReqHome();
     else h+=pSvHome(due);
     h+='<div style="height:30px"></div>';
+    if(!PSUB)h=h.replace(/<div style="height:30px"><\/div>$/,'<div class="card" style="padding:10px 14px"><div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:14px;color:#4b5563;line-height:1.45"><span>👪</span><span>채팅방 <b>아랫줄 메뉴</b>는 학부모님용</span><span>🙋</span><span>채팅방 <b>윗줄 메뉴</b>는 학생용</span></div></div><div style="height:30px"></div>');
     out.innerHTML=h;window.scrollTo(0,0);pBind();if(pg==='stat')pStat();if(pg==='sv'&&PSUB==='nt')pNt();}
   var PA={};
   function pSvHtml(due){var h='<div class="card"><h2 style="margin:0 0 4px;font-size:18px;color:var(--navy)">📋 부모님이 보시는 우리 아이</h2><div class="hint">'+(PCTX.psv_last?'마지막 작성: '+esc(PCTX.psv_last)+(due?' · 새 학기라 한 번 더 부탁드려요':''):'4분쯤 걸립니다. 수업을 아이에게 맞추는 데 씁니다.')+'</div></div>';
