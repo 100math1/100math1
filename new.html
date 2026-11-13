@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.78d';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.78e';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -394,9 +394,9 @@ input.w{width:100%;max-width:520px}
       PST=r.data;PST._c=PCUR;PST._t=Date.now();PMO=(R[1]&&R[1].data)||{};try{PSC=pStatSec(PST);}catch(e){PSC={};}pRep(box);},function(){box.innerHTML='<div class="card">인터넷 연결을 확인해 주세요</div>';});}
   function pSum(k){var d=PST||{},me=(PMO&&PMO.me)||{},mo=(me.mo||[])[0]||{};
     if(k==='today'){var tn=d.tn;return tn?(tn.att?'✔ '+esc(tn.att)+'<br>':'')+'오늘 기록 있음':'오늘 기록 전';}
-    if(k==='hw')return d.hw&&d.hw.avg!=null?'최근 '+d.hw.n+'번 평균 '+d.hw.avg+'%':'숙제 기록 전';
-    if(k==='book'){var x=(d.slots||{}).concept;return x&&x.book?esc(x.book)+(x.to!=null&&x.to!==''?' '+esc(x.to)+'쪽까지':''):'진도 기록 전';}
-    if(k==='exam'){var e=d.exam;return e?'<b style="color:#c0392b">'+(e.dday>0?'D-'+e.dday:e.dday===0?'D-DAY':'시험 기간')+'</b><br>'+esc(e.title):'다가오는 학교 시험 일정 없음';}
+    if(k==='hw')return d.hw&&d.hw.avg!=null?'최근 '+d.hw.n+'번<br>평균 '+d.hw.avg+'%':'숙제 기록 전';
+    if(k==='book'){var x=(d.slots||{}).concept;return x&&x.book?esc(x.book)+(x.to!=null&&x.to!==''?'<br>'+esc(x.to)+'쪽까지':''):'진도 기록 전';}
+    if(k==='exam'){var e=d.exam;var st=e?String(e.title||''):'',mm=st.match(/([1-4])\s*학기\s*(중간|기말)/);st=mm?mm[1]+'학기 '+mm[2]:st.replace(/^\S+(초|중|고)(등학교|학교)?\s*/,'').replace(/^[1-6]\s*학년\s*/,'');return e?'<b style="color:#c0392b">'+(e.dday>0?'D-'+e.dday:e.dday===0?'D-DAY':'시험 기간')+'</b><br>'+esc(st):'다가오는 학교 시험 일정 없음';}
     if(k==='wrong'){var WR=(PMO&&PMO.wr)||{},f=function(nm,o){return o&&+o.n?nm+' '+Math.round(100*(+o.x)/(+o.n))+'%':'';},L=[f('교재',WR.bk),f('기출',WR.ex),f('테스트',WR.ts)].filter(Boolean);return L.length?L.join('<br>'):'최근 1개월 기록 전';}
     if(k==='habit'){var a=d.att||{};return a.n?'출석 '+a.ok+'/'+a.n+' (4주)'+(mo.study?'<br>혼공 '+Math.round(mo.study/6)/10+'시간 (이번 달)':''):'출결 기록 전';}
     return '';}
