@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.77a';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.77b';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -341,9 +341,9 @@ input.w{width:100%;max-width:520px}
     if(tn){var at=tn.src==='note'&&tn.att?'<b>✔ '+esc(tn.att)+'</b> <span class="hint">(담당 쌤 확인)</span>':'<span class="hint">출결은 담당 쌤 확인 전</span>';
       var lt=items(tn.learn),ht=items(tn.hw);
       oh+='<div style="font-size:16px">'+at+((clsT||(bo&&bo.t))?' · 수업 '+esc(bo&&bo.t?bo.t:clsT):'')+'</div>'+
-        (lt?'<div style="margin-top:8px;font-size:15px"><span class="hint">오늘 한 곳'+(tn.src==='phone'?' (아이가 폰으로 남긴 것)':'')+'</span><br>'+lt+'</div>':'')+
+        (lt?'<div style="margin-top:8px;background:#eef3fb;border-radius:10px;padding:8px 10px;font-size:15px">📖 <b>오늘의 수업</b>'+(tn.src==='phone'?' <span class="hint">(아이가 폰으로 남긴 것)</span>':'')+lt+'</div>':'')+
         (ht?'<div style="margin-top:8px;background:#fff6dc;border-radius:10px;padding:8px 10px;font-size:15px">📌 <b>숙제</b>'+ht+'</div>':'');}
-    else if(onDay||bo)oh+='<div style="font-size:16px">오늘 수업'+((bo&&bo.t)||clsT?' '+esc(bo&&bo.t?bo.t:clsT):'')+'</div><div class="hint" style="margin-top:4px">수업이 끝나면 오늘 한 곳·숙제가 여기에 보입니다.</div>';
+    else if(onDay||bo)oh+='<div style="font-size:16px">오늘 수업'+((bo&&bo.t)||clsT?' '+esc(bo&&bo.t?bo.t:clsT):'')+'</div><div class="hint" style="margin-top:4px">수업이 끝나면 오늘의 수업·숙제가 여기에 보입니다.</div>';
     else if(!SM)oh+='<div class="hint">오늘 기록은 아직 없습니다.</div>';
     else{var nx='';if(SM){for(var i=1;i<=7;i++){var x=new Date(String(td)+'T00:00:00');x.setDate(x.getDate()+i);var w=W[x.getDay()];if(SM.hasOwnProperty(w)){nx=(x.getMonth()+1)+'/'+x.getDate()+'('+w+')'+(SM[w]?' '+SM[w]:'');break;}}}
       oh+='<div style="font-size:16px">오늘은 수업 없는 날이에요</div>'+(nx?'<div class="hint" style="margin-top:4px">다음 수업 '+esc(nx)+'</div>':'');}
