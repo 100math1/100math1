@@ -485,10 +485,10 @@ input.w{width:100%;max-width:520px}
   function pRqDef(k){var td=String((PCTX&&PCTX.today)||new Date().toISOString().slice(0,10)),D=[];for(var i=0;i<14;i++){var x=new Date(td+'T00:00:00');x.setDate(x.getDate()+i);if(x.getDay())D.push(pMd(x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)));}
     /* v0.80 원장 11-14 14:0x~14:2x 음성: 상담 주제 8개(여러 개) · 방법 전화/학원 방문(채팅으로 이끄는 건 X) · 평일 시간대 4칸(주말 X — 원장 주말 수업) · 안 되는 요일 · 받으실 분 · 존댓말 / 결석 = 달력에서 날짜 누르면 그 날 이유 · 보강 원함/안 함 뺌(기본값 — 학원이 아이와 정해 알림장으로) */
     var AM=(PRF.abs&&PRF.abs.mode)||'abs';
-    return {meet:{kind:'상담 요청',G:[['주제','s',['📊 성적·시험','📚 진도·선행','🎓 진로·진학','🙂 학원 적응·수업 태도','🗓 수업 횟수·휴원','💬 기타 문의'],1,2],['방법','m',['📞 전화','🏫 학원 방문'],0,2],['편하신 시간 (평일)','w',['오전 10시~1시','오후 1시~6시','저녁 6시~8시','저녁 8시~10시'],1,2],['어려운 요일','x',['월','화','수','목','금'],1,5],['받으실 분','who',['어머님','아버님','어느 분이든'],0,3]],ph:'상담하고 싶은 내용 (안 쓰셔도 돼요)'},
-      abs:AM==='time'?{kind:'수업 시간 변경 문의',mode:1,G:[['언제부터','p',['이번만','계속','다음 학기부터'],0,3]],ph:'원하시는 요일·시간을 적어 주세요',need:1,note:'반 구성에 맞춰 짜인 시간표라 지금 바로 바꾸기는 어려울 수 있어요. 남겨 주시면 학기마다 시간표를 새로 짤 때 꼭 함께 고려할게요.',go:'변경 문의 보내기'}:{kind:'결석·보강',mode:1,G:[],cal:1,ph:'더 전하실 말씀 (안 쓰셔도 돼요)'},
-      hw:{kind:'숙제·진도 요청',G:[['숙제 양','q',['조금 줄여 주세요','조금 늘려 주세요'],0,2],['진도','v',['조금 천천히','조금 빠르게'],0,2]],ph:'더 전하실 말씀 (안 쓰셔도 돼요)'},
-      sp:{kind:'방학 특강 신청',G:[['방학','v',['겨울방학','여름방학'],0,2],['관심 있는 것','i',['선행','복습·보충','심화','시험 대비'],1,2]],ph:'궁금하신 점 (안 쓰셔도 돼요)',note:'특강 일정·내용은 학원 안내로 알려 드려요.'},
+    return {meet:{kind:'상담 요청',G:[['주제','s',['📊 성적·시험','📚 진도·선행','🎓 진로·진학','🙂 학원 적응·수업 태도','🗓 수업 횟수·휴원','💬 기타 문의'],1,2],['방법','m',['📞 전화','🏫 학원 방문'],0,2],['편하신 시간 (평일)','w',['오전 10시~1시','오후 1시~6시','저녁 6시~8시','저녁 8시~10시'],1,2],['어려운 요일','x',['월','화','수','목','금'],1,5],['받으실 분','who',['어머님','아버님','어느 분이든'],0,3]],ph:'상담하고 싶은 내용\n(안 쓰셔도 돼요)'},
+      abs:AM==='time'?{kind:'수업 시간 변경 문의',mode:1,G:[['언제부터','p',['이번만','계속','다음 학기부터'],0,3]],ph:'원하시는 요일·시간을 적어 주세요',need:1,note:'반 구성에 맞춰 짜인 시간표라 지금 바로 바꾸기는 어려울 수 있어요. 남겨 주시면 학기마다 시간표를 새로 짤 때 꼭 함께 고려할게요.',go:'변경 문의 보내기'}:{kind:'결석·보강',mode:1,G:[],cal:1,ph:'더 전하실 말씀\n(안 쓰셔도 돼요)'},
+      hw:{kind:'숙제·진도 요청',G:[['숙제 양','q',['조금 줄여 주세요','조금 늘려 주세요'],0,2],['진도','v',['조금 천천히','조금 빠르게'],0,2]],ph:'더 전하실 말씀\n(안 쓰셔도 돼요)'},
+      sp:{kind:'방학 특강 신청',G:[['방학','v',['겨울방학','여름방학'],0,2],['관심 있는 것','i',['선행','복습·보충','심화','시험 대비'],1,2]],ph:'궁금하신 점\n(안 쓰셔도 돼요)',note:'특강 일정·내용은 학원 안내로 알려 드려요.'},
       news:{kind:'아이 소식',G:[['어떤 소식','t',['집에서 본 모습','칭찬할 점','걱정되는 점'],0,3]],ph:'쌤께 전하실 아이 소식을 적어 주세요',need:1}}[k];}
   /* v0.80 결석 달력: 이번 달·다음 달 · 지난 날·수업 없는 요일(시간표 기준, 없으면 일요일만) 흐리게 · 날짜 누르면 그 날 이유 고르는 창 · 「위와 같은 이유」 */
   var PABM=0,PABD='',PABR=['아파서','학교 행사','가족 일정','기타'];
@@ -497,14 +497,14 @@ input.w{width:100%;max-width:520px}
   function pAbsCal(V){var td=String((PCTX&&PCTX.today)||pYmd(new Date())).slice(0,10),t0=new Date(td+'T00:00:00'),m=new Date(t0.getFullYear(),t0.getMonth()+PABM,1),ok=pAbsDays(),days=V.days||{},y=m.getFullYear(),mo=m.getMonth(),n=new Date(y,mo+1,0).getDate(),st=(m.getDay()+6)%7,c='';
     for(var i=0;i<st;i++)c+='<span></span>';
     for(var d=1;d<=n;d++){var x=new Date(y,mo,d),k=pYmd(x),can=k>=td&&ok[x.getDay()],sel=days.hasOwnProperty(k),isT=k===td;
-      c+='<button data-ab="d" data-abk="'+k+'"'+(can?'':' disabled')+' style="font:inherit;font-size:15px;height:40px;border-radius:12px;border:'+(isT?'2px solid var(--navy)':'1px solid '+(sel?'#d9534f':'transparent'))+';background:'+(sel?(days[k]?'#d9534f':'#fbe3e3'):can?'#f3f5fb':'transparent')+';color:'+(sel&&days[k]?'#fff':can?'#1c2163':'#c4c8d4')+';font-weight:'+(sel||can?800:400)+';padding:0">'+d+'</button>';}
+      c+='<button data-ab="d" data-abk="'+k+'"'+(can?'':' disabled')+' style="font:inherit;font-size:14px;height:32px;border-radius:9px;border:'+(isT?'2px solid var(--navy)':'1px solid '+(sel?'#d9534f':'transparent'))+';background:'+(sel?(days[k]?'#d9534f':'#fbe3e3'):can?'#f3f5fb':'transparent')+';color:'+(sel&&days[k]?'#fff':can?'#1c2163':'#c4c8d4')+';font-weight:'+(sel||can?800:400)+';padding:0">'+d+'</button>';}
     var L=Object.keys(days).sort();
-    return '<div style="font-weight:800;font-size:14.5px;margin-bottom:6px">빠지는 날 <small class="hint">날짜를 누르면 이유를 고르실 수 있어요</small></div>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin:2px 0 6px"><button class="back" data-ab="m0" style="padding:4px 12px;'+(PABM?'':'visibility:hidden')+'">◀</button><b style="font-size:16px;color:var(--navy)">'+y+'년 '+(mo+1)+'월</b><button class="back" data-ab="m1" style="padding:4px 12px;'+(PABM?'visibility:hidden':'')+'">▶</button></div>'+
+    return '<div style="font-weight:800;font-size:14.5px;margin-bottom:2px">빠지는 날</div><div class="hint" style="font-size:13px;margin-bottom:4px;white-space:nowrap">날짜를 누르고 이유를 골라 주세요</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin:2px 0 6px"><button class="back" data-ab="m0" style="padding:2px 12px;'+(PABM?'':'visibility:hidden')+'">◀</button><b style="font-size:15px;color:var(--navy)">'+y+'년 '+(mo+1)+'월</b><button class="back" data-ab="m1" style="padding:4px 12px;'+(PABM?'visibility:hidden':'')+'">▶</button></div>'+
       '<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;font-size:12px;color:#8a90a6;margin-bottom:4px">'+'월화수목금토일'.split('').map(function(w){return '<span>'+w+'</span>';}).join('')+'</div>'+
-      '<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">'+c+'</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px">'+c+'</div>'+
       (L.length?'<div style="margin-top:10px">'+L.map(function(k){return '<button data-ab="e" data-abk="'+k+'" style="font:inherit;display:flex;width:100%;justify-content:space-between;align-items:center;padding:9px 12px;margin-top:5px;border-radius:12px;border:1px solid #f0caca;background:#fdf3f3;color:#1c2163;font-size:15px"><b>'+pMd(k)+'</b><span style="color:'+(days[k]?'#b33':'#8a90a6')+';font-weight:700">'+(days[k]?esc(days[k]):'이유 고르기 ›')+'</span></button>';}).join('')+'</div>':'')+
-      '<div class="hint" style="font-size:12.5px;margin:10px 0 12px;line-height:1.5">보강 날짜는 학원에서 아이와 정해 알림장으로 알려 드려요</div>'+(PABD?pAbsPop(V):'');}
+      '<div class="hint" style="font-size:12.5px;margin:10px 0 12px;line-height:1.5">보강 날짜는 알림장으로 알려 드려요</div>'+(PABD?pAbsPop(V):'');}
   function pAbsPop(V){var k=PABD,days=V.days||{},prev=Object.keys(days).sort().filter(function(x){return x<k&&days[x];}).pop();
     return '<div data-ab="bg" style="position:fixed;inset:0;background:rgba(20,24,50,.45);z-index:80;display:flex;align-items:flex-end;justify-content:center"><div style="background:#fff;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:18px 16px 22px;box-sizing:border-box">'+
       '<div style="font-size:18px;font-weight:900;color:#1c2163;margin-bottom:12px">'+pMd(k)+' 빠지는 이유</div>'+
