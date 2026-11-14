@@ -497,7 +497,7 @@ input.w{width:100%;max-width:520px}
   /* 📋 우리 아이·설정 — 6칸 */
   /* v0.79 원장 11-14 02:xx 음성: 학부모설문 6칸 = 📝 설문 · ✅ 동의 관리 / 🗓 시간표·공지 · 💳 원비 결제 / 🏆 아이 포인트 · 💌 친구 소개 (형제 추가·알림·사용법 뺌 — 형제는 학원에서 묶으면 위에 아이 이름 버튼) */
   var PSVT=[['sv','📝','설문','우리 아이에 대해'],['cn','📄','동의 내용 확인','사진·안내 받기 등<br>보기·바꾸기'],['tt','🗓','시간표·공지','수업 시간 · 학원 소식'],['pay','💳','원비 결제','계좌 · 카드'],['pt','🏆','아이 포인트','학생폰에서 모은 점수'],['ref','💌','친구 소개','아는 집에 보내기']];
-  var PAY={bank:'',acct:'',holder:''};/* ★ 원장이 계좌 알려 주면 채움 — 비어 있으면 「안내 준비 중」 */
+  var PAY={bank:'농협',acct:'302-0372-9991-21',holder:'백원재'};/* 원장 11-14 13:36 *//* ★ 원장이 계좌 알려 주면 채움 — 비어 있으면 「안내 준비 중」 */
   function pSvHome(due){if(!PSUB){var G=(PMO&&PMO.game)||null,T=PSVT.map(function(t){var x=t.slice();if(x[0]==='sv')x[3]=PCTX.psv_last?'마지막 작성 '+pMd(PCTX.psv_last)+(due?'<br>다시 부탁드려요':''):'아직 안 쓰셨어요<br>3분이면 끝나요';if(x[0]==='cn'&&PCTX.consent&&PCTX.consent.date)x[3]='✔ '+esc(pMd(PCTX.consent.date))+' 동의<br>보기·바꾸기';if(x[0]==='pt'&&G&&G.xp!=null){try{x[3]=rkTier(+G.xp).nm+'<br>'+(+G.xp)+'점 · 🔥 '+(+G.streak||0)+'일';}catch(e){}}return x;});
       if(!PMO||PMO._c!==PCUR)setTimeout(function(){prpc('par_more',{p_code:PCUR}).then(function(r){PMO=(r&&r.data)||{};PMO._c=PCUR;if(!PSUB&&PDOOR==='sv')pMain();});},0);
       return pTiles(T);}
