@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#1c2163">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="백수학 기록">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
 <style>
 :root{--navy:#1c2163;--yel:#f2b21b;--line:#d6dbe4;--bg:#f4f6fa;--mut:#6b7585;--ok:#1e7e45}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:'Gowun Dodum','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:#1d2430;font-size:17px;user-select:none;-webkit-user-select:none}
+body{margin:0;font-family:'Jua','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:#1d2430;font-size:17px;user-select:none;-webkit-user-select:none}
 input{user-select:text;-webkit-user-select:text}
 body.exm{background:#fff1ef}body.exm .top{background:linear-gradient(90deg,#8e1f14,#c0392b);border-bottom-color:#ffb3a7}
 .top{background:var(--navy);color:#fff;border-bottom:4px solid var(--yel);padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.80c';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.80d';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
