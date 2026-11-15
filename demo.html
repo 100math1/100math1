@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1c2163">
+<title>백수학 — 이렇게 챙겨요</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 백수학 상담 시연 v0.1 (2026-11-16) — 상담실 태블릿용. 가상 학생만, 로그인·DB 없음. 학부모 문구 = 사실만(자동 칭찬·약속 X), 과정 이름만(선행·본진도·상중하 X) */
+:root{--navy:#1c2163;--navy2:#2a3180;--yel:#ffd23f;--ink:#1d2135;--mut:#646a85;--line:#e3e5ee;--bg:#f4f5fa;--ok:#1f9d6b;--warn:#d98c00;--bad:#d93636}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.top{height:64px;background:var(--navy);color:#fff;display:flex;align-items:center;padding:0 24px;gap:14px}
+.top .lg{font-weight:900;font-size:20px;letter-spacing:-.3px}
+.top .lg i{display:inline-block;width:6px;height:22px;background:var(--yel);border-radius:3px;margin-right:10px;vertical-align:-4px}
+.top .tag{font-size:13px;background:rgba(255,255,255,.12);padding:4px 10px;border-radius:99px;color:#dfe2ff}
+.dots{margin-left:auto;display:flex;gap:6px;align-items:center}
+.dots b{display:block;min-width:30px;height:30px;padding:0 9px;border-radius:99px;font-size:13px;line-height:30px;text-align:center;color:#c9cdf5;cursor:pointer;font-weight:500}
+.dots b.on{background:var(--yel);color:var(--navy);font-weight:900}
+.stage{position:absolute;top:64px;left:0;right:0;bottom:84px;overflow:hidden}
+.sl{position:absolute;inset:0;padding:28px 40px;display:none;gap:40px;align-items:center;justify-content:center}
+.sl.on{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sl.on{animation:none}}
+.tx{flex:0 1 400px;max-width:430px}
+.tx .when{display:inline-block;font-size:14px;font-weight:700;color:var(--navy);background:#e8eaff;padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.tx h2{font-size:34px;line-height:1.28;font-weight:900;letter-spacing:-.8px;margin-bottom:16px}
+.tx h2,.tx p,.tx li,.cover h1,.cover p{word-break:keep-all}
+.tx h2 em{font-style:normal;box-shadow:inset 0 -12px 0 var(--yel)}
+.tx p{font-size:17px;line-height:1.7;color:#3b4060;margin-bottom:10px}
+.tx ul{list-style:none;margin-top:14px}
+.tx li{font-size:16px;line-height:1.55;padding:8px 0 8px 28px;position:relative;color:#30354f;border-top:1px solid var(--line)}
+.tx li:before{content:'';position:absolute;left:6px;top:16px;width:9px;height:9px;border-radius:3px;background:var(--navy)}
+.vis{flex:0 1 auto;display:flex;justify-content:center;align-items:center;max-height:100%}
+.bot{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:18px;font-weight:700;border:0;border-radius:14px;padding:0 28px;height:56px;cursor:pointer}
+.btn.p{background:var(--navy);color:#fff;min-width:220px}
+.btn.g{background:#eef0f7;color:var(--mut)}
+.btn:disabled{opacity:.35}
+.note{font-size:13px;color:var(--mut)}
+/* 폰 */
+.ph{width:340px;height:min(620px,calc(100vh - 220px));background:#111;border-radius:42px;padding:12px;box-shadow:0 24px 60px rgba(28,33,99,.25)}
+.ph .sc{width:100%;height:100%;background:#b9c8da;border-radius:32px;overflow:hidden;display:flex;flex-direction:column}
+.ph .hd{background:#a9b9cc;padding:16px 16px 10px;font-size:14px;font-weight:700;color:#253046;display:flex;align-items:center;gap:8px}
+.ph .hd .av{width:30px;height:30px;border-radius:10px;background:var(--navy);color:var(--yel);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.ph .bd{flex:1;overflow:auto;padding:12px 12px 16px;-webkit-overflow-scrolling:touch}
+.ph .dt{font-size:11px;color:#55627a;text-align:center;margin:4px 0 10px}
+.bub{background:#fff;border-radius:4px 16px 16px 16px;padding:12px 14px;font-size:13.5px;line-height:1.62;color:#1e2233;max-width:94%;white-space:pre-line;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.bub+.bub{margin-top:8px}
+.bub img{display:block;width:100%;border-radius:8px}
+.tm{font-size:10.5px;color:#55627a;margin:4px 0 0 4px}
+/* 쌤 화면 카드 */
+.pane{width:520px;background:#fff;border-radius:22px;box-shadow:0 18px 48px rgba(28,33,99,.12);overflow:hidden}
+.pane .ph2{background:var(--navy);color:#fff;padding:14px 20px;font-weight:700;font-size:15px;display:flex;gap:10px;align-items:center}
+.pane .ph2 span{margin-left:auto;font-size:12px;color:#c9cdf5;font-weight:400}
+.pane .pb{padding:16px 20px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.row .k{width:92px;color:var(--mut);font-size:13.5px;flex:none}
+.row .v{flex:1;font-weight:500}
+.pill{display:inline-block;font-size:12.5px;padding:3px 10px;border-radius:99px;font-weight:700;margin-right:4px}
+.pill.g{background:#e3f6ee;color:var(--ok)}.pill.y{background:#fff3d6;color:#a66a00}.pill.r{background:#fde7e7;color:var(--bad)}.pill.b{background:#e8eaff;color:var(--navy)}
+/* 채점 */
+.grd{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:6px}
+.grd div{border:1.5px solid var(--line);border-radius:12px;text-align:center;padding:8px 0 6px;font-size:12px;color:var(--mut)}
+.grd div b{display:block;font-size:20px;line-height:1.2}
+.grd .o b{color:var(--ok)}.grd .x b{color:var(--bad)}.grd .q b{color:var(--warn)}
+.grd .x{border-color:#f4c1c1;background:#fff7f7}
+.flow{display:flex;align-items:center;gap:6px;margin-top:14px;font-size:13px;flex-wrap:wrap}
+.flow span{background:#f4f5fa;border-radius:10px;padding:7px 10px}
+.flow i{font-style:normal;color:var(--mut)}
+/* 학습 여정 */
+.jy{width:560px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 48px rgba(28,33,99,.14)}
+.jy .jh{background:var(--navy);color:var(--yel);padding:14px 18px;display:flex;align-items:baseline;gap:10px}
+.jy .jh b{font-size:19px;font-weight:900}.jy .jh span{color:#fff;font-size:13px;opacity:.85}
+.jy .jb{padding:14px 16px 16px}
+.mt{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.mt div{background:#f6f7fb;border-radius:12px;padding:9px 8px 8px;text-align:center}
+.mt small{display:block;font-size:11px;color:var(--mut)}
+.mt b{display:block;font-size:19px;font-weight:900;margin:2px 0 1px;color:var(--navy)}
+.mt em{font-style:normal;font-size:11px;font-weight:700}
+.up{color:var(--ok)}.dn{color:var(--bad)}.eq{color:var(--mut)}
+.jsec{font-size:12.5px;font-weight:700;color:var(--navy);margin:14px 0 6px;display:flex;gap:8px;align-items:center}
+.jsec:after{content:'';flex:1;height:1px;background:var(--line)}
+.crs{display:grid;grid-template-columns:62px 1fr 46px;gap:6px 8px;align-items:center;font-size:12.5px}
+.crs .bar{height:16px;background:#eef0f7;border-radius:99px;overflow:hidden}
+.crs .bar i{display:block;height:100%;background:linear-gradient(90deg,#3a47b8,var(--navy));border-radius:99px}
+.crs .pc{text-align:right;font-weight:700;color:var(--navy)}
+.two{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal div{height:30px;border-radius:6px;font-size:9.5px;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f6f7fb;color:#9aa0b8}
+.cal div b{font-size:10.5px;color:#454b68;font-weight:700}
+.cal .cG{background:#e3f6ee;color:var(--ok)}.cal .cY{background:#fff3d6;color:#a66a00}.cal .cR{background:#fde7e7;color:var(--bad)}
+.lgd{display:flex;gap:10px;font-size:10.5px;color:var(--mut);margin-top:5px}
+.lgd i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+/* 성적 */
+.sc2{width:560px;background:#fff;border-radius:22px;padding:18px 20px;box-shadow:0 18px 48px rgba(28,33,99,.12)}
+.sc2 h4{font-size:15px;color:var(--navy);margin-bottom:6px}
+/* 마무리 */
+.rh{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:min(900px,92vw)}
+.rh div{background:#fff;border-radius:20px;padding:22px 20px;box-shadow:0 10px 30px rgba(28,33,99,.08)}
+.rh small{display:block;font-size:14px;font-weight:700;color:var(--navy);background:#e8eaff;border-radius:99px;padding:4px 12px;width:max-content;margin-bottom:12px}
+.rh b{display:block;font-size:21px;font-weight:900;margin-bottom:8px}
+.rh p{font-size:15px;color:#3b4060;line-height:1.6}
+.cover{flex-direction:column;text-align:center;gap:24px}
+.cover h1{font-size:46px;font-weight:900;letter-spacing:-1.2px;line-height:1.25}
+.cover h1 em{font-style:normal;box-shadow:inset 0 -16px 0 var(--yel)}
+.cover p{font-size:19px;color:#3b4060;line-height:1.6}
+.stu{display:inline-flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:14px 22px;box-shadow:0 10px 30px rgba(28,33,99,.08);text-align:left}
+.stu .av{width:52px;height:52px;border-radius:16px;background:var(--navy);color:var(--yel);font-weight:900;font-size:20px;display:flex;align-items:center;justify-content:center}
+.stu b{font-size:19px}.stu span{display:block;font-size:13.5px;color:var(--mut);margin-top:2px}
+.fake{position:fixed;right:16px;bottom:94px;font-size:11.5px;color:#8a90a8;background:rgba(255,255,255,.85);padding:4px 10px;border-radius:99px;pointer-events:none}
+@media (max-width:980px){.sl{flex-direction:column;gap:18px;padding:18px;overflow:auto;justify-content:flex-start}.tx{max-width:none;flex:none}.tx h2{font-size:26px}.tx p{font-size:15px}.pane,.jy,.sc2{width:100%;max-width:560px}.ph{height:540px}.rh{grid-template-columns:1fr}.cover h1{font-size:34px}.top .tag{display:none}.dots b{min-width:24px;padding:0 6px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="lg"><i></i>백수학</div><span class="tag">상담용 둘러보기 · 가상 학생 예시</span><div class="dots" id="dots"></div></div>
+<div class="stage" id="stage">
+
+<!-- 0 표지 -->
+<section class="sl cover" data-t="처음">
+  <h1>백수학은 아이를<br><em>이렇게 챙겨요</em></h1>
+  <p>수업 시간에 쌤이 남긴 기록이<br>매일 · 매주 · 매달 부모님께 어떻게 가는지 순서대로 보여 드릴게요.</p>
+  <div class="stu"><div class="av">하</div><div><b>김하늘 <small style="font-size:13px;color:#8a90a8;font-weight:400">(예시 학생)</small></b><span>중학교 2학년 · 주 3회 · 학교 시험 80점대</span></div></div>
+</section>
+
+<!-- 1 수업 시간 -->
+<section class="sl" data-t="수업">
+  <div class="tx"><span class="when">수업 시간 · 학원 안에서</span>
+    <h2>쌤이 <em>매 수업 기록</em>을 남겨요</h2>
+    <p>출결, 오늘 나간 진도, 숙제, 테스트 점수, 수업 태도를 수업마다 적어요.</p>
+    <ul><li>기록이 쌓여야 알림장·리포트가 만들어져요</li><li>쌤이 바뀌어도 아이 기록은 그대로 이어져요</li></ul>
+  </div>
+  <div class="vis"><div class="pane"><div class="ph2">📝 오늘 수업 기록 — 김하늘<span>11월 17일 (화)</span></div><div class="pb">
+    <div class="row"><span class="k">출결</span><span class="v"><span class="pill g">제시간 도착</span> 17:58</span></div>
+    <div class="row"><span class="k">오늘 진도</span><span class="v">중2-2 · 삼각형의 성질 — 이등변삼각형</span></div>
+    <div class="row"><span class="k">지난 숙제</span><span class="v"><span class="pill g">완료</span> 유형서 42~45쪽</span></div>
+    <div class="row"><span class="k">단원 테스트</span><span class="v"><b>18 / 20</b> <span class="note">· 반 평균 16.4</span></span></div>
+    <div class="row"><span class="k">수업 태도</span><span class="v">질문하면서 끝까지 참여</span></div>
+    <div class="row"><span class="k">다음 숙제</span><span class="v">유형서 46~49쪽</span></div>
+  </div></div></div>
+</section>
+
+<!-- 2 채점·오답 -->
+<section class="sl" data-t="채점">
+  <div class="tx"><span class="when">수업 시간 · 문제 하나하나</span>
+    <h2>틀린 문제는 <em>맞힐 때까지</em> 따라가요</h2>
+    <p>푼 문제는 번호마다 ⭕ ✕ 로 채점해 남겨요. 틀린 문제는 다시 풀어서 맞힐 때까지 목록에 남아요.</p>
+    <ul><li>❓ 표시 = 아이가 "설명 듣고 싶어요" 한 문제 → 쌤이 같이 풀어요</li><li>여러 명이 같은 문제를 물으면 칠판에서 한 번에 설명해요</li></ul>
+  </div>
+  <div class="vis"><div class="pane"><div class="ph2">✔ 채점 — 유형서 46쪽<span>번호별</span></div><div class="pb">
+    <div class="grd">
+      <div class="o">1<b>⭕</b></div><div class="o">2<b>⭕</b></div><div class="x">3<b>✕</b></div><div class="o">4<b>⭕</b></div><div class="q">5<b>❓</b></div><div class="o">6<b>⭕</b></div>
+      <div class="o">7<b>⭕</b></div><div class="o">8<b>⭕</b></div><div class="o">9<b>⭕</b></div><div class="x">10<b>✕</b></div><div class="o">11<b>⭕</b></div><div class="o">12<b>⭕</b></div>
+    </div>
+    <div class="jsec" style="margin-top:16px">틀린 3번은 이렇게 따라가요</div>
+    <div class="flow"><span>✕ 46쪽 3번</span><i>→</i><span>다음 수업에 다시 풀기</span><i>→</i><span style="background:#e3f6ee;color:#1f9d6b;font-weight:700">⭕ 다시 풀어 맞힘</span></div>
+    <div class="row" style="margin-top:12px"><span class="k">이번 달</span><span class="v">틀린 문제 31개 중 <b>23개</b> 다시 풀어 맞힘 · 8개 남음</span></div>
+  </div></div></div>
+</section>
+
+<!-- 3 매일 알림장 -->
+<section class="sl" data-t="매일">
+  <div class="tx"><span class="when">매일 · 수업 끝나고</span>
+    <h2>부모님 폰으로 <em>오늘 수업 알림장</em></h2>
+    <p>그날 기록이 그대로 알림장이 돼요. 있었던 일만 적고, 꾸미는 말은 넣지 않아요.</p>
+    <ul><li>숙제를 덜 해 온 날도 그대로 알려 드려요</li><li>쌤이 한 번 확인하고 보내요</li></ul>
+  </div>
+  <div class="vis"><div class="ph"><div class="sc"><div class="hd"><div class="av">백</div>백수학</div><div class="bd">
+    <div class="dt">11월 17일 화요일</div>
+    <div class="bub">안녕하세요. 백수학입니다.
+11/17 화 김하늘 수업 알림장을 보내드립니다.
+
+오늘은 제시간에 와서 중2-2 삼각형의 성질 중 이등변삼각형을 공부했어요. 지난 숙제(유형서 42~45쪽)는 모두 해 왔어요.
+
+📝 단원 테스트 18/20점 (반 평균 16.4점)
+✏️ 46쪽은 12문제 중 10문제 맞혔고, 틀린 3·10번은 다음 수업에 다시 풀어요.
+❓ 5번은 질문해서 수업 때 같이 풀었어요.
+
+📚 다음 숙제: 유형서 46~49쪽
+
+감사합니다.
+— 백수학</div><div class="tm">오후 9:42</div>
+    <div class="dt" style="margin-top:14px">11월 19일 목요일</div>
+    <div class="bub">안녕하세요. 백수학입니다.
+11/19 목 김하늘 수업 알림장을 보내드립니다.
+
+오늘은 10분 늦게 와서 직각삼각형의 합동을 공부했어요. 지난 숙제는 46~49쪽 중 46~47쪽까지 해 왔어요.
+
+📝 단원 테스트 15/20점 (반 평균 16.0점)
+✏️ 지난번 틀린 3·10번은 다시 풀어서 맞혔어요.
+
+📚 다음 숙제: 유형서 48~52쪽
+
+감사합니다.
+— 백수학</div><div class="tm">오후 9:38</div>
+  </div></div></div></div>
+</section>
+
+<!-- 4 매주 -->
+<section class="sl" data-t="매주">
+  <div class="tx"><span class="when">매주 · 금요일</span>
+    <h2>한 주를 모은 <em>주간 알림장</em></h2>
+    <p>그 주 수업을 한 장에 모아서 보내요. 숙제, 테스트, 다시 풀어 맞힌 문제가 한눈에 보여요.</p>
+    <ul><li>매일 알림장을 놓치셔도 금요일에 한 번에 보실 수 있어요</li></ul>
+  </div>
+  <div class="vis"><div class="ph"><div class="sc"><div class="hd"><div class="av">백</div>백수학</div><div class="bd">
+    <div class="dt">11월 20일 금요일</div>
+    <div class="bub">안녕하세요. 백수학입니다.
+11/16~11/20 김하늘 주간 알림장을 보내드립니다.
+
+🏫 출석 3번 (11/19 10분 늦음)
+📚 진도: 중2-2 삼각형의 성질 — 이등변삼각형 → 직각삼각형의 합동
+✏️ 숙제 3번 중 완료 2번 · 일부 1번
+📝 단원 테스트 18 · 15 · 17점 (반 평균 16.4 · 16.0 · 16.8점)
+🔁 지난주 틀린 문제 9개 중 7개 다시 풀어 맞힘 · 2개 남음
+❓ 질문한 문제 3개 수업 때 같이 풀었어요
+
+📌 다음 주: 삼각형의 내심 · 단원 마무리 테스트
+
+감사합니다.
+— 백수학</div><div class="tm">오후 9:50</div>
+  </div></div></div></div>
+</section>
+
+<!-- 5 매달 학습 여정 -->
+<section class="sl" data-t="매달">
+  <div class="tx"><span class="when">매달 · 마지막 주 금요일</span>
+    <h2>한 달을 한 장으로, <em>학습 여정</em></h2>
+    <p>한 달 동안 숙제, 푼 문제, 다시 풀어 맞힌 문제, 출석을 지난달과 나란히 보여 드려요.</p>
+    <ul><li>▲▼ 표시로 지난달보다 나아진 것과 아쉬운 것을 그대로</li><li>달력 색으로 출석·숙제를 한눈에</li><li>지금 어느 과정을 하고 있고 다음 달은 어디까지인지</li></ul>
+  </div>
+  <div class="vis"><div class="jy"><div class="jh"><b>김하늘 · 11월 학습 여정</b><span>백수학</span></div><div class="jb">
+    <div class="mt">
+      <div><small>숙제</small><b>83%</b><em class="up">▲ 6%p</em></div>
+      <div><small>푼 문제</small><b>412</b><em class="up">▲ 38</em></div>
+      <div><small>다시 풀어 맞힘</small><b>23/31</b><em class="up">74% ▲ 9%p</em></div>
+      <div><small>학교 시험</small><b>84점</b><em class="up">▲ 3점</em></div>
+      <div><small>다음 시험 목표</small><b>88점</b><em class="eq">2학기 기말</em></div>
+    </div>
+    <div class="two">
+      <div><div class="jsec">과정</div>
+        <div class="crs">
+          <span>중2-1</span><div class="bar"><i style="width:100%"></i></div><span class="pc">끝</span>
+          <span>중2-2</span><div class="bar"><i style="width:58%"></i></div><span class="pc">58%</span>
+          <span style="color:#9aa0b8">다음 달</span><div style="font-size:11.5px;color:var(--mut)">중2-2 마무리 · 📌 12월 기말 대비</div><span></span>
+        </div>
+        <div class="jsec">주간 테스트 평균</div>
+        <svg viewBox="0 0 240 70" width="100%" height="70" aria-label="주간 테스트 평균 그래프">
+          <line x1="0" y1="62" x2="240" y2="62" stroke="#e3e5ee"/>
+          <polyline fill="none" stroke="#1c2163" stroke-width="2.5" points="20,40 80,34 140,44 200,26"/>
+          <g fill="#1c2163"><circle cx="20" cy="40" r="3.5"/><circle cx="80" cy="34" r="3.5"/><circle cx="140" cy="44" r="3.5"/><circle cx="200" cy="26" r="3.5"/></g>
+          <g font-size="9" fill="#646a85" text-anchor="middle"><text x="20" y="30">80</text><text x="80" y="24">84</text><text x="140" y="56">77</text><text x="200" y="16">88</text><text x="20" y="70">1주</text><text x="80" y="70">2주</text><text x="140" y="70">3주</text><text x="200" y="70">4주</text></g>
+        </svg>
+      </div>
+      <div><div class="jsec">출석 · 숙제</div>
+        <div class="cal" id="cal"></div>
+        <div class="lgd"><span><i style="background:#e3f6ee"></i>출석·숙제 완료</span><span><i style="background:#fff3d6"></i>숙제 일부·늦음</span><span><i style="background:#fde7e7"></i>결석</span></div>
+      </div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- 6 시험 -->
+<section class="sl" data-t="시험">
+  <div class="tx"><span class="when">시험 기간</span>
+    <h2>학교 시험은 <em>목표와 나란히</em></h2>
+    <p>학교 시험 점수를 쌓아서 흐름을 보여 드려요. 다음 시험 목표 점수도 같이 정해서 보여 드려요.</p>
+    <ul><li>시험 4주 전부터 시험 대비 모드로 바뀌어요</li><li>학교 기출 시험지로 연습하고, 틀린 단원을 다시 봐요</li></ul>
+  </div>
+  <div class="vis"><div class="sc2"><h4>📊 학교 수학 시험 — 김하늘</h4>
+    <svg viewBox="0 0 520 230" width="100%" aria-label="학교 시험 점수 그래프">
+      <g stroke="#eef0f7"><line x1="40" y1="30" x2="510" y2="30"/><line x1="40" y1="80" x2="510" y2="80"/><line x1="40" y1="130" x2="510" y2="130"/><line x1="40" y1="180" x2="510" y2="180"/></g>
+      <g font-size="11" fill="#9aa0b8" text-anchor="end"><text x="32" y="34">100</text><text x="32" y="84">90</text><text x="32" y="134">80</text><text x="32" y="184">70</text></g>
+      <line x1="40" y1="70" x2="510" y2="70" stroke="#d98c00" stroke-width="2" stroke-dasharray="6 5"/>
+      <text x="508" y="62" font-size="11.5" fill="#a66a00" text-anchor="end" font-weight="700">🎯 다음 목표 88</text>
+      <polyline fill="none" stroke="#1c2163" stroke-width="3" points="90,200 210,165 330,110"/>
+      <polyline fill="none" stroke="#1c2163" stroke-width="2.5" stroke-dasharray="3 6" points="330,110 450,70"/>
+      <g fill="#1c2163"><circle cx="90" cy="200" r="6"/><circle cx="210" cy="165" r="6"/><circle cx="330" cy="110" r="6"/></g>
+      <circle cx="450" cy="70" r="7" fill="#fff" stroke="#d98c00" stroke-width="2.5"/>
+      <g font-size="14" font-weight="900" fill="#1c2163" text-anchor="middle"><text x="90" y="188">74</text><text x="210" y="153">81</text><text x="330" y="98">84</text></g>
+      <g font-size="12" fill="#646a85" text-anchor="middle"><text x="90" y="222">1학기 중간</text><text x="210" y="222">1학기 기말</text><text x="330" y="222">2학기 중간</text><text x="450" y="222">2학기 기말</text></g>
+    </svg>
+    <div class="row" style="border-top:1px solid var(--line)"><span class="k">약한 단원</span><span class="v">삼각형의 외심·내심 <span class="note">— 단원 테스트 정답률 68%</span></span></div>
+  </div></div>
+</section>
+
+<!-- 7 정리 -->
+<section class="sl cover" data-t="정리">
+  <h1 style="font-size:38px">기록은 매일, <em>알림은 리듬대로</em></h1>
+  <div class="rh">
+    <div><small>매일</small><b>수업 알림장</b><p>출결 · 진도 · 숙제 · 테스트 · 다음 숙제</p></div>
+    <div><small>매주 금요일</small><b>주간 알림장</b><p>한 주 숙제 · 테스트 흐름 · 다시 풀어 맞힌 문제</p></div>
+    <div><small>매달</small><b>학습 여정</b><p>지난달과 비교 · 출석 달력 · 과정 · 다음 시험 목표</p></div>
+  </div>
+  <p style="font-size:16px">궁금하신 건 편하게 물어봐 주세요.</p>
+</section>
+</div>
+<div class="fake">화면 속 학생·점수는 모두 예시예요</div>
+<div class="bot"><button class="btn g" id="prev">← 이전</button><span class="note" id="hint">화면을 옆으로 밀어도 넘어가요</span><button class="btn p" id="next">시작하기 →</button></div>
+<script>
+(function(){
+  var S=[].slice.call(document.querySelectorAll('.sl')),i=0,dots=document.getElementById('dots');
+  S.forEach(function(s,k){var b=document.createElement('b');b.textContent=s.getAttribute('data-t');b.onclick=function(){go(k);};dots.appendChild(b);});
+  /* 2026년 11월 달력(1일=일요일): 월·화·목 수업(주 3회) — 가상 */
+  var cal=document.getElementById('cal'),h='';['월','화','수','목','금','토','일'].forEach(function(w){h+='<div style="background:none;height:16px"><b>'+w+'</b></div>';});
+  var st={2:'cG',3:'cG',5:'cY',9:'cG',10:'cG',12:'cG',16:'cG',17:'cG',19:'cY',23:'cG',24:'cR',26:'cG'},wd={cG:'완료',cY:'일부',cR:'결석'};
+  for(var e=0;e<6;e++)h+='<div style="background:none"></div>';
+  for(var d=1;d<=30;d++){var c=st[d];h+='<div class="'+(c||'')+'"><b>'+d+'</b>'+(c?wd[c]:'')+'</div>';}
+  cal.innerHTML=h;
+  var P=document.getElementById('prev'),N=document.getElementById('next'),H=document.getElementById('hint');
+  function go(k){if(k<0||k>=S.length)return;i=k;S.forEach(function(s,j){s.classList.toggle('on',j===i);});[].forEach.call(dots.children,function(b,j){b.classList.toggle('on',j===i);});
+    P.disabled=i===0;N.textContent=i===0?'시작하기 →':i===S.length-1?'처음으로 ↺':'다음 →';H.style.visibility=i===0?'visible':'hidden';}
+  P.onclick=function(){go(i-1);};N.onclick=function(){go(i===S.length-1?0:i+1);};
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')N.onclick();if(e.key==='ArrowLeft')go(i-1);});
+  var x0=null,y0=null;var st2=document.getElementById('stage');
+  st2.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  st2.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){dx<0?N.onclick():go(i-1);}x0=null;},{passive:true});
+  go(0);
+})();
+</script>
+</body>
+</html>
