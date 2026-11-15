@@ -198,7 +198,7 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.80d';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.80e';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
@@ -1392,15 +1392,18 @@ input.w{width:100%;max-width:520px}
       '<div class="hint" id="xth">'+(t0?'풀고 있어… 다 풀면 아래 버튼!':'[시작]을 누르고 종이 시험지를 풀어. 다 풀면 [다 풀었어]!')+'</div>'+
       (t0?'':'<button class="send" id="xStart" style="background:var(--yel);color:#1d2430;margin-top:12px">▶ 시작</button>')+
       '<button class="send" id="xDone" style="margin-top:12px'+(t0?'':';display:none')+'">✅ 다 풀었어 — 답 입력하기</button>'+
+      '<button class="back" id="xStop" style="display:'+(t0?'block':'none')+';width:100%;margin-top:10px;padding:9px;font-size:14px;color:#c0392b;border-color:#f0c4c0">⏹ 시작 취소 <small style="font-weight:400;color:#8a90a0">잘못 눌렀으면 — 시간 지우고 목록으로</small></button>'+
       '<button class="back" id="xSkip" style="display:block;width:100%;margin-top:12px;padding:10px;font-size:15px">📝 바로 답 입력<small style="display:block;font-size:11.5px;color:#8a90a0;font-weight:400">종이로 이미 풀었으면</small></button></div>'+
       '<div class="card hint">⏱ 시간은 자동으로 재. 종이에도 걸린 시간을 적어 두면 학교 시험 연습이 돼.</div>';
     out.innerHTML=h;window.scrollTo(0,0);clearInterval(X.tick);
     function run(){X.tick=setInterval(function(){var s=(Date.now()-(+LS(k)))/1000;var e=document.getElementById('xtm');if(e)e.textContent=xfmt(s);else clearInterval(X.tick);},1000);}
     if(t0)run();
-    var sb=document.getElementById('xStart');if(sb)sb.onclick=function(){LS(k,String(Date.now()));sb.style.display='none';document.getElementById('xDone').style.display='';document.getElementById('xth').textContent='풀고 있어… 다 풀면 아래 버튼!';run();};
+    var sb=document.getElementById('xStart');if(sb)sb.onclick=function(){LS(k,String(Date.now()));sb.style.display='none';document.getElementById('xDone').style.display='';document.getElementById('xStop').style.display='block';document.getElementById('xth').textContent='풀고 있어… 다 풀면 아래 버튼!';run();};
     document.getElementById('xDone').onclick=function(){clearInterval(X.tick);xOMR(Math.round((Date.now()-(+LS(k)))/1000));};
     document.getElementById('xSkip').onclick=function(){clearInterval(X.tick);xOMR(null);};
-    document.getElementById('xCancel').onclick=function(){clearInterval(X.tick);xBack();};}
+    document.getElementById('xCancel').onclick=function(){clearInterval(X.tick);xBack();};
+    /* v0.80e 원장 11-15 12:3x 「중간 시험지 시작 잘못 눌렀는데 취소도 안 되고」 → ⏹ 시작 취소 = 이 폰 시간 기록만 지움(서버엔 원래 안 남음) */
+    document.getElementById('xStop').onclick=function(){if(!confirm('시작을 취소할까? 잰 시간이 지워져.'))return;clearInterval(X.tick);LS(k,null);toast('취소했어 — 다른 시험지를 골라');xBack();};}
   function xOMR(elapsed){X.elapsed=elapsed;X.ans={};X.ph={};out.innerHTML='<div class="card">시험지 정보 불러오는 중…</div>';
     SB.rpc('stu_exam_paper',{p_code:CODE,p_paper:X.paper.id}).then(function(r){if(r.error||!r.data||r.data.error){toast('시험지 정보를 못 가져왔어');xBack();return;}X.info=r.data;xRenderOMR();});}
   function xRenderOMR(){var I=X.info;
