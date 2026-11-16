@@ -119,7 +119,7 @@ input.w{width:100%;max-width:520px}
 .hmsum{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:15px;align-items:baseline}
 .hmsum span{color:#6b7280;white-space:nowrap}
 @media (max-width:380px){.top .cn{display:none}.top{flex-wrap:nowrap;gap:8px;padding:10px 12px}.top h1{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}}
-.frc{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.82em;line-height:1.05;margin:0 2px}.frc i{font-style:normal;padding:0 2px}.frc i:first-child{border-bottom:1.5px solid currentColor}</style>
+.frc{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.82em;line-height:1.05;margin:0 2px}.frc i{font-style:normal;padding:0 2px}.frc i:first-child{border-bottom:1.5px solid currentColor}.rtx{white-space:nowrap}.rtx>span{border-top:1.5px solid currentColor;padding:1px 1px 0;margin-left:-1px}</style>
 </head>
 <body>
 <div class="top"><button id="hBack" style="display:none;margin-right:2px;font-size:14px;font-weight:800;padding:6px 11px;background:#f2b21b;color:#1c2163;border-color:#f2b21b">🏠 홈</button><h1 id="hTtl">🙋 오늘 기록</h1><span class="cn" id="cn"></span><span class="sp"><button id="hNot" style="display:none;font-size:12px;padding:4px 9px">내가 아니야</button><span id="dday" style="display:none;font-size:12.5px;font-weight:800;border-radius:10px;padding:3px 8px;white-space:nowrap"></span><span id="conn"></span></span></div>
@@ -198,14 +198,15 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.80i';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.80j';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   /* 원장 11-16 15:49 「분수 답을 실제 분수로 — 저학년은 3/4가 뭔지 모르는 경우 은근 많아」 → a/b 를 위아래 분수로 · 2/7/36 = 대분수 2와 7/36 · {1/2} 괄호 벗김 */
   function fracH(s){var t=esc(s==null?'':s);t=t.replace(/\{([^{}]*\/[^{}]*)\}/g,'$1');
     var F=function(n,d){return '<span class="frc"><i>'+n+'</i><i>'+d+'</i></span>';};
     t=t.replace(/(^|[^0-9./])(\d+)\/(\d+)\/(\d+)(?![0-9./])/g,function(m,p,w,n,d){return p+w+F(n,d);});
-    t=t.replace(/(^|[^0-9./])(\d*√?\d+|\d*√\(?[^\s,/)]+\)?|\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)(?![0-9./])/g,function(m,p,n,d){return p+F(n,d);});return t;}
+    t=t.replace(/(^|[^0-9./])(\d*√?\d+|\d*√\(?[^\s,/)]+\)?|\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)(?![0-9./])/g,function(m,p,n,d){return p+F(n,d);});
+  t=t.replace(/√\(([^()]*)\)|√(\d+(?:\.\d+)?|[a-zA-Z])/g,function(m,a,b){return '<span class="rtx">√<span>'+(a!=null?a:b)+'</span></span>';});return t;}
   
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
   function given(n){n=String(n||'').replace(/\s/g,'');return n.length>=3?n.slice(1):n;}
