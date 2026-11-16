@@ -198,15 +198,18 @@ input.w{width:100%;max-width:520px}
   if(DEMO&&SB){var _rpc=SB.rpc.bind(SB);SB.rpc=function(n,a){var v;try{v=dmRpc(n,a||{});}catch(e){v=undefined;}if(v===undefined)return _rpc(n,a);return {then:function(f,g){return Promise.resolve({data:v,error:null}).then(f,g);}};};
     setTimeout(function(){try{var b=document.createElement('div');b.id='demoBan';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;background:#7a3cff;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);white-space:nowrap';b.innerHTML='🧪 연습 모드 · 가짜 기록 <u style="margin-left:6px;cursor:pointer" id="demoOff">끄기</u>';document.body.appendChild(b);document.getElementById('demoOff').onclick=function(){sessionStorage.removeItem('bzs_demo');location.replace(location.pathname+'?m=wrong');};}catch(e){}},300);}
   /* v0.29 새 버전 자동 받기: 서버 파일 버전이 지금 화면과 다르면 한 번 새로 불러옴 (폰 캐시 때문에 옛 화면 남는 문제) */
-  var APPV='v0.80j';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
+  var APPV='v0.80k';try{setTimeout(function(){fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(m&&m[1]!==APPV&&sessionStorage.getItem('bzs_rl')!==m[1]){sessionStorage.setItem('bzs_rl',m[1]);var u=new URL(location.href);u.searchParams.set('v',m[1]);location.replace(u.toString());}}).catch(function(){});},1500);}catch(e){}
   function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   /* 원장 11-16 15:49 「분수 답을 실제 분수로 — 저학년은 3/4가 뭔지 모르는 경우 은근 많아」 → a/b 를 위아래 분수로 · 2/7/36 = 대분수 2와 7/36 · {1/2} 괄호 벗김 */
   function fracH(s){var t=esc(s==null?'':s);t=t.replace(/\{([^{}]*\/[^{}]*)\}/g,'$1');
-    var F=function(n,d){return '<span class="frc"><i>'+n+'</i><i>'+d+'</i></span>';};
-    t=t.replace(/(^|[^0-9./])(\d+)\/(\d+)\/(\d+)(?![0-9./])/g,function(m,p,w,n,d){return p+w+F(n,d);});
-    t=t.replace(/(^|[^0-9./])(\d*√?\d+|\d*√\(?[^\s,/)]+\)?|\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)(?![0-9./])/g,function(m,p,n,d){return p+F(n,d);});
-  t=t.replace(/√\(([^()]*)\)|√(\d+(?:\.\d+)?|[a-zA-Z])/g,function(m,a,b){return '<span class="rtx">√<span>'+(a!=null?a:b)+'</span></span>';});return t;}
+    /* 원장 11-16 15:49~53 「분수는 위아래로 · 근호 안의 수가 밖으로 나와 보기 안 좋아」 → a/b 위아래 분수 · 2/7/36 = 대분수 · √x·√(…) 는 지붕 아래로 */
+    var F=function(n,d){return '<span class="frc"><i>'+n+'</i><i>'+d+'</i></span>';},RT=function(x){return '<span class="rtx">√<span>'+x+'</span></span>';};
+    var fr=function(u){u=u.replace(/(^|[^0-9./])(\d+)\/(\d+)\/(\d+)(?![0-9./])/g,function(m,p,w,n,d){return p+w+F(n,d);});
+      return u.replace(/(^|[^0-9./√])(\d*√\d+(?:\.\d+)?|\d+(?:\.\d+)?|[a-z])\/(\d+(?:\.\d+)?|[a-z])(?![0-9./])/g,function(m,p,n,d){return p+F(n,d);});};
+    t=t.replace(/√\(([^()]*)\)/g,function(m,a){return '\u0001'+encodeURIComponent(RT(fr(a)))+'\u0002';});
+    t=fr(t);t=t.replace(/√(\d+(?:\.\d+)?|[a-zA-Z])/g,function(m,a){return RT(a);});
+    return t.replace(/\u0001([^\u0002]*)\u0002/g,function(m,a){return decodeURIComponent(a);});}
   
   function toast(t){var e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2200);}
   function given(n){n=String(n||'').replace(/\s/g,'');return n.length>=3?n.slice(1):n;}
