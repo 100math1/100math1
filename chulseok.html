@@ -42,7 +42,7 @@ header .cnt{font-size:14px;background:rgba(255,255,255,.12);border-radius:99px;p
 .empty{padding:40px;text-align:center;color:#5b6380;font-size:18px}
 #srch{margin-left:auto;font-size:17px;padding:8px 12px;border:2px solid #c9cfe2;border-radius:12px;width:160px}
 </style></head><body>
-<div id="login"><form class="bx" id="loginF"><h2>백수학 출석</h2><p style="font-size:14px;color:#5b6380">지점 원장 계정으로 한 번만 로그인하면<br>이 태블릿은 계속 로그인돼 있어요.</p><input type="email" id="lgE" placeholder="이메일" autocomplete="username" required><input type="password" id="lgP" placeholder="비밀번호" autocomplete="current-password" required><button type="submit">로그인</button><div class="err" id="lgErr"></div></form></div>
+<div id="login"><form class="bx" id="loginF"><h2>백수학 출석</h2><p style="font-size:14px;color:#5b6380">입구 = 지점 원장 아이디 · 강의실 = 그 쌤 아이디로 한 번만 로그인하면<br>이 태블릿은 계속 로그인돼 있어요.</p><input type="text" id="lgE" placeholder="아이디 (예: 100math1)" autocomplete="username" autocapitalize="off" required><input type="password" id="lgP" placeholder="비밀번호" autocomplete="current-password" required><button type="submit">로그인</button><div class="err" id="lgErr"></div></form></div>
 <header><span class="t">📚 백수학 출석</span><span class="cnt" id="mt"></span><span class="d" id="dt"></span><span class="cnt" id="cnt"></span><span class="clock" id="clk"></span><span id="gear" title="설정(길게 누르기)">⚙</span></header>
 <div id="tabs"></div>
 <div id="hint">내 이름을 눌러요 · 👋 오면 한 번 = <b style="color:#1f9d55">등원</b> · 🏠 갈 때 한 번 더 = <b style="color:#22307e">하원</b></div>
@@ -77,7 +77,7 @@ var CUR=MODE==='gate'?(LS('bzk_t')||'__all'):ROOM_T,VOICE=LS('bzk_voice')!=='0',
 // ===== 로그인 (데일리 v1.4.6 패턴 — Supabase Auth + RLS) =====
 function gate(){sb.auth.getSession().then(function(r){if(r.data&&r.data.session)authed();else showLogin();});}
 function showLogin(){var L=$('login');L.style.display='flex';$('loginF').onsubmit=function(e){e.preventDefault();$('lgErr').textContent='확인 중…';
- sb.auth.signInWithPassword({email:$('lgE').value.trim(),password:$('lgP').value}).then(function(r){if(r.error){$('lgErr').textContent='로그인 실패: '+(r.error.message==='Invalid login credentials'?'이메일 또는 비밀번호가 달라요':r.error.message);return;}L.style.display='none';authed();});};}
+ var em=$('lgE').value.trim();if(em.indexOf('@')<0)em+='@baeksu.kr';sb.auth.signInWithPassword({email:em,password:$('lgP').value}).then(function(r){if(r.error){$('lgErr').textContent='로그인 실패: '+(r.error.message==='Invalid login credentials'?'이메일 또는 비밀번호가 달라요':r.error.message);return;}L.style.display='none';authed();});};}
 function authed(){sb.rpc('app_me').then(function(r){var m=r.data;if(Array.isArray(m))m=m[0];ME=m||null;$('sMe').textContent=(ME&&ME.name)||'';if(ME&&ME.role!=='원장'&&!ME.view_all){MODE='room';ROOM_T=ME.name;LOCKED=true;}load();});}
 
 // ===== 불러오기 =====
