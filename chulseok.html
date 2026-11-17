@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>백수학 출석</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* 백수학 출석 v0.1 (2026-11-17 원장 음성) — 학원 입구 태블릿·아이패드에 띄워 두는 출석 화면.
+   쌤 고르기 → 그 쌤 반 학생이 동물 아이콘(사진 낸 학생은 사진) + 이름으로 → 한 번 누르면 등원, 다시 누르면 하원. 메이크에듀 출결 태블릿과 같은 방식. */
+:root{--navy:#22307e;--y:#f2b21b;--ok:#1f9d55;--out:#8a90a6;--bg:#eef1f8}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:#1d2440;font-family:'Pretendard Variable','Pretendard',-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;user-select:none;-webkit-user-select:none}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px}
+header .t{font-size:22px;font-weight:800}header .d{font-size:15px;opacity:.85}
+header .clock{margin-left:auto;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+header .cnt{font-size:14px;background:rgba(255,255,255,.12);border-radius:99px;padding:5px 12px;white-space:nowrap}
+#gear{font-size:20px;opacity:.5;padding:4px 6px;cursor:pointer}
+#tabs{display:flex;gap:8px;padding:10px 14px 4px;overflow-x:auto;scrollbar-width:none}
+#tabs::-webkit-scrollbar{display:none}
+.tb{flex:none;border:2px solid #c9cfe2;background:#fff;border-radius:14px;padding:10px 18px;font-size:19px;font-weight:700;color:#1d2440;cursor:pointer}
+.tb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tb small{font-weight:500;font-size:13px;opacity:.75;margin-left:4px}
+#hint{padding:2px 18px 6px;font-size:14px;color:#5b6380}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px;padding:6px 14px 30px;overflow-y:auto;height:calc(100% - 150px)}
+.c{background:#fff;border:3px solid #dfe4f0;border-radius:20px;padding:10px 6px 8px;text-align:center;cursor:pointer;transition:transform .08s;position:relative}
+.c:active{transform:scale(.95)}
+.c .em{font-size:62px;line-height:76px;height:76px}
+.c img{width:76px;height:76px;border-radius:50%;object-fit:cover;display:block;margin:0 auto}
+.c .nm{font-size:21px;font-weight:800;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c .st{font-size:13px;min-height:18px;color:#5b6380}
+.c.in{border-color:var(--ok);background:#ecf9f1}.c.in .st{color:var(--ok);font-weight:700}
+.c.out{border-color:#c9cfe2;background:#f2f3f7}.c.out .em,.c.out img{opacity:.45}.c.out .st{color:var(--out);font-weight:700}
+#ov{position:fixed;inset:0;background:rgba(20,26,60,.55);display:none;align-items:center;justify-content:center;z-index:50}
+#ov .bx{background:#fff;border-radius:28px;padding:30px 40px;text-align:center;min-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#ov .big{font-size:110px;line-height:1.1}#ov img{width:130px;height:130px;border-radius:50%;object-fit:cover}
+#ov .msg{font-size:34px;font-weight:900;margin:8px 0 4px}#ov .sub{font-size:18px;color:#5b6380}
+#ov .undo{margin-top:18px;border:0;background:#f1f2f6;color:#5b6380;border-radius:12px;padding:10px 18px;font-size:16px;cursor:pointer}
+#ov.in .msg{color:var(--ok)}#ov.out .msg{color:var(--navy)}#ov.warn .msg{color:#c77700}
+#login{position:fixed;inset:0;background:#1c2163;display:none;align-items:center;justify-content:center;z-index:99}#login .bx{background:#fff;border-radius:16px;padding:26px;width:320px}#login input{display:block;width:100%;margin:8px 0;padding:12px;font-size:16px}#login button{width:100%;padding:13px;border:0;border-radius:10px;background:#1e3a5f;color:#fff;font-size:16px;cursor:pointer}#login .err{color:#c0392b;font-size:13px;min-height:18px;margin-top:6px}
+#set{position:fixed;inset:0;background:rgba(20,26,60,.5);display:none;align-items:center;justify-content:center;z-index:60}
+#set .bx{background:#fff;border-radius:18px;padding:22px;width:400px;max-width:92vw;font-size:16px}#set .bx div{margin:10px 0}#set select,#set button{font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid #c9cfe2}
+.empty{padding:40px;text-align:center;color:#5b6380;font-size:18px}
+#srch{margin-left:auto;font-size:17px;padding:8px 12px;border:2px solid #c9cfe2;border-radius:12px;width:160px}
+</style></head><body>
+<div id="login"><form class="bx" id="loginF"><h2>백수학 출석</h2><p style="font-size:14px;color:#5b6380">지점 원장 계정으로 한 번만 로그인하면<br>이 태블릿은 계속 로그인돼 있어요.</p><input type="email" id="lgE" placeholder="이메일" autocomplete="username" required><input type="password" id="lgP" placeholder="비밀번호" autocomplete="current-password" required><button type="submit">로그인</button><div class="err" id="lgErr"></div></form></div>
+<header><span class="t">📚 백수학 출석</span><span class="d" id="dt"></span><span class="cnt" id="cnt"></span><span class="clock" id="clk"></span><span id="gear" title="설정(길게 누르기)">⚙</span></header>
+<div id="tabs"></div>
+<div id="hint">내 이름을 눌러요 · 👋 오면 한 번 = <b style="color:#1f9d55">등원</b> · 🏠 갈 때 한 번 더 = <b style="color:#22307e">하원</b></div>
+<div id="grid"><div class="empty">불러오는 중…</div></div>
+<div id="ov"><div class="bx"><div id="ovPic"></div><div class="msg" id="ovMsg"></div><div class="sub" id="ovSub"></div><button class="undo" id="ovUndo">↩ 잘못 눌렀어요</button></div></div>
+<div id="set"><div class="bx"><b style="font-size:19px">⚙ 출석 화면 설정</b>
+ <div>지점 <select id="sBr"></select></div>
+ <div><label><input type="checkbox" id="sVoice"> 🔊 소리로 알려 주기 (「○○ 등원」)</label></div>
+ <div style="font-size:13px;color:#5b6380">로그인: <span id="sMe"></span></div>
+ <div style="display:flex;gap:8px;justify-content:flex-end"><button id="sOut">로그아웃</button><button id="sClose" style="background:#22307e;color:#fff;border-color:#22307e">닫기</button></div></div></div>
+<script>
+var ME=null;
+(function(){
+var sb=supabase.createClient('https://abjhmwvnnrnhlobxabat.supabase.co','sb_publishable_w0dHCw-JObpIn6U_Sjbjlg_OQcMdUAr');
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function pad(n){return String(n).padStart(2,'0');}
+function ymd(d){d=d||new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function hm(d){d=new Date(d);return pad(d.getHours())+':'+pad(d.getMinutes());}
+function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
+var ANI=['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦉','🐺','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐢','🐍','🦖','🐙','🦑','🦀','🐡','🐠','🐬','🐳','🦈','🐊','🐅','🦓','🦒','🐘','🦛','🦏','🐪','🦘','🦥','🦦','🦨','🦔','🐿️','🦩','🦚','🦜','🐓','🦢','🐇'];
+function ani(id){var h=0;id=String(id);for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return ANI[h%ANI.length];}
+var STU=[],CLS={},PIC={},LAST={},TODAY=ymd(),BR=[],TEA=[];
+var CUR=LS('bzk_t')||'',VOICE=LS('bzk_voice')!=='0',SBR=LS('bzk_br')||'';
+
+// ===== 로그인 (데일리 v1.4.6 패턴 — Supabase Auth + RLS) =====
+function gate(){sb.auth.getSession().then(function(r){if(r.data&&r.data.session)authed();else showLogin();});}
+function showLogin(){var L=$('login');L.style.display='flex';$('loginF').onsubmit=function(e){e.preventDefault();$('lgErr').textContent='확인 중…';
+ sb.auth.signInWithPassword({email:$('lgE').value.trim(),password:$('lgP').value}).then(function(r){if(r.error){$('lgErr').textContent='로그인 실패: '+(r.error.message==='Invalid login credentials'?'이메일 또는 비밀번호가 달라요':r.error.message);return;}L.style.display='none';authed();});};}
+function authed(){sb.rpc('app_me').then(function(r){var m=r.data;if(Array.isArray(m))m=m[0];ME=m||null;$('sMe').textContent=(ME&&ME.name)||'';load();});}
+
+// ===== 불러오기 =====
+async function all(qf){var out=[],from=0;for(;;){var r=await qf().range(from,from+999);if(r.error)throw r.error;out=out.concat(r.data||[]);if(!r.data||r.data.length<1000)break;from+=1000;}return out;}
+async function load(){try{
+ var R=await Promise.all([all(function(){return sb.from('students').select('id,name,class_id,branch_id,status').eq('status','active').order('name');}),all(function(){return sb.from('classes').select('id,class_name,teacher_name,branch_id,is_active,status');}),sb.from('branches').select('id,branch_name').order('branch_name')]);
+ STU=R[0];CLS={};R[1].forEach(function(c){CLS[c.id]=c;});BR=(R[2].data||[]);
+ try{var P=await all(function(){return sb.from('student_profiles').select('student_id,photo:data->>photo_url');});PIC={};P.forEach(function(p){if(p.photo)PIC[p.student_id]=p.photo;});}catch(e){PIC={};}
+ await loadToday();drawTabs();draw();
+}catch(e){$('grid').innerHTML='<div class="empty">불러오기 실패: '+esc(e.message||e)+'<br>인터넷 연결을 확인해 주세요.</div>';}}
+async function loadToday(){TODAY=ymd();LAST={};var ids=STU.map(function(s){return s.id;});
+ for(var i=0;i<ids.length;i+=150){var r=await sb.from('attendance_logs').select('id,student_id,event_type,log_timestamp').eq('log_date',TODAY).in('student_id',ids.slice(i,i+150)).order('log_timestamp');(r.data||[]).forEach(function(x){LAST[x.student_id]=x;});}}
+function inBr(s){return !SBR||String(s.branch_id)===SBR;}
+function teacherOf(s){var c=CLS[s.class_id];return (c&&c.teacher_name)||'반 없음';}
+function drawTabs(){var T={};STU.filter(inBr).forEach(function(s){var t=teacherOf(s);T[t]=(T[t]||0)+1;});
+ TEA=Object.keys(T).sort(function(a,b){if(a==='반 없음')return 1;if(b==='반 없음')return -1;return T[b]-T[a]||a.localeCompare(b,'ko');});
+ if(CUR&&CUR!=='__all'&&!T[CUR])CUR='';if(!CUR)CUR=TEA[0]||'__all';
+ $('tabs').innerHTML=TEA.map(function(t){return '<button class="tb'+(t===CUR?' on':'')+'" data-t="'+esc(t)+'">'+esc(t)+(t==='반 없음'?'':' 쌤')+'<small>'+T[t]+'</small></button>';}).join('')+'<button class="tb'+(CUR==='__all'?' on':'')+'" data-t="__all">전체<small>'+STU.filter(inBr).length+'</small></button><input id="srch" placeholder="🔍 이름">';
+ $('tabs').querySelectorAll('.tb').forEach(function(b){b.onclick=function(){CUR=b.getAttribute('data-t');LS('bzk_t',CUR);$('srch').value='';drawTabs();draw();};});
+ $('srch').oninput=draw;}
+function stateOf(id){var x=LAST[id];if(!x)return null;return x;}
+function draw(){var q=(($('srch')||{}).value||'').replace(/\s/g,'');
+ var L=STU.filter(inBr).filter(function(s){if(q)return (s.name||'').indexOf(q)>=0;return CUR==='__all'||teacherOf(s)===CUR;}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ko');});
+ if(!L.length){$('grid').innerHTML='<div class="empty">학생이 없어요</div>';cnt();return;}
+ $('grid').innerHTML=L.map(function(s){var x=stateOf(s.id),cl=x?(x.event_type==='하원'?'out':'in'):'';var pic=PIC[s.id]?'<img src="'+esc(PIC[s.id])+'" alt="">':'<div class="em">'+ani(s.id)+'</div>';
+  return '<div class="c '+cl+'" data-id="'+s.id+'">'+pic+'<div class="nm">'+esc(s.name)+'</div><div class="st">'+(x?(x.event_type==='하원'?'🏠 하원 '+hm(x.log_timestamp):'✅ 등원 '+hm(x.log_timestamp)):'')+'</div></div>';}).join('');
+ $('grid').querySelectorAll('.c').forEach(function(el){el.onclick=function(){tap(el.getAttribute('data-id'));};});cnt();}
+function cnt(){var L=STU.filter(inBr),a=0,b=0;L.forEach(function(s){var x=LAST[s.id];if(!x)return;if(x.event_type==='하원')b++;else a++;});$('cnt').textContent='👋 지금 학원에 '+a+'명 · 🏠 하원 '+b+'명';}
+
+// ===== 누르기 = 등원 / 하원 =====
+var BUSY=false,UNDO=null,OVT=null;
+function say(t){if(!VOICE||!window.speechSynthesis)return;try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
+function show(s,kind,msg,sub,undo){if(!undo)UNDO=null;var ov=$('ov');ov.className=kind;$('ovPic').innerHTML=PIC[s.id]?'<img src="'+esc(PIC[s.id])+'">':'<div class="big">'+ani(s.id)+'</div>';$('ovMsg').textContent=msg;$('ovSub').textContent=sub||'';$('ovUndo').style.display=undo?'':'none';ov.style.display='flex';clearTimeout(OVT);OVT=setTimeout(function(){ov.style.display='none';UNDO=null;},undo?5000:2200);}
+$('ov').onclick=function(e){if(e.target.id==='ovUndo')return;$('ov').style.display='none';UNDO=null;};
+$('ovUndo').onclick=async function(){if(!UNDO)return;var u=UNDO;UNDO=null;$('ov').style.display='none';
+ await sb.from('attendance_logs').delete().eq('id',u.id);
+ if(u.rep)await sb.from('student_reports').upsert(u.rep,{onConflict:'student_id,note_date'});
+ LAST[u.sid]=u.prev||undefined;if(!u.prev)delete LAST[u.sid];draw();};
+async function tap(id){if(BUSY)return;var s=STU.find(function(x){return x.id===id;});if(!s)return;
+ if(ymd()!==TODAY){await loadToday();}
+ var prev=LAST[id],now=new Date(),kind=(!prev||prev.event_type==='하원')?'등원':'하원';
+ if(prev&&now-new Date(prev.log_timestamp)<60000){show(s,'warn','방금 '+prev.event_type+'했어요','다시 누르는 건 1분 뒤에 돼요',false);return;}
+ BUSY=true;
+ try{var ins={student_id:id,branch_id:s.branch_id||null,log_date:TODAY,log_time:hm(now)+':'+pad(now.getSeconds()),log_timestamp:now.toISOString(),event_type:kind,source:'kiosk'};
+  var r=await sb.from('attendance_logs').insert(ins).select('id,student_id,event_type,log_timestamp');if(r.error)throw r.error;var row=r.data&&r.data[0];
+  // 데일리·학생 기록에 바로 보이게: student_reports(오늘) — 등원 = data.arr(학생 폰 도착과 같은 자리, 이미 있으면 그대로) · 하원 = data.out_at
+  var old=null,rep=null;try{var g=await sb.from('student_reports').select('student_id,note_date,class_id,data').eq('student_id',id).eq('note_date',TODAY).maybeSingle();old=g.data||null;
+   var d=Object.assign({},(old&&old.data)||{});if(kind==='등원'){if(!d.arr||!d.arr.at)d.arr={at:now.toISOString(),src:'kiosk'};}else d.out_at=now.toISOString();
+   rep={student_id:id,note_date:TODAY,class_id:(old&&old.class_id)||s.class_id||null,data:d};await sb.from('student_reports').upsert(rep,{onConflict:'student_id,note_date'});}catch(e){}
+  LAST[id]=row||ins;draw();
+  UNDO={id:row&&row.id,sid:id,prev:prev,rep:old?{student_id:id,note_date:TODAY,class_id:old.class_id,data:old.data}:(rep?{student_id:id,note_date:TODAY,class_id:rep.class_id,data:{}}:null)};
+  show(s,kind==='등원'?'in':'out',s.name+(kind==='등원'?' 등원 👋':' 하원 🏠'),hm(now)+(kind==='등원'?' · 오늘도 화이팅!':' · 잘 가요!'),true);say(s.name+' '+kind);
+ }catch(e){show(s,'warn','저장이 안 됐어요','인터넷 확인 후 다시 눌러 주세요 ('+(e.message||e)+')',false);}
+ BUSY=false;}
+
+// ===== 시계 · 날짜 바뀌면 새로 · 화면 안 꺼지게 =====
+function tick(){var d=new Date();$('clk').textContent=hm(d);$('dt').textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+'일월화수목금토'[d.getDay()]+')';if(ymd(d)!==TODAY&&STU.length){loadToday().then(draw);}}
+setInterval(tick,1000);tick();
+setInterval(function(){if(STU.length)loadToday().then(draw);},60000);
+setInterval(function(){if(STU.length)load();},30*60000);
+var WL=null;async function wake(){try{if(navigator.wakeLock&&document.visibilityState==='visible')WL=await navigator.wakeLock.request('screen');}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){wake();if(STU.length)loadToday().then(draw);}});wake();
+
+// ===== ⚙ 설정 (길게 누르기 — 학생이 실수로 못 열게) =====
+var gt=null;$('gear').addEventListener('pointerdown',function(){gt=setTimeout(openSet,900);});['pointerup','pointerleave'].forEach(function(e){$('gear').addEventListener(e,function(){clearTimeout(gt);});});
+function openSet(){$('sBr').innerHTML='<option value="">전체 지점</option>'+BR.map(function(b){return '<option value="'+b.id+'"'+(String(b.id)===SBR?' selected':'')+'>'+esc(b.branch_name)+'</option>';}).join('');$('sVoice').checked=VOICE;$('set').style.display='flex';}
+$('sClose').onclick=function(){SBR=$('sBr').value;LS('bzk_br',SBR);VOICE=$('sVoice').checked;LS('bzk_voice',VOICE?'1':'0');$('set').style.display='none';drawTabs();draw();};
+$('sOut').onclick=function(){sb.auth.signOut().then(function(){location.reload();});};
+gate();
+})();
+</script></body></html>
