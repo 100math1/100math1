@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<title>백수학 출석 v0.3</title>
+<title>백수학 출석 v0.3b</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* 백수학 출석 v0.1 (2026-11-17 원장 음성) — 학원 입구 태블릿·아이패드에 띄워 두는 출석 화면.
@@ -138,7 +138,7 @@ async function tap(id){if(BUSY)return;var s=STU.find(function(x){return x.id===i
  var prev=LAST[id],now=new Date(),kind=(!prev||prev.event_type==='하원')?'등원':'하원';
  if(prev&&now-new Date(prev.log_timestamp)<60000){show(s,'warn','방금 '+prev.event_type+'했어요','다시 누르는 건 1분 뒤에 돼요',false);return;}
  BUSY=true;
- try{var ins={student_id:id,branch_id:s.branch_id||null,log_date:TODAY,log_time:hm(now)+':'+pad(now.getSeconds()),log_timestamp:now.toISOString(),event_type:kind,source:'kiosk'};
+ try{var ins={student_id:id,branch_id:s.branch_id||null,log_date:TODAY,log_time:hm(now)+':'+pad(now.getSeconds()),log_timestamp:now.toISOString(),event_type:kind,source:'태블릿',memo:MODE==='room'?'강의실 '+ROOM_T:'입구'};
   var r=await sb.from('attendance_logs').insert(ins).select('id,student_id,event_type,log_timestamp');if(r.error)throw r.error;var row=r.data&&r.data[0];
   // 데일리·학생 기록에 바로 보이게: student_reports(오늘) — 등원 = data.arr(학생 폰 도착과 같은 자리, 이미 있으면 그대로) · 하원 = data.out_at
   var old=null,rep=null;try{var g=await sb.from('student_reports').select('student_id,note_date,class_id,data').eq('student_id',id).eq('note_date',TODAY).maybeSingle();old=g.data||null;
