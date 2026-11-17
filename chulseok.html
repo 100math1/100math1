@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<title>백수학 출석</title>
+<title>백수학 출석 v0.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* 백수학 출석 v0.1 (2026-11-17 원장 음성) — 학원 입구 태블릿·아이패드에 띄워 두는 출석 화면.
@@ -43,13 +43,16 @@ header .cnt{font-size:14px;background:rgba(255,255,255,.12);border-radius:99px;p
 #srch{margin-left:auto;font-size:17px;padding:8px 12px;border:2px solid #c9cfe2;border-radius:12px;width:160px}
 </style></head><body>
 <div id="login"><form class="bx" id="loginF"><h2>백수학 출석</h2><p style="font-size:14px;color:#5b6380">지점 원장 계정으로 한 번만 로그인하면<br>이 태블릿은 계속 로그인돼 있어요.</p><input type="email" id="lgE" placeholder="이메일" autocomplete="username" required><input type="password" id="lgP" placeholder="비밀번호" autocomplete="current-password" required><button type="submit">로그인</button><div class="err" id="lgErr"></div></form></div>
-<header><span class="t">📚 백수학 출석</span><span class="d" id="dt"></span><span class="cnt" id="cnt"></span><span class="clock" id="clk"></span><span id="gear" title="설정(길게 누르기)">⚙</span></header>
+<header><span class="t">📚 백수학 출석</span><span class="cnt" id="mt"></span><span class="d" id="dt"></span><span class="cnt" id="cnt"></span><span class="clock" id="clk"></span><span id="gear" title="설정(길게 누르기)">⚙</span></header>
 <div id="tabs"></div>
 <div id="hint">내 이름을 눌러요 · 👋 오면 한 번 = <b style="color:#1f9d55">등원</b> · 🏠 갈 때 한 번 더 = <b style="color:#22307e">하원</b></div>
 <div id="grid"><div class="empty">불러오는 중…</div></div>
 <div id="ov"><div class="bx"><div id="ovPic"></div><div class="msg" id="ovMsg"></div><div class="sub" id="ovSub"></div><button class="undo" id="ovUndo">↩ 잘못 눌렀어요</button></div></div>
 <div id="set"><div class="bx"><b style="font-size:19px">⚙ 출석 화면 설정</b>
+ <div>화면 <select id="sMode"><option value="gate">🏫 입구 — 원장 버전 (전 학생, 쌤별 탭)</option><option value="room">🚪 강의실 — 담당 쌤 버전 (그 쌤 반 학생만)</option></select></div>
+ <div id="sRoomW">강의실 쌤 <select id="sRoom"></select></div>
  <div>지점 <select id="sBr"></select></div>
+ <div style="font-size:12px;color:#5b6380">쌤 계정으로 로그인하면 자동으로 그 쌤 강의실 화면이 돼요. 홈 화면 아이콘을 따로 만들려면 주소 끝에 <b>?mode=gate</b> 또는 <b>?mode=room&t=쌤이름</b></div>
  <div><label><input type="checkbox" id="sVoice"> 🔊 소리로 알려 주기 (「○○ 등원」)</label></div>
  <div style="font-size:13px;color:#5b6380">로그인: <span id="sMe"></span></div>
  <div style="display:flex;gap:8px;justify-content:flex-end"><button id="sOut">로그아웃</button><button id="sClose" style="background:#22307e;color:#fff;border-color:#22307e">닫기</button></div></div></div>
@@ -65,14 +68,17 @@ function hm(d){d=new Date(d);return pad(d.getHours())+':'+pad(d.getMinutes());}
 function LS(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
 var ANI=['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦉','🐺','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐢','🐍','🦖','🐙','🦑','🦀','🐡','🐠','🐬','🐳','🦈','🐊','🐅','🦓','🦒','🐘','🦛','🦏','🐪','🦘','🦥','🦦','🦨','🦔','🐿️','🦩','🦚','🦜','🐓','🦢','🐇'];
 function ani(id){var h=0;id=String(id);for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return ANI[h%ANI.length];}
-var STU=[],CLS={},PIC={},LAST={},TODAY=ymd(),BR=[],TEA=[];
-var CUR=LS('bzk_t')||'',VOICE=LS('bzk_voice')!=='0',SBR=LS('bzk_br')||'';
+var HINT0=document.getElementById('hint').innerHTML,LOCKED=false,STU=[],CLS={},PIC={},LAST={},TODAY=ymd(),BR=[],TEA=[];
+var Q=new URLSearchParams(location.search);
+/* v0.2 원장 11-17 17:04 「입구 = 원장 버전 전 학생 · 강의실 = 담당 쌤 버전 그 반 학생만」 — 주소로도 고정 가능: ?mode=gate / ?mode=room&t=쌤이름 */
+var MODE=Q.get('mode')||LS('bzk_mode')||'gate',ROOM_T=Q.get('t')||LS('bzk_room_t')||'';
+var CUR=MODE==='gate'?(LS('bzk_t')||'__all'):ROOM_T,VOICE=LS('bzk_voice')!=='0',SBR=Q.get('br')||LS('bzk_br')||'';
 
 // ===== 로그인 (데일리 v1.4.6 패턴 — Supabase Auth + RLS) =====
 function gate(){sb.auth.getSession().then(function(r){if(r.data&&r.data.session)authed();else showLogin();});}
 function showLogin(){var L=$('login');L.style.display='flex';$('loginF').onsubmit=function(e){e.preventDefault();$('lgErr').textContent='확인 중…';
  sb.auth.signInWithPassword({email:$('lgE').value.trim(),password:$('lgP').value}).then(function(r){if(r.error){$('lgErr').textContent='로그인 실패: '+(r.error.message==='Invalid login credentials'?'이메일 또는 비밀번호가 달라요':r.error.message);return;}L.style.display='none';authed();});};}
-function authed(){sb.rpc('app_me').then(function(r){var m=r.data;if(Array.isArray(m))m=m[0];ME=m||null;$('sMe').textContent=(ME&&ME.name)||'';load();});}
+function authed(){sb.rpc('app_me').then(function(r){var m=r.data;if(Array.isArray(m))m=m[0];ME=m||null;$('sMe').textContent=(ME&&ME.name)||'';if(ME&&ME.role!=='원장'&&!ME.view_all){MODE='room';ROOM_T=ME.name;LOCKED=true;}load();});}
 
 // ===== 불러오기 =====
 async function all(qf){var out=[],from=0;for(;;){var r=await qf().range(from,from+999);if(r.error)throw r.error;out=out.concat(r.data||[]);if(!r.data||r.data.length<1000)break;from+=1000;}return out;}
@@ -86,20 +92,23 @@ async function loadToday(){TODAY=ymd();LAST={};var ids=STU.map(function(s){retur
  for(var i=0;i<ids.length;i+=150){var r=await sb.from('attendance_logs').select('id,student_id,event_type,log_timestamp').eq('log_date',TODAY).in('student_id',ids.slice(i,i+150)).order('log_timestamp');(r.data||[]).forEach(function(x){LAST[x.student_id]=x;});}}
 function inBr(s){return !SBR||String(s.branch_id)===SBR;}
 function teacherOf(s){var c=CLS[s.class_id];return (c&&c.teacher_name)||'반 없음';}
-function drawTabs(){var T={};STU.filter(inBr).forEach(function(s){var t=teacherOf(s);T[t]=(T[t]||0)+1;});
+function drawTabs(){if(MODE==='room')return drawRoom();$('hint').innerHTML=HINT0;var T={};STU.filter(inBr).forEach(function(s){var t=teacherOf(s);T[t]=(T[t]||0)+1;});
  TEA=Object.keys(T).sort(function(a,b){if(a==='반 없음')return 1;if(b==='반 없음')return -1;return T[b]-T[a]||a.localeCompare(b,'ko');});
  if(CUR&&CUR!=='__all'&&!T[CUR])CUR='';if(!CUR)CUR=TEA[0]||'__all';
  $('tabs').innerHTML=TEA.map(function(t){return '<button class="tb'+(t===CUR?' on':'')+'" data-t="'+esc(t)+'">'+esc(t)+(t==='반 없음'?'':' 쌤')+'<small>'+T[t]+'</small></button>';}).join('')+'<button class="tb'+(CUR==='__all'?' on':'')+'" data-t="__all">전체<small>'+STU.filter(inBr).length+'</small></button><input id="srch" placeholder="🔍 이름">';
  $('tabs').querySelectorAll('.tb').forEach(function(b){b.onclick=function(){CUR=b.getAttribute('data-t');LS('bzk_t',CUR);$('srch').value='';drawTabs();draw();};});
  $('srch').oninput=draw;}
+function drawRoom(){CUR=ROOM_T;var n=STU.filter(inBr).filter(function(s){return teacherOf(s)===ROOM_T;}).length;
+ $('tabs').innerHTML='<span class="tb on" style="cursor:default">🚪 '+esc(ROOM_T||'(쌤 안 고름)')+(ROOM_T&&ROOM_T!=='반 없음'?' 쌤':'')+' 강의실<small>'+n+'명</small></span><input id="srch" placeholder="🔍 이름">';
+ $('srch').oninput=draw;$('hint').innerHTML=ROOM_T?'우리 반 학생만 나와요 · 오면 한 번 = <b style="color:#1f9d55">등원</b> · 갈 때 한 번 더 = <b style="color:#22307e">하원</b>':'⚙(길게 누르기)에서 이 강의실 쌤을 골라 주세요';}
 function stateOf(id){var x=LAST[id];if(!x)return null;return x;}
 function draw(){var q=(($('srch')||{}).value||'').replace(/\s/g,'');
- var L=STU.filter(inBr).filter(function(s){if(q)return (s.name||'').indexOf(q)>=0;return CUR==='__all'||teacherOf(s)===CUR;}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ko');});
+ var L=STU.filter(inBr).filter(function(s){if(MODE==='room'&&teacherOf(s)!==ROOM_T)return false;if(q)return (s.name||'').indexOf(q)>=0;return CUR==='__all'||teacherOf(s)===CUR;}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ko');});
  if(!L.length){$('grid').innerHTML='<div class="empty">학생이 없어요</div>';cnt();return;}
  $('grid').innerHTML=L.map(function(s){var x=stateOf(s.id),cl=x?(x.event_type==='하원'?'out':'in'):'';var pic=PIC[s.id]?'<img src="'+esc(PIC[s.id])+'" alt="">':'<div class="em">'+ani(s.id)+'</div>';
   return '<div class="c '+cl+'" data-id="'+s.id+'">'+pic+'<div class="nm">'+esc(s.name)+'</div><div class="st">'+(x?(x.event_type==='하원'?'🏠 하원 '+hm(x.log_timestamp):'✅ 등원 '+hm(x.log_timestamp)):'')+'</div></div>';}).join('');
  $('grid').querySelectorAll('.c').forEach(function(el){el.onclick=function(){tap(el.getAttribute('data-id'));};});cnt();}
-function cnt(){var L=STU.filter(inBr),a=0,b=0;L.forEach(function(s){var x=LAST[s.id];if(!x)return;if(x.event_type==='하원')b++;else a++;});$('cnt').textContent='👋 지금 학원에 '+a+'명 · 🏠 하원 '+b+'명';}
+function cnt(){var L=STU.filter(inBr).filter(function(s){return MODE!=='room'||teacherOf(s)===ROOM_T;}),a=0,b=0;L.forEach(function(s){var x=LAST[s.id];if(!x)return;if(x.event_type==='하원')b++;else a++;});$('cnt').textContent=(MODE==='room'?'👋 우리 반 지금 ':'👋 지금 학원에 ')+a+'명 · 🏠 하원 '+b+'명';$('mt').textContent=MODE==='room'?'🚪 강의실':'🏫 입구';}
 
 // ===== 누르기 = 등원 / 하원 =====
 var BUSY=false,UNDO=null,OVT=null;
@@ -137,8 +146,8 @@ document.addEventListener('visibilitychange',function(){if(document.visibilitySt
 
 // ===== ⚙ 설정 (길게 누르기 — 학생이 실수로 못 열게) =====
 var gt=null;$('gear').addEventListener('pointerdown',function(){gt=setTimeout(openSet,900);});['pointerup','pointerleave'].forEach(function(e){$('gear').addEventListener(e,function(){clearTimeout(gt);});});
-function openSet(){$('sBr').innerHTML='<option value="">전체 지점</option>'+BR.map(function(b){return '<option value="'+b.id+'"'+(String(b.id)===SBR?' selected':'')+'>'+esc(b.branch_name)+'</option>';}).join('');$('sVoice').checked=VOICE;$('set').style.display='flex';}
-$('sClose').onclick=function(){SBR=$('sBr').value;LS('bzk_br',SBR);VOICE=$('sVoice').checked;LS('bzk_voice',VOICE?'1':'0');$('set').style.display='none';drawTabs();draw();};
+function openSet(){var T={};STU.forEach(function(s){T[teacherOf(s)]=1;});$('sMode').value=MODE;$('sMode').disabled=LOCKED;$('sRoom').innerHTML=Object.keys(T).sort().map(function(t){return '<option'+(t===ROOM_T?' selected':'')+'>'+esc(t)+'</option>';}).join('');$('sRoom').disabled=LOCKED;$('sRoomW').style.display=$('sMode').value==='room'?'':'none';$('sMode').onchange=function(){$('sRoomW').style.display=$('sMode').value==='room'?'':'none';};$('sBr').innerHTML='<option value="">전체 지점</option>'+BR.map(function(b){return '<option value="'+b.id+'"'+(String(b.id)===SBR?' selected':'')+'>'+esc(b.branch_name)+'</option>';}).join('');$('sVoice').checked=VOICE;$('set').style.display='flex';}
+$('sClose').onclick=function(){if(!LOCKED){MODE=$('sMode').value;LS('bzk_mode',MODE);if(MODE==='room'){ROOM_T=$('sRoom').value;LS('bzk_room_t',ROOM_T);}else{CUR=LS('bzk_t')||'__all';}}SBR=$('sBr').value;LS('bzk_br',SBR);VOICE=$('sVoice').checked;LS('bzk_voice',VOICE?'1':'0');$('set').style.display='none';drawTabs();draw();};
 $('sOut').onclick=function(){sb.auth.signOut().then(function(){location.reload();});};
 gate();
 })();
