@@ -117,7 +117,7 @@ function drawRoom(){CUR=ROOM_T;var n=STU.filter(inBr).filter(function(s){return 
  $('srch').oninput=draw;$('hint').innerHTML=ROOM_T?'우리 반 학생만 나와요 · 오면 한 번 = <b style="color:#1f9d55">등원</b> · 갈 때 한 번 더 = <b style="color:#22307e">하원</b>':'⚙(길게 누르기)에서 이 강의실 쌤을 골라 주세요';}
 function stateOf(id){var x=LAST[id];if(!x)return null;return x;}
 function draw(){var q=(($('srch')||{}).value||'').replace(/\s/g,'');
- var L=STU.filter(inBr).filter(function(s){if(MODE==='room'&&teacherOf(s)!==ROOM_T)return false;if(q)return (s.name||'').indexOf(q)>=0;return CUR==='__all'||teacherOf(s)===CUR;}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ko');});
+ var L=STU.filter(inBr).filter(function(s){if(MODE==='room'&&teacherOf(s)!==ROOM_T)return false;if(q)return (s.name||'').replace(/\s+/g,'').indexOf(String(q).replace(/\s+/g,''))>=0;/* v0.3c 11-18 이름 띄어쓰기 무시(DB엔 「김 세영」) */return CUR==='__all'||teacherOf(s)===CUR;}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ko');});
  if(!L.length){$('grid').innerHTML='<div class="empty">학생이 없어요</div>';cnt();return;}
  $('grid').innerHTML=L.map(function(s){var x=stateOf(s.id),cl=x?(x.event_type==='하원'?'out':'in'):'';var pic=PIC[s.id]?'<img src="'+esc(PIC[s.id])+'" alt="">':icoHTML(s.id);
   return '<div class="c '+cl+'" data-id="'+s.id+'">'+pic+'<div class="nm">'+esc(s.name)+'</div><div class="st">'+(x?(x.event_type==='하원'?'🏠 하원 '+hm(x.log_timestamp):'✅ 등원 '+hm(x.log_timestamp)):'')+'</div></div>';}).join('');
