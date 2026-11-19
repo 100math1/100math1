@@ -795,7 +795,7 @@ input.w{width:100%;max-width:520px}
     var gb=(HM.log||[]).filter(function(b){return +b.tp>0;}).length,nb=hmGear().filter(function(g){return g.book;}).length;if(hmTracks().length){var sn={};hmTracks().forEach(function(t){['concept','type','type2'].forEach(function(k){if(t[k])sn[hmBk(t[k])]=1;});});var S0=(F&&F.slots)||{};['review','recap'].forEach(function(k){var x=S0[k];if(x&&x.book&&!x.none)sn[x.book]=1;});nb=Object.keys(sn).length;}
     Q.gr=(td&&+td.graded>0)?{c:'ok',t:(gb&&nb?Math.min(gb,nb)+' / '+nb+'권 · ':'오늘 ')+td.graded+'문제'+(+td.wrong?' · 오답 '+td.wrong+' → 📕 메뉴':'')}:{c:'',t:'정답 보고 ⭕❌ 누르기'};
     Q.wr=(wo===0)?{c:'skip',t:'오답 없음 ✓'}:(td&&+td.fixed>0)?{c:'ok',t:'오늘 '+td.fixed+'개 고침'+(wo?' · 남은 '+wo:'')}:{c:'',t:'틀린 문제 다시 풀기'+(wo?' · '+wo+'개':'')};
-    var PL=m.plan||{};Q.plan=PL.ok_at?{c:'ok',t:'쌤 OK '+hmHM(PL.ok_at)}:PL.req_at?{c:'',t:'쌤 OK 기다리는 중 ⏳'}:{c:'',t:'쌤이랑 진도·숙제 정하기'};if(!PL.ok_at&&!(td&&+td.graded>0))Q.gr={c:'',t:'🔒 🤝 쌤 OK 뒤에 열려'};
+    var PL=(m.plan&&!Array.isArray(m.plan))?m.plan:{};Q.plan=PL.ok_at?{c:'ok',t:'적었어 '+hmHM(PL.ok_at)}:{c:'',t:'쌤하고 정해서 적기'};
     Q.end=m.learn?{c:'ok',t:'적었어'}:(d&&d._rdy)?{c:'ok',t:'적었어 — 이제 보내기'}:{c:'',t:d?'적는 중 ✍':'집 가기 전에 쪽 번호 적기'};
     Q.send=m.at_end?{c:'ok',t:hmHM(m.at_end)+' 보냄'}:{c:'',t:'쌤께 보내기'};
     var SCN=m.sched_chg||[];Q.sch=SCN.length?{c:'ok',t:SCN.map(function(x){return sckL(x.k).replace(/^\S+\s/,'')+' '+mdW(x.d);}).join(' · ')}:m.sched_ok?{c:'ok',t:'변경 없음'}:{c:'',t:'다음 수업 못 오면 누르기'};
@@ -803,11 +803,11 @@ input.w{width:100%;max-width:520px}
     if(m.at_end)Q.end={c:'ok',t:hmHM(m.at_end)+' 저장'};
     var cur='';if(!m.at_end)HMQS.some(function(q){if(q[0]!=='sch'&&Q[q[0]].c===''){cur=q[0];return true;}return false;});Q._cur=cur;return Q;}
   function hmGo(k){if(firstBooks()){gGo('hw');return;}
-    if(k==='plan'){planScr();return;}if(k==='gr'&&!(((CTX.mine||{}).plan||{}).ok_at)&&!(HM.td&&+HM.td.graded>0)){toast('🤝 오늘 할 것 — 쌤 OK 먼저');planScr();return;}
+    if(k==='plan'){planScr();return;}
     if(k==='arr'||k==='hw'||k==='end'||k==='send'||k==='sch'||k==='self')gGo(k);else if(k==='wr')gGo('wrong');
     else if(k==='gr'){if(hwPrev().some(function(i){return i&&i.book;})){GPEND='hw';}gGo('grade');}
     else gGo('today');}
-  var HMB={arr:['🏫 도착 누르기','누르면 바로 저장돼 · 그다음 지난 숙제'],plan:['🤝 오늘 할 것','쌤이랑 진도·숙제 정하기 — 쌤 OK 나야 채점'],hw:['📌 숙제 확인','책마다 얼마나 했는지 체크'],gr:['✅ 채점하기','정답 보고 ⭕❌'],wr:['📕 오답 다시 풀기','틀린 문제 다시 · 모르면 쌤께'],end:['🏠 진도·숙제 기록','집 가기 전에 쪽 번호 적기'],sch:['📅 학원 빠지는 날','다음 수업 못 오면 누르기'],self:['🙋 나의 수업 태도','오늘 어땠는지 하나 고르기'],send:['📤 쌤께 보내기','눌러야 쌤이 봐요']};
+  var HMB={arr:['🏫 도착 누르기','누르면 바로 저장돼 · 그다음 지난 숙제'],plan:['🤝 오늘 할 것','쌤하고 정해서 진도·숙제 쪽 적기'],hw:['📌 숙제 확인','책마다 얼마나 했는지 체크'],gr:['✅ 채점하기','정답 보고 ⭕❌'],wr:['📕 오답 다시 풀기','틀린 문제 다시 · 모르면 쌤께'],end:['🏠 진도·숙제 기록','집 가기 전에 쪽 번호 적기'],sch:['📅 학원 빠지는 날','다음 수업 못 오면 누르기'],self:['🙋 나의 수업 태도','오늘 어땠는지 하나 고르기'],send:['📤 쌤께 보내기','눌러야 쌤이 봐요']};
   function hmHtml(){var Q=hmQ(),cur=Q._cur,G=hmGear(),T=hmTracks(),ti=T.length?Math.min(HM.ti,T.length-1):0,fb=firstBooks();
     var bt=fb?['📚 처음이구나! 내 책부터 알려 줘','한 번만 하면 돼']:cur?[HMB[cur][0],(cur==='arr'||cur==='end'||cur==='send')?HMB[cur][1]:Q[cur].t+' · '+HMB[cur][1]]:['오늘 끝! 조심히 가~','쌤이 확인하고 부모님께 알림장 보내요'];
     var h='<div class="hm" id="hmRoot">';
@@ -1042,23 +1042,21 @@ input.w{width:100%;max-width:520px}
   /* 📤 보내기 — 따로 (원장 11-13 01:58 「따로 둬서 보냈다가 보이는 게 좋은 거 같아」) : 오늘 한 것 한눈에 + 큰 보내기 버튼 하나 */
 
   /* v0.82 원장 11-19 17시 「먼저 쌤이랑 정하고 출발」 — 🤝 오늘 할 것: 지금 책·쪽 보여 주고 「쌤 확인 요청」 → 쌤이 데일리 「🤝 확인 대기」에서 진도·숙제 쪽 정해 OK → 채점 열림 */
+  /* v0.85 원장 11-19 18:41 「쌤이 데일리에서 OK 해야 넘어가게 → 그냥 「쌤하고 정해서 여기 적어요!」 설명만 · 학생이 직접 적음 · 채점 잠금 없음」 */
   var PLT=null;
   function planScr(){SCBIG=false;setDoor('today');hmT('🤝 오늘 할 것');NAVBACK=null;if(PLT){clearInterval(PLT);PLT=null;}
-    var G=hmGear().filter(function(g){return g.book;}),m=CTX.mine||{},PL=m.plan||{};
-    function rowB(g){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #eef0f4"><span style="min-width:0"><b>'+esc(g.nm)+'</b> <span style="color:#555">'+esc(g.book)+'</span></span><span class="hint" style="white-space:nowrap">'+(g.pg!=null?'지금 '+esc(g.pg)+'쪽까지':'')+'</span></div>';}
-    function draw(){m=CTX.mine||{};PL=m.plan||{};var h='';
-      if(PL.ok_at){var IT=PL.items||[];h='<div class="hmband stat done"><span class="f">✅</span><span><b>쌤 OK ('+hmHM(PL.ok_at)+')</b><small>이제 ✅ 교재 채점으로 가</small></span></div><div class="card" style="padding:12px 14px"><h2 style="margin:0 0 8px;font-size:17px">오늘 정한 것</h2>'+
-          (IT.length?IT.map(function(x){return '<div style="padding:7px 0;border-bottom:1px solid #eef0f4"><b>'+esc(x.nm||'')+'</b> '+esc(x.book||'')+'<div style="font-size:14px;margin-top:2px">'+(x.learn?'🗺 진도 <b>'+esc(x.learn)+'쪽까지</b>':'')+(x.learn&&x.hw?' · ':'')+(x.hw?'📝 숙제 <b>'+esc(x.hw)+'쪽</b>':'')+(!x.learn&&!x.hw?'<span class="hint">오늘은 안 함</span>':'')+'</div></div>';}).join(''):'<div class="hint">쌤이 그대로 하자고 했어</div>')+(PL.memo?'<div style="margin-top:8px">💬 '+esc(PL.memo)+'</div>':'')+'</div><button class="send" id="plGo">✅ 교재 채점하러 가기</button>';}
-      else if(PL.req_at){h='<div class="hmband stat"><span class="f">⏳</span><span><b>쌤 확인 기다리는 중</b><small>쌤이 OK 하면 바로 열려 · 쌤한테 「확인해 주세요」 말해도 돼</small></span></div><div class="card" style="padding:12px 14px"><h2 style="margin:0 0 6px;font-size:17px">지금 내 책</h2>'+G.map(rowB).join('')+'</div><button class="back" id="plRe" style="width:100%;padding:12px">🔄 새로고침</button>';}
-      else{h='<div class="card" style="padding:12px 14px"><h2 style="margin:0 0 4px;font-size:17px">🤝 오늘 어디까지 할지 쌤이랑 정해</h2><div class="hint" style="margin-bottom:6px">지금 내 책이랑 어디까지 했는지 — 쌤이 보고 진도·숙제 쪽을 정해 줘</div>'+(G.length?G.map(rowB).join(''):'<div class="hint">책이 아직 없어 — 쌤한테 말해 줘</div>')+'</div><button class="send" id="plReq">🙋 쌤 확인 요청</button>';}
-      out.innerHTML=h+'<div style="height:24px"></div>';window.scrollTo(0,0);
-      var b=document.getElementById('plGo');if(b)b.onclick=function(){gGo('grade');};
-      b=document.getElementById('plRe');if(b)b.onclick=poll;
-      b=document.getElementById('plReq');if(b)b.onclick=function(){b.disabled=true;var pl={req_at:new Date().toISOString(),books:G.map(function(g){return {k:g.k,nm:g.nm,book:g.book,pg:g.pg};})};
-        SB.rpc('stu_submit',{p_code:CODE,p_data:{plan:pl,dev:DEV}}).then(function(r){if(r.error||r.data!==true){toast('요청 안 됨 — 다시 눌러 줘');b.disabled=false;return;}CTX.mine=CTX.mine||{};CTX.mine.plan=pl;toast('🙋 쌤한테 요청 보냈어');draw();},function(){toast('요청 안 됨 — 다시 눌러 줘');b.disabled=false;});};
-      if(PL.req_at&&!PL.ok_at&&!PLT)PLT=setInterval(function(){if(!document.getElementById('plRe')){clearInterval(PLT);PLT=null;return;}poll();},8000);}
-    function poll(){SB.rpc('stu_ctx',{p_code:CODE}).then(function(r){if(r.error||!r.data)return;var mm=r.data.mine||{};if(mm.plan){CTX.mine=CTX.mine||{};CTX.mine.plan=mm.plan;if(mm.plan.ok_at){if(PLT){clearInterval(PLT);PLT=null;}toast('✅ 쌤 OK!');draw();}}});}
-    draw();}
+    var G=hmGear().filter(function(g){return g.book;}),m=CTX.mine||{},PL=m.plan&&!Array.isArray(m.plan)?m.plan:{},IT=PL.items||[];
+    var pre=function(g,k){var x=IT.filter(function(i){return i.k===g.k;})[0];return x?(x[k]||''):'';};
+    var h='<div class="card" style="padding:12px 14px;background:#fff6dc;border-color:#f2d98a"><div style="font-size:17px;font-weight:900;color:#1c2163">🤝 쌤하고 정해서 여기 적어요!</div><div style="font-size:14px;margin-top:4px;line-height:1.5;word-break:keep-all">오늘 <b>진도 어디까지</b> 나갈지, <b>숙제 몇 쪽</b> 할지 쌤한테 물어보고 → 책마다 적어 줘</div></div>';
+    h+='<div class="card" style="padding:12px 14px">'+(G.length?G.map(function(g){return '<div style="padding:10px 0;border-bottom:1px solid #eef0f4"><div><b>'+esc(g.nm)+'</b> <span style="color:#555">'+esc(g.book)+'</span>'+(g.pg!=null?' <span class="hint">지금 '+esc(g.pg)+'쪽까지</span>':'')+'</div>'+
+      '<div style="display:flex;gap:8px;margin-top:8px"><label style="flex:1;min-width:0"><span style="font-size:13px;font-weight:800;color:#1c2163">🗺 오늘 진도</span><input class="t w" data-plk="'+esc(g.k)+'" data-plf="learn" inputmode="numeric" value="'+esc(pre(g,'learn'))+'" placeholder="몇 쪽까지" style="margin-top:4px;padding:9px 10px;font-size:16px"></label>'+
+      '<label style="flex:1;min-width:0"><span style="font-size:13px;font-weight:800;color:#1c2163">📝 오늘 숙제</span><input class="t w" data-plk="'+esc(g.k)+'" data-plf="hw" value="'+esc(pre(g,'hw'))+'" placeholder="예: 24~30쪽" style="margin-top:4px;padding:9px 10px;font-size:16px"></label></div></div>';}).join(''):'<div class="hint">책이 아직 없어 — 쌤한테 말해 줘</div>')+
+      '<input class="t w" id="plMemo" value="'+esc(PL.memo||'')+'" placeholder="쌤이 따로 한 말 (안 써도 돼)" style="margin-top:10px;padding:8px 10px;font-size:15px"></div>';
+    h+='<button class="send" id="plSave">💾 적었어요</button><div class="hint" style="text-align:center;margin-top:8px">'+(PL.ok_at?'✅ '+hmHM(PL.ok_at)+'에 적었어 — 고치면 다시 「적었어요」':'오늘은 진도·숙제 없으면 비워 두고 눌러도 돼')+' · 다 했으면 왼쪽 위 🏠 홈</div><div style="height:24px"></div>';
+    out.innerHTML=h;window.scrollTo(0,0);
+    document.getElementById('plSave').onclick=function(){var b=this,I=G.map(function(g){var o={k:g.k,nm:g.nm,book:g.book};[].forEach.call(out.querySelectorAll('[data-plk="'+g.k+'"]'),function(x){var v=x.value.trim().slice(0,30);if(v)o[x.getAttribute('data-plf')]=v;});return o;}),mm=(document.getElementById('plMemo').value||'').trim().slice(0,80);
+      var pl={at:new Date().toISOString(),ok_at:new Date().toISOString(),ok_by:'학생',items:I,memo:mm,books:G.map(function(g){return {k:g.k,nm:g.nm,book:g.book,pg:g.pg};})};b.disabled=true;
+      SB.rpc('stu_submit',{p_code:CODE,p_data:{plan:pl,dev:DEV}}).then(function(r){b.disabled=false;if(r.error||r.data!==true){toast('저장 안 됨 — 다시 눌러 줘');return;}CTX.mine=CTX.mine||{};CTX.mine.plan=pl;toast('🤝 오늘 할 것 저장! 다 했으면 🏠 홈');planScr();},function(){b.disabled=false;toast('저장 안 됨 — 다시 눌러 줘');});};}
   function sendScr(){setDoor('today');hmT('📤 보내기');NAVBACK=null;STEP='';var d=hmDraft();if(d){F=d;MODE='end';}else{HMQ=true;try{build0('end');}catch(e){}HMQ=false;}FIRSTB=false;
     var m=CTX.mine||{},Q=hmQ(),sent=!!m.at_end,rows='';
     HMQS.slice(0,3).forEach(function(q){var x=Q[q[0]];rows+='<span>'+q[1]+' '+q[2]+'</span><b style="font-weight:'+(x.c===''?'400;color:#9aa1b0':'700')+'">'+(x.c==='ok'?'✅ ':'')+esc(x.t)+'</b>';});
