@@ -745,7 +745,7 @@ input.w{width:100%;max-width:520px}
   var STEP='',HM={td:null,log:null,ti:0,nt:0,help:false},HMQ=false;
   var HMK=[['concept','진도'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습'],['','시험대비']];
   /* v0.82 원장 11-19 17시 「출결 안에 다음 시간 빠져? 같이 — 그 둘은 세트」 → 📅 빠지는 날 타일은 도착 안으로 */
-  var HMQS=[['arr','🏫','출결 · 일정'],['hw','📌','숙제 확인'],['plan','🤝','오늘 할 것'],['gr','✅','교재 채점'],['self','🙋','나의 · 수업 태도'],['end','🏠','하원']];
+  var HMQS=[['arr','🏫','출결 · 일정'],['hw','📌','숙제 확인'],['plan','🤝','오늘 할 것'],['gr','✅','교재 채점'],['self','🙋','나의 · 수업태도'],['end','🏠','하원']];
   function hmT(t){var h=document.getElementById('hTtl');if(h)h.textContent=t;}
   function hmHM(at){var t=new Date(at);return isNaN(t)?'':t.getHours()+':'+('0'+t.getMinutes()).slice(-2);}
   function hmDraft(){var d=FDR.end;return (d&&d.code===CODE&&d.day===String((CTX&&CTX.today)||''))?d.F:null;}
