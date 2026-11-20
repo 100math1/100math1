@@ -184,10 +184,11 @@ input.w{width:100%;max-width:520px}
     var t0=new Date();[[1,3,1],[3,2,2],[5,4,0],[8,1,3],[10,5,2],[12,2,4]].forEach(function(x){if(x[0]<=t0.getDate()){var d=t0.getFullYear()+'-'+('0'+(t0.getMonth()+1)).slice(-2)+'-'+('0'+x[0]).slice(-2);DMW.cal[d]=[x[1],x[2]];}});}
   var DMP={test:[['fake-t1','주간 테스트 11월 2주 (연습 가짜)',10,20],['fake-t2','주간 테스트 11월 1주 (연습 가짜)',10,20]],mock:[['fake-m1','학원 모의고사 1회 (연습 가짜)',20,45],['fake-m2','학원 모의고사 2회 (연습 가짜)',20,45]],my:[['fake-y1','👩‍🏫 쌤이 보낸 것 — 삼각비의 활용 (연습 가짜)',8,15,'t'],['fake-y2','🧩 내가 요청한 것 — 실수 연습 6문제 (연습 가짜)',6,12,'r']]};
   function dmRpc(n,a){if(!DMW)dmInit();var W=DMW,f=function(id){return W.open.filter(function(w){return w.id===id;})[0];};
-    switch(n){case 'stu_wrongs':return {open:W.open.map(function(w){return Object.assign({},w);}),done_recent:W.done_recent.slice(),todo:W.todo.slice()};
+    switch(n){case 'stu_wrongs':return {open:W.open.map(function(w){return Object.assign({},w);}),done_recent:W.done_recent.slice(),todo:W.todo.slice(),tri:(W.tri=W.tri||[{id:'t1',book:'쎈 3-2',page:'P.20',no:12,days:0}]).slice()};
       case 'stu_wrong_miss':var w=f(a.p_id);if(w){w.tries=(+w.tries||0)+1;if(w.tries>=3)w.q=true;return w.tries>=3?{n:w.tries,to_teacher:true}:{n:w.tries};}return {n:1};
+      case 'stu_tri_retry':W.tri=(W.tri||[]).filter(function(x){return x.id!==a.p_id;});return {ok:a.p_ok,to_teacher:!a.p_ok};
       case 'stu_wrong_mark':var w2=f(a.p_id);if(w2){if(a.p_act==='fixed'){W.open=W.open.filter(function(x){return x!==w2;});W.done_recent.unshift({book:w2.book,page:w2.page,no:w2.no,st:'다시'});}else w2.q=true;}return true;
-      case 'stu_wrong_why':case 'stu_wrong_try':case 'stu_retry':case 'stu_tri_retry':case 'stu_practice_req':case 'stu_ask':return {ok:true};
+      case 'stu_wrong_why':case 'stu_wrong_try':case 'stu_retry':case 'stu_practice_req':case 'stu_ask':return {ok:true};
       case 'stu_grade':var keep={};Object.keys(a.p_marks||{}).forEach(function(k){keep[a.p_page+'|'+k]=1;});W.todo=W.todo.filter(function(t){return !keep[t.pg+'|'+t.no];});return 1;
       case 'stu_exam_history':return W.exh.slice();
       case 'stu_review':return {rev:W.rev.slice(),cal:W.cal,why:W.why,units:W.units};
