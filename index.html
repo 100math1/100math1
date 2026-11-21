@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v0.90 (11-21 비서): 📄 기출 시험지 — 과정 고르기 칩(학교 시험 / 대수 / 미적분1 …) · 시험대비 모드면 처음엔 학교 시험 · RPC stu_exam_papers_v2(p_track) — 옛 stu_exam_papers는 옛 폰용으로 그대로 -->
 <meta name="theme-color" content="#1c2163">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="백수학 기록">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1568,7 +1569,7 @@ input.w{width:100%;max-width:520px}
   function stvBind(){var t=document.getElementById('stvT');if(t)t.onclick=function(){LS('bzs_stv_shut',LS('bzs_stv_shut')==='1'?null:'1');var el=document.getElementById('stv');if(el)el.innerHTML=stvHtml();stvBind();};
     var w=document.getElementById('stvWr');if(w)w.onclick=function(){toast('📕 오답은 현관의 「오답·시험지」에서!');};}
   /* ===== v0.27 📝 시험지 (설계 §HT · 2026-11-09) ===== */
-  var X={list:null,q:'',g:null,t:null,paper:null,info:null,ans:{},ph:{},cur:null,buf:'',tick:null,res:null,elapsed:null,phFor:null};
+  var X={trk:null,list:null,q:'',g:null,t:null,paper:null,info:null,ans:{},ph:{},cur:null,buf:'',tick:null,res:null,elapsed:null,phFor:null};
   function xfmt(s){s=Math.max(0,Math.floor(s||0));return ('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);}
   function xmin(s){return s==null?'-':Math.round(s/60)+'분';}
   function xpretty(s){if(!s)return '';function sq(x){return x.replace(/√(\d+(?:\.\d+)?|\([^)]*\)|[a-zπ])/g,function(m,a){return '<span class="sqrt">√<span class="in">'+a.replace(/^\(|\)$/g,'')+'</span></span>';});}
@@ -1580,7 +1581,7 @@ input.w{width:100%;max-width:520px}
   function xFresh(){X.g=null;X.t=null;X.q='';X.more=false;X.xt=null;X.xy=null;X.fake=null;}
   function examScr(){setDoor('wrong');navTo(function(){gGo('wrong');});if(EXM&&EXM.term&&X.g==null&&X.t==null){var tp=String(EXM.term).split('-');X.g=+tp[0];X.t=+tp[1];}try{history.replaceState(null,'',location.pathname+'?m=exam');}catch(e){}
     out.innerHTML='<div class="card">시험지 목록 불러오는 중…</div>';
-    Promise.all([SB.rpc('stu_exam_papers',{p_code:CODE,p_q:X.q||null,p_grade:X.g,p_term:X.t}),SB.rpc('stu_scope',{p_code:CODE})]).then(function(rs){var r=rs[0];if(r.error||!r.data){out.innerHTML='<div class="card">시험지를 못 불러왔어 — 다시 열어 줘<br><span class="hint">'+esc(r.error&&r.error.message)+'</span></div>';return;}
+    Promise.all([SB.rpc('stu_exam_papers_v2',{p_code:CODE,p_q:X.q||null,p_grade:X.g,p_term:X.t,p_track:X.trk||(EXM&&EXM.term?'school':null)}),SB.rpc('stu_scope',{p_code:CODE})]).then(function(rs){var r=rs[0];if(r.error||!r.data){out.innerHTML='<div class="card">시험지를 못 불러왔어 — 다시 열어 줘<br><span class="hint">'+esc(r.error&&r.error.message)+'</span></div>';return;}
       X.scopeInfo=(rs[1]&&rs[1].data)||null;X.list=r.data;X.g=r.data.grade;X.t=r.data.term;LS('bzs_exam_term',JSON.stringify({g:X.g,t:X.t}));xRenderList();});}
   /* 📝 시험 범위 고르기 — 단원 칩(그 학년·학기 기출 단원 전부), 내 것으로 저장 */
   function xScopeEdit(){var I=X.scopeInfo;if(!I||I.none){toast('지금은 시험 일정이 없어');return;}var sel={};(I.units||[]).forEach(function(u){sel[u]=1;});var all=I.all_units||[];
@@ -1591,6 +1592,8 @@ input.w{width:100%;max-width:520px}
     draw();d.onclick=function(e){if(e.target===d)d.remove();};document.body.appendChild(d);}
   function xRenderList(){var L=X.list,P=L.papers||[],done=L.done||0,tot=L.total||0,hi=L.level==='고등';
     var h='<div class="card"><div class="row" style="margin:0"><div class="big" style="flex:1">📄 '+(hi?'고등':L.grade+'-'+L.term)+' 기출 시험지</div><button class="back" id="xHome" style="padding:6px 10px;font-size:13px">← 뒤로</button></div>';
+    /* v0.90 원장 11-21 「과정이 여러 개라 — 시험대비면 중2 기말, 대수·미적분1도 — 세 개 고르는 기능」: 고를 과정이 2개 이상(학교 학년 + 반 과목 + 같이 듣는 반)이면 칩. 시험대비 모드면 처음엔 학교 시험 */
+    if(L.tracks&&L.tracks.length>1){var curT=L.track||(L.level==='고등'?L.h_subject:'school');h+='<div style="margin-top:8px">'+L.tracks.map(function(k){return '<span class="chipx'+(k.k===curT?' on':'')+'" data-trk="'+esc(k.k)+'">'+(k.k==='school'?'🏫 ':'📘 ')+esc(k.label)+'</span>';}).join('')+'</div>';}
     if(!hi&&!X.more){h+='<div class="row" style="margin:6px 0 0"><span class="hint">'+(L.my_grade&&+L.my_grade===+L.grade?'내 학년·학기 시험지만 보여 줘':'선택한 학년·학기')+'</span><button class="back" id="xMore" style="margin-left:auto;font-size:12px;padding:4px 10px">다른 학년도 보기</button></div>';}
     if(!hi&&X.more){h+='<div style="margin-top:8px">'+(L.terms||[]).map(function(x){return '<span class="chipx'+(x.g===L.grade&&x.t===L.term?' on':'')+'" data-g="'+x.g+'" data-t="'+x.t+'">'+x.g+'-'+x.t+' <small>'+x.n+'</small></span>';}).join('')+'</div>';}
     var SC=L.scope;if(SC&&SC.units&&SC.units.length){h+='<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:#eef3ff;border:1px solid #c9d6f5"><div class="row" style="margin:0"><b>📝 시험 범위</b> <span class="hint">'+esc(SC.name||'')+(SC.src==='student'?' · 내가 정함':' · 쌤이 정함')+'</span><button class="back" id="xScope" style="margin-left:auto;font-size:12px;padding:4px 10px">바꾸기</button></div><div class="hint" style="margin-top:4px">'+SC.units.map(esc).join(' · ')+'</div>'+(L.hidden?'<div class="hint" style="margin-top:3px">범위 밖 문제 5개 넘는 시험지 '+L.hidden+'장은 숨겼어</div>':'')+'</div>';}
@@ -1616,7 +1619,8 @@ input.w{width:100%;max-width:520px}
     document.getElementById('xHome').onclick=function(){gGo('wr_solve');};var xs=document.getElementById('xScope');if(xs)xs.onclick=function(){xScopeEdit();};
     var qi=document.getElementById('xq'),tm=null;qi.oninput=function(){clearTimeout(tm);tm=setTimeout(function(){X.q=qi.value.trim();examScr();},400);};
     var xm=document.getElementById('xMore');if(xm)xm.onclick=function(){X.more=true;xRenderList();};out.querySelectorAll('[data-xy]').forEach(function(b){b.onclick=function(){X.xy=+b.getAttribute('data-xy');xRenderList();};});out.querySelectorAll('[data-hs]').forEach(function(b){b.onclick=function(){X.hs=b.getAttribute('data-hs');X.xt=null;X.xy=null;xRenderList();};});out.querySelectorAll('[data-xt]').forEach(function(b){b.onclick=function(){X.xt=b.getAttribute('data-xt');X.xy=null;xRenderList();};});
-    out.querySelectorAll('.chipx').forEach(function(c){c.onclick=function(){X.g=+c.getAttribute('data-g');X.t=+c.getAttribute('data-t');X.q='';examScr();};});
+    out.querySelectorAll('[data-trk]').forEach(function(c){c.onclick=function(){X.trk=c.getAttribute('data-trk');X.g=null;X.t=null;X.hs=null;X.xt=null;X.xy=null;X.more=false;X.q='';examScr();};});
+    out.querySelectorAll('.chipx[data-g]').forEach(function(c){c.onclick=function(){X.g=+c.getAttribute('data-g');X.t=+c.getAttribute('data-t');X.q='';examScr();};});
     out.querySelectorAll('.xpaper').forEach(function(el){el.onclick=function(){var p=P.filter(function(x){return x.id===el.getAttribute('data-p');})[0];if(!p.has_answers){toast('이 시험지는 정답이 아직 준비 안 됐어');return;}X.paper=p;xSolve();};});}
   function xSolve(){var p=X.paper,k='bzs_xt0_'+p.id,t0=+LS(k)||0;
     var h='<div class="card" style="text-align:center"><div style="text-align:left"><button class="back" id="xCancel" style="font-size:13px;padding:5px 12px">← 목록</button></div><div class="big" style="margin-top:6px">'+esc(p.label)+'</div><div class="hint">기준 '+p.limit+'분 · '+p.n+'문제'+(p.my?' · 전에 '+p.my.n_correct+'/'+p.my.n_total:'')+'</div><div class="xtimer" id="xtm">'+xfmt(t0?(Date.now()-t0)/1000:0)+'</div>'+
