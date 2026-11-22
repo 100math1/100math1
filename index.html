@@ -832,7 +832,7 @@ input.w{width:100%;max-width:520px}
       return '<button class="hmtl '+c+'" data-hq="'+q[0]+'"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span class="hmBody"><b class="hmTt">'+q[2].replace(' · ','<br>').replace(/^(숙제|오늘|교재|수업) /,'$1<br>')+'</b><small>'+esc(x.t)+'</small></span></button>';}).join('')+'</div>';
     return h+'</div>';}
   /* v0.98 원장 11-22 15:39 「다른 쪽 타일도 제목 가운데·크게 · 모든 칸에서 글씨 안 삐져나오는 크기로 공통」 */
-  function hmTtl(t){return esc(String(t||'')).replace(/\s*·\s*/,'<br>').replace(/^(\S+) (\S+)$/,'$1<br>$2');}
+  function hmTtl(t){var M={'레벨·퀘스트':'레벨<br>퀘스트','내 공부 현황':'내 공부<br>현황','내 교재':'내<br>교재','학원 일정·공지':'학원일정<br>공지'};/* 원장 11-22 15:41 줄 나눔 그대로 */t=String(t||'');if(M[t])return M[t];return esc(t).replace(/\s*·\s*/,'<br>').replace(/^(\S+) (\S+)$/,'$1<br>$2');}
   function hmTtFit(){var r=document.getElementById('hmRoot');if(!r)return;var L=[].slice.call(r.querySelectorAll('.hmtl .hmTt'));if(!L.length)return;var best=40;
     L.forEach(function(el){var bx=el.parentNode,sz=40;el.style.setProperty('font-size',sz+'px','important');while(sz>14&&(el.scrollWidth>el.clientWidth+1||bx.scrollHeight>bx.clientHeight+1||el.scrollHeight>el.clientHeight+1)){sz-=1;el.style.setProperty('font-size',sz+'px','important');}if(sz<best)best=sz;});
     L.forEach(function(el){el.style.setProperty('font-size',best+'px','important');});}
