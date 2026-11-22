@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v0.96 (11-22 비서): 이름 밑 빨간 「시험대비 모드 · 교재 · 며칠 남음」 띠 없앰 → 이름 옆 D-day 칸 두 줄(🔥 시험대비 모드 / 📝 기말 D-22) -->
 <!-- 학생폰 v0.95 (11-22 비서): 🏠 하원 「정한 거 다 했어?」도 시험대비·진도1·진도2 탭 · 교재 채점 🔥→📝 시험대비 -->
 <!-- 학생폰 v0.94 (11-22 비서): 🤝 오늘 할 것 위에 📝 시험대비 · 📘 진도1 · 📘 진도2 탭 먼저 → 그 아래 교재 줄 -->
 <!-- 학생폰 v0.93 (11-22 비서): 🤝 오늘 할 것 = [지금 N쪽] [적는 칸] [🚫 없음] 한 줄 · 진도 줄엔 숙제 칸 없음 -->
@@ -876,8 +877,11 @@ input.w{width:100%;max-width:520px}
       document.getElementById('sfSave').onclick=function(){if(!sel.length){toast('하나 이상 골라 줘');return;}qSave({self:sel[0],selfs:sel.slice(),self_auto:false},'🙋 저장!');};}
     draw();window.scrollTo(0,0);}
   /* ===== v0.70 🎮 내 현황 6칸 (원장 11-13 04:3x 음성) — 현황 보기만 · 채점으로 가는 길 없음 · 「내 상태 바꾸기」(책·목표)는 여기 ===== */
-  function ddayDraw(d){var el=document.getElementById('dday');if(!el)return;var e=STV&&STV.exam;if(!e||d==='parent'||!CODE){el.style.display='none';return;}var n=+e.dday;if(isNaN(n)||n<0||n>45){el.style.display='none';return;}
-    var t=String(e.title||'시험').replace(/\s*\(.*?\)\s*/g,'').replace(/^.*?(중간|기말|시험)/,'$1');if(t.length>6)t=t.slice(0,6);el.textContent='📝 '+t+' '+(n===0?'D-DAY':'D-'+n);el.style.display='inline-block';el.style.background=n<=14?'#e03b3b':'#f2b21b';el.style.color=n<=14?'#fff':'#1c2163';}
+  function ddayDraw(d){var el=document.getElementById('dday');if(!el)return;var e=STV&&STV.exam,X=CTX&&CTX.exm;if(d==='parent'||!CODE||(!e&&!X)){el.style.display='none';return;}var n=e?+e.dday:NaN,okN=!(isNaN(n)||n<0||n>45);
+    if(!okN&&X){var dx=Math.max(0,Math.round((new Date(X.to+'T00:00:00')-new Date(String(CTX.today||'').slice(0,10)+'T00:00:00'))/864e5));if(!isNaN(dx)){n=dx;okN=true;}}if(!okN&&!X){el.style.display='none';return;}
+    var t=e?String(e.title||'시험').replace(/\s*\(.*?\)\s*/g,'').replace(/^.*?(중간|기말|시험)/,'$1'):'시험';if(t.length>6)t=t.slice(0,6);var bot=okN?'📝 '+t+' '+(n===0?'D-DAY':'D-'+n):'';
+    if(X){el.innerHTML='<span style="display:block;font-size:10.5px;line-height:1.15;opacity:.95">🔥 시험대비 모드</span>'+(bot?'<span style="display:block;line-height:1.2">'+esc(bot)+'</span>':'');el.style.background='#e03b3b';el.style.color='#fff';el.style.textAlign='center';el.style.lineHeight='1.15';el.style.whiteSpace='nowrap';}
+    else{el.textContent=bot;el.style.textAlign='';el.style.background=n<=14?'#e03b3b':'#f2b21b';el.style.color=n<=14?'#fff':'#1c2163';}el.style.display='inline-block';}
   function ddayLoad(){if(!SB||!CODE)return;if(STV&&!STV._bad){ddayDraw(doorOf(QM));return;}SB.rpc('stu_status',{p_code:CODE}).then(function(r){if(r.data&&!r.data.err){STV=r.data;ddayDraw(doorOf(QM));}});}
   var MEQ=[['game','🎮','레벨·퀘스트','등급 · 퀘스트 · 배지'],['rank','🏆','순위표','우리 학원 순위'],['goal','🎯','목표','이번 주 · 이번 달'],['stat','📈','내 공부 현황','시험지 · 테스트 · 숙제'],['book','📖','내 교재','교재 바꾸기'],['notice','📢','학원 일정·공지','내 수업 시간 · 방학 · 보강 · 시험']];
   function meSub(t){pgOff();setDoor('me');hmT(t);var b=document.getElementById('hBack');if(b){b.style.display='inline-block';b.textContent='🏠 홈';b.onclick=function(){gGo('me');};}NAVBACK=null;out.classList.remove('hmw');window.scrollTo(0,0);}
@@ -1727,7 +1731,7 @@ input.w{width:100%;max-width:520px}
   /* 🔥 시험대비 모드 — CTX.exm(로드맵 ⏸ 시험대비 막대 안) */
   var SLOTS0=null;function exmApply(){var X=CTX&&CTX.exm;try{document.body.classList.toggle('exm',!!X);}catch(e){}
     /* v0.76b: 칸 만들기는 trkApply가 (시험대비 칸 2개 + 원래 책 칸) */
-    var b=document.getElementById('exmBan');if(b)b.remove();if(X){var dd=Math.max(0,Math.round((new Date(X.to+'T00:00:00')-new Date(String(CTX.today||'').slice(0,10)+'T00:00:00'))/864e5));b=document.createElement('div');b.id='exmBan';b.style.cssText='background:linear-gradient(90deg,#c0392b,#e74c3c);color:#fff;font-size:12.5px;font-weight:800;text-align:center;padding:4px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';b.textContent='🔥 시험대비 모드 · '+(X.b1||'')+(X.b2?' · '+X.b2:'')+' · '+dd+'일 남음';var hd=document.querySelector('.top');if(hd&&hd.parentNode)hd.parentNode.insertBefore(b,hd.nextSibling);}}
+    var b=document.getElementById('exmBan');if(b)b.remove();if(X){var dd=Math.max(0,Math.round((new Date(X.to+'T00:00:00')-new Date(String(CTX.today||'').slice(0,10)+'T00:00:00'))/864e5));b=document.createElement('div');b.id='exmBan';b.style.cssText='background:linear-gradient(90deg,#c0392b,#e74c3c);color:#fff;font-size:12.5px;font-weight:800;text-align:center;padding:4px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';/* v0.96 원장 11-22 15:30 「이 띠는 없애고 이름 옆 D-day를 두 줄로(위 시험대비 모드 · 아래 기말고사 D-22)」 */b=null;try{ddayDraw(doorOf(QM));}catch(e){}}}
   var WTAB='wrong',WRMODE='',REV=null,WRBK='',WRLN='';
   /* 📕 오답·시험지 홈 — 6칸 (원장 11-13 07:0x) */
   var WRQ=[['book','📕','교재 오답','다시 풀기 · 덜 한 숙제'],['exam','📄','시험지 오답','기출 · 테스트 · 모의고사'],['solve','✏️','시험지 풀기','기출 · 실전 타이머'],['req','🧩','문제 요청','실수 연습 · 이해 연습'],['note','📒','실수 노트','틀린 이유 · 자주 틀리는 단원'],['doc','📸','학교 자료','수행평가 · 시험 범위 사진']];
