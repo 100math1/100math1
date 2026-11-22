@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v1.18 (11-22 비서): 하원 「남아서 할 거」 맨 위로 -->
 <!-- 학생폰 v1.16 (11-22 비서): 교재 채점 = 오늘 할 것처럼 카드 하나 안에 책마다 줄로 나눔 · 출결 바닥 저장 ✅ -->
 <!-- 학생폰 v1.14 (11-22 비서): 숙제 확인·교재 채점 탭 = 오늘 할 것과 같은 모양 · 「옆으로 밀어서 넘겨」 지움 · 이름 📝 시험대비 / 📘 과정 -->
 <!-- 학생폰 v1.12 (11-22 비서): 바닥 = 늘 같은 파란 띠 하나(왼쪽 💡 · 가운데 그 화면 저장 버튼 + 바로 옆 ❓ 설명 · 오른쪽 ❓ 사용법) -->
@@ -1156,6 +1157,7 @@ html.fx #out{bottom:58px!important;padding-bottom:12px!important}/* v1.11 원장
   /* v0.86 원장 11-19 18:45 「마지막 = 하원으로 바꾸기로 했잖아」 — 진도·숙제 쪽은 🤝 오늘 할 것에서 이미 적음 → 여기선 하원만(+남아서 한 거) · 알림장용 진도·숙제는 오늘 할 것에서 그대로 */
   function leaveScr(){SCBIG=false;setDoor('today');hmT('🏠 하원');NAVBACK=null;var m=CTX.mine||{},PL=(m.plan&&!Array.isArray(m.plan))?m.plan:{},IT=(PL.items||[]).filter(function(i){return i.learn||i.hw;}),done=!!m.at_end,STY=Array.isArray(m.stay)?m.stay:(m.stay?String(m.stay).split(','):[]);
     var h='<div class="hmband stat'+(done?' done':'')+'"><span class="f">'+(done?'✅':'🏠')+'</span><span><b>'+(done?hmHM(m.at_end)+'에 하원했어':'다 끝났으면 「하원」 누르기')+'</b><small>'+(done?'조심히 가~':'누르면 쌤한테 가')+'</small></span></div>';
+    h+='<div class="card" style="padding:10px 14px"><b style="font-size:15px">🕘 수업 끝나고 남아서 할 거 있어?</b><div style="display:flex;gap:6px;margin-top:6px">'+[['','없음'],['hw','숙제 마무리'],['wr','오답 마무리']].map(function(a){var on=a[0]?STY.indexOf(a[0])>=0:!STY.length;return '<button class="bkc'+(on?' on':'')+'" data-sty="'+a[0]+'" style="flex:1;padding:10px 2px;font-size:14px'+(on?';background:#1c2163;color:#fff;border-color:#1c2163':'')+'">'+a[1]+'</button>';}).join('')+'</div></div>';
     var DN=m.plan_done||(window.__lvDN=window.__lvDN||{});if(!m.plan_done)DN=window.__lvDN;
     /* v0.95 원장 11-22 「교재 관련은 다 시험대비·진도1·진도2 탭이 기본」 — 하원 「정한 거 다 했어?」도 탭으로 나눠 보기 */
     var lvT=hmTracks(),lvL=function(x){var k=String(x.k||'');if(/^ex/.test(k))return 'ex';var mm=k.match(/@(\d+)/);return 't'+(mm?mm[1]:'0');},lvN={ex:'📝 시험대비'};lvT.forEach(function(t,i){lvN['t'+i]='📘 '+(t.prog?(TRKT[t.prog]||t.prog):'진도'+(i+1));});if(!lvT.length)lvN.t0='📘 진도';
@@ -1169,7 +1171,6 @@ html.fx #out{bottom:58px!important;padding-bottom:12px!important}/* v1.11 원장
        LN?'<div style="margin-top:6px;font-size:16px;font-weight:800;color:#c0392b">아직 '+LN+'개 남았어 <span style="font-weight:400;font-size:14px;color:#4a5068">('+[LTD.length?'❌ 오답 '+LTD.length:'',LTR.length?'🔺 헷갈림 '+LTR.length:''].filter(Boolean).join(' · ')+')</span></div><div class="hint" style="margin-top:2px;word-break:keep-all">맞았으면 기록 (안 해도 하원 돼)</div><button class="send" id="lvFix" style="margin-top:8px;padding:12px;font-size:16px;background:#c0392b">📕 맞힘 기록하러 가기</button>'
        :'<div style="margin-top:6px;font-size:16px;font-weight:800;color:#2fa35a">👍 오늘 틀린 거 다 고쳤어</div>')+
       (LW&&LOLD?'<div class="hint" style="margin-top:6px">전에 틀린 것도 '+LOLD+'개 남아 있어 — '+(LN?'위 버튼 안에 같이 있어':'<a href="#" id="lvOld" style="font-weight:800">📕 고치러 가기</a>')+'</div>':'')+'</div>';
-    h+='<div class="card" style="padding:10px 14px"><b style="font-size:15px">🕘 수업 끝나고 남아서 할 거 있어?</b><div style="display:flex;gap:6px;margin-top:6px">'+[['','없음'],['hw','숙제 마무리'],['wr','오답 마무리']].map(function(a){var on=a[0]?STY.indexOf(a[0])>=0:!STY.length;return '<button class="bkc'+(on?' on':'')+'" data-sty="'+a[0]+'" style="flex:1;padding:10px 2px;font-size:14px'+(on?';background:#1c2163;color:#fff;border-color:#1c2163':'')+'">'+a[1]+'</button>';}).join('')+'</div></div>';
     h+='<div class="sbRow"><button class="send" id="lvGo">🏠 하원</button><button class="qh" data-qh="책마다 「다 했어 / 덜 했어」 누르고 → 하원\n다 했으면 왼쪽 위 🏠 홈">❓</button></div>';
     out.innerHTML=h;window.scrollTo(0,0);var lp=document.getElementById('lvPlan');if(lp)lp.onclick=function(e){e.preventDefault();planScr();};
     var lf=document.getElementById('lvFix'),lo2=document.getElementById('lvOld');if(lf)lf.onclick=function(){lvFix();};if(lo2)lo2.onclick=function(e){e.preventDefault();lvFix();};document.getElementById('lvWrQ').onclick=lvHelp;
