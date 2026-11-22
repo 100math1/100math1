@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v1.04e (11-22 비서): 빨간 시험대비 칸 오른쪽 끝에 딱 붙임 · 위 제목 넘치면 글씨 줄여 다 보이게 -->
 <!-- 학생폰 v1.04 (11-22 비서): 위 빨간 시험대비 D-day 칸 = 오른쪽 끝에 붙임 · 안 잘리게(제목이 대신 줄어듦) -->
 <!-- 학생폰 v1.03 (11-22 비서): 교재 채점도 같은 꼴(제목 한 줄 설명 → 📝 시험대비·📘 진도 탭 → 책) -->
 <!-- 학생폰 v1.02 (11-22 비서): 오늘 할 것 = 숙제 확인과 같은 꼴(카드 제목 한 줄 설명 → 탭 → 책 줄) -->
@@ -136,7 +137,7 @@ input.w{width:100%;max-width:520px}
 @media (max-width:380px){.top .cn{display:none}.top{flex-wrap:nowrap;gap:8px;padding:10px 12px}.top h1{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}}
 .frc{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.82em;line-height:1.05;margin:0 2px}.frc i{font-style:normal;padding:0 2px}.frc i:first-child{border-bottom:1.5px solid currentColor}.rtx{white-space:nowrap}.rtx>span{border-top:1.5px solid currentColor;padding:1px 1px 0;margin-left:-1px}.katex{font-size:1.08em}.mth{font-size:1.15em;math-style:normal;font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math;color:inherit;font-weight:400}.mth *{color:inherit}</style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<style id="sp103">/* v1.04 원장 11-22 16:12 「빨간 시험대비 띠 오른쪽 끝에 붙게 — 중간에 글씨 잘림」 */.top{padding-right:4px!important;padding-left:4px!important}#hBack{margin-left:0!important;flex:none;border-radius:0!important;clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%);padding:6px 11px 6px 18px!important;border:0!important}/* 원장 11-22 16:13 「둥근 노란 띠 말고 밖으로 나간다는 모양」 = 왼쪽 화살표 꼴 */.top .sp{flex:none;margin-left:auto}#dday{flex:none;margin-left:auto;margin-right:0;padding:3px 7px!important;overflow:visible}.top h1{flex:1 1 auto}</style><style id="sp87">/* v0.87 원장 11-19 18:59 「타일 제목 가운데 · 더 크게 · 아래 작은 글씨 설명」 */
+<style id="sp103">/* v1.04 원장 11-22 16:12 「빨간 시험대비 띠 오른쪽 끝에 붙게 — 중간에 글씨 잘림」 */.top{padding-right:0!important;padding-left:4px!important;gap:6px!important}.top .sp{gap:4px!important}.top h1{font-size:min(18px,4.5vw)!important;letter-spacing:-.3px}#hBack{margin-left:0!important;flex:none;border-radius:0!important;clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%);padding:6px 11px 6px 18px!important;border:0!important}/* 원장 11-22 16:13 「둥근 노란 띠 말고 밖으로 나간다는 모양」 = 왼쪽 화살표 꼴 */.top .sp{flex:none;margin-left:auto}#dday{flex:none;margin-left:auto;margin-right:0;padding:3px 6px 3px 8px!important;overflow:visible;border-radius:10px 0 0 10px!important}.top h1{flex:1 1 auto}</style><style id="sp87">/* v0.87 원장 11-19 18:59 「타일 제목 가운데 · 더 크게 · 아래 작은 글씨 설명」 */
 .hmtl .hmBody{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .hmtl .hmTt{flex:1;display:flex!important;align-items:center;justify-content:center;text-align:center;font-size:clamp(22px,8vw,34px)!important;line-height:1.12!important;font-weight:900;letter-spacing:-.5px;margin:2px 0;min-width:0;min-height:0;overflow:hidden;word-break:keep-all}
 .hmtl .hmBody small{text-align:center;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:2.6em;line-height:1.3;word-break:keep-all}
@@ -754,7 +755,7 @@ input.w{width:100%;max-width:520px}
   /* ===== v0.32 현관·문 3개 (원장 11-10 00:00 「카톡 메뉴 윗줄 3개 중 왼쪽만 쓰게 됨 → 재설계」 · 「서로 막아놔야」 · 카톡 없는 애도 같은 문 3개) ===== */
   var DOORS={today:'✅ 교재 채점',me:'🎮 내 현황',wrong:'📕 오답·시험지',notice:'📢 공지·일정',lobby:'🙋 백수학',parent:'👪 백수학 학부모',help:'❓ 사용법'};
   function doorOf(m){if(!m)return 'lobby';if(m==='me'||String(m).indexOf('me_')===0)return 'me';if(m==='notice'||m==='wrong')return m;if(m==='exam'||m==='ask'||String(m).indexOf('wr_')===0)return 'wrong';return 'today';}
-  function setDoor(d){var h=document.getElementById('hTtl'),b=document.getElementById('hBack');if(h&&DOORS[d])h.textContent=DOORS[d];if(b){b.style.display=(d==='lobby'||d==='parent'||d==='help'||!CODE)?'none':'inline-block';var wsub=d==='wrong'&&QM&&QM!=='wrong';b.textContent=(d==='today'||wsub)?'🏠 홈':'🚪 현관';b.onclick=function(){gGo(d==='today'?'today':wsub?'wrong':'');};}var fb=document.getElementById('qFb');if(fb)fb.style.display=(CODE&&d!=='parent')?'block':'none';try{ddayDraw(d);}catch(e){}var hn=document.getElementById('hNot');if(hn)hn.style.display=(d==='lobby'&&CODE&&!PUB)?'inline-block':'none';if(d!=='lobby')out.classList.remove('hmw');}
+  function setDoor(d){var h=document.getElementById('hTtl'),b=document.getElementById('hBack');if(h&&DOORS[d]){h.textContent=DOORS[d];try{ttlFit();}catch(e){}}if(b){b.style.display=(d==='lobby'||d==='parent'||d==='help'||!CODE)?'none':'inline-block';var wsub=d==='wrong'&&QM&&QM!=='wrong';b.textContent=(d==='today'||wsub)?'🏠 홈':'🚪 현관';b.onclick=function(){gGo(d==='today'?'today':wsub?'wrong':'');};}var fb=document.getElementById('qFb');if(fb)fb.style.display=(CODE&&d!=='parent')?'block':'none';try{ddayDraw(d);}catch(e){}var hn=document.getElementById('hNot');if(hn)hn.style.display=(d==='lobby'&&CODE&&!PUB)?'inline-block':'none';if(d!=='lobby')out.classList.remove('hmw');}
   function isKakao(){return /KAKAOTALK/i.test(navigator.userAgent||'');}
   function isStandalone(){try{return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}catch(e){return false;}}
   /* ===== v0.68 홈 (화면 틀 원칙 8개) ===== */
@@ -762,7 +763,10 @@ input.w{width:100%;max-width:520px}
   var HMK=[['concept','진도'],['type','유형서1'],['type2','유형서2'],['review','심화'],['recap','복습'],['','시험대비']];
   /* v0.82 원장 11-19 17시 「출결 안에 다음 시간 빠져? 같이 — 그 둘은 세트」 → 📅 빠지는 날 타일은 도착 안으로 */
   var HMQS=[['arr','🏫','출결 · 다음일정'],['hw','📌','숙제 확인'],['plan','🤝','오늘 할 것'],['gr','✅','교재 채점'],['self','🙋','나의 · 수업태도'],['end','🏠','하원']];
-  function hmT(t){var h=document.getElementById('hTtl');if(h)h.textContent=t;}
+  function hmT(t){var h=document.getElementById('hTtl');if(h){h.textContent=t;ttlFit();}}
+  /* v1.04e 원장 11-22 16:15 「나의 수업태도·내 공부 현황 제목 잘림」 → 넘치면 글씨를 줄여서 다 보이게 */
+  function ttlFit(){var h=document.getElementById('hTtl');if(!h)return;h.style.fontSize='';var sz=parseFloat(getComputedStyle(h).fontSize)||18;var go=function(){while(sz>12&&h.scrollWidth>h.clientWidth+1){sz-=0.5;h.style.setProperty('font-size',sz+'px','important');}};go();setTimeout(function(){sz=parseFloat(getComputedStyle(h).fontSize)||sz;go();},80);}
+  window.addEventListener('resize',function(){try{ttlFit();}catch(e){}});
   function hmHM(at){var t=new Date(at);return isNaN(t)?'':t.getHours()+':'+('0'+t.getMinutes()).slice(-2);}
   function hmDraft(){var d=FDR.end;return (d&&d.code===CODE&&d.day===String((CTX&&CTX.today)||''))?d.F:null;}
   function hmTracks(){var T=(CTX&&Array.isArray(CTX.rm_tracks))?CTX.rm_tracks:[];T=T.filter(function(t){return t&&(t.concept||t.type||t.type2);}).slice(0,3);return T.length>=2?T:[];}
