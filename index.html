@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v1.03 (11-22 비서): 교재 채점도 같은 꼴(제목 한 줄 설명 → 📝 시험대비·📘 진도 탭 → 책) -->
 <!-- 학생폰 v1.02 (11-22 비서): 오늘 할 것 = 숙제 확인과 같은 꼴(카드 제목 한 줄 설명 → 탭 → 책 줄) -->
 <!-- 학생폰 v1.01 (11-22 비서): 출결 「다음 시간에 그대로 와?」 늘 보임(도착 안 눌러도) -->
 <!-- 학생폰 v1.00 (11-22 비서): 오늘 할 것 위 노란 「쌤하고 정해서 여기 적어요」 띠 뺌 -->
@@ -1324,7 +1325,7 @@ input.w{width:100%;max-width:520px}
     if(!GR.book){navTo(function(){gGo('today');});if(!GRB){out.innerHTML='<div class="card">책 목록 불러오는 중…</div>';SB.rpc('stu_grade_books',{p_code:CODE}).then(function(r){GRB=r.data||[];GR_ALL=GR.all;grScr();});return;}var bs=grBooks().map(function(x){x.ok=grOk(trkB(x.book));return x;});if(GR_HW&&GR_HW.length){var HW=GR_HW;GR_HW=null;HW.forEach(function(b){if(!bs.some(function(x){return x.book===b;}))bs.push({book:b,to:'',ok:grOk(b)});});bs.forEach(function(x){x.hw=HW.indexOf(x.book)>=0;});bs.sort(function(a,b){return (b.hw?1:0)-(a.hw?1:0);});}if(!bs.length)GR.all=1;var lastK=null;try{for(var i=0;i<localStorage.length;i++){var kk=localStorage.key(i);if(kk.indexOf('bzs_grd_')===0){var vv=JSON.parse(localStorage.getItem(kk));if(vv&&vv.m&&Object.keys(vv.m).length&&Date.now()-vv.at<3*864e5&&(!lastK||vv.at>lastK.at))lastK={k:kk,at:vv.at,n:Object.keys(vv.m).length};}}}catch(e){}GR_LAST=lastK;hmT('✅ 교재 채점');if(!F||!F.slots){HMQ=true;try{build0('end');}catch(e){}HMQ=false;}
       /* v0.81d 원장 11-18 16:40 「교재 채점도 좌우 스와이프로 넘어가면서」 → 시험대비 켜짐 or 진도 줄 2개 이상이면 [🔥 시험대비] [과정명]… 장으로 (최대 4장) */
       var T=hmTracks(),ti=T.length?Math.min(HM.ti,T.length-1):0,hwB={};hwPrev().forEach(function(i){if(i&&i.book)hwB[i.book]=1;});var X0=CTX&&CTX.exm,PGc=!!(X0||T.length>=2),ALLG=[];
-      var h='';if(!PGc&&T.length)h+='<div class="hmtrk" style="margin-bottom:8px">'+T.map(function(t,i){return '<button data-hti="'+i+'"'+(i===ti?' class="on"':'')+'>'+esc(t.prog?(TRKT[t.prog]||t.prog):'진도'+(i+1))+'</button>';}).join('')+'</div>';
+      var h='<div class="card" style="padding:10px 12px;margin-bottom:8px"><h2 style="margin:2px 0 0;font-size:16px">✅ 어느 책 채점할까? <small>책 골라서 → 쪽마다 ○✕ · 틀린 건 오답으로 가</small></h2></div>';/* v1.03 원장 11-22 16:10 「교재 채점도 숙제 확인·오늘 할 것과 형태 최대한 비슷하게」 */if(!PGc&&T.length)h+='<div class="hmtrk" style="margin-bottom:8px">'+T.map(function(t,i){return '<button data-hti="'+i+'"'+(i===ti?' class="on"':'')+'>📘 '+esc(t.prog?(TRKT[t.prog]||t.prog):'진도'+(i+1))+'</button>';}).join('')+'</div>';
       if(GR_LAST)h+=(function(){var p=GR_LAST.k.slice(8).split('_');return '<button class="send" id="grCont" style="margin:0 0 10px;padding:11px;font-size:16px">💾 하던 채점 이어서 — '+esc(p[0]+' '+p[1]+' '+p[2]+'~'+p[3]+'쪽')+'</button>';})();
       var card=function(g){if(!g.book&&g.i>=3)return '';
         if(!g.book)return '<div class="card" style="padding:9px 14px;margin-bottom:8px;background:#f4f5f8;border-style:dashed;color:#9aa1b0"><b style="font-size:13px">'+g.nm+'</b> · 교재 없음</div>';
@@ -1335,7 +1336,7 @@ input.w{width:100%;max-width:520px}
       if(!PGc){hmGearX().forEach(function(g){h+=card(g);});}
       else{var P=[],ti0=HM.ti,TR=(CTX&&Array.isArray(CTX.rm_tracks))?CTX.rm_tracks:[];
         if(X0){var ge=hmGearX().filter(function(g){return g.k==='ex1'||g.k==='ex2';});P.push(['📝 시험대비',ge.map(card).join('')]);}
-        var nT=T.length||1;for(var q=0;q<nT;q++){HM.ti=q;var gq=hmGear().filter(function(g){return g.k!=='ex1'&&g.k!=='ex2'&&g.nm!=='시험대비'&&!(q>0&&(g.i===3||g.i===4));});var tq=T[q]||TR[0],pn=tq&&tq.prog?(TRKT[tq.prog]||tq.prog):'진도';P.push([pn,gq.map(card).join('')||'<div class="hint" style="padding:10px">이 과정 교재가 아직 없어</div>']);}
+        var nT=T.length||1;for(var q=0;q<nT;q++){HM.ti=q;var gq=hmGear().filter(function(g){return g.k!=='ex1'&&g.k!=='ex2'&&g.nm!=='시험대비'&&!(q>0&&(g.i===3||g.i===4));});var tq=T[q]||TR[0],pn='📘 '+(tq&&tq.prog?(TRKT[tq.prog]||tq.prog):'진도'+(nT>1?(q+1):''));P.push([pn,gq.map(card).join('')||'<div class="hint" style="padding:10px">이 과정 교재가 아직 없어</div>']);}
         HM.ti=ti0;
         h+='<div class="pgT" style="display:flex;gap:4px;margin-bottom:8px">'+P.map(function(p,i){return '<button class="bkc pgB'+(i===0?' on':'')+'" data-pgb="'+i+'" style="flex:1;min-width:0;padding:8px 2px;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'+(i===0?';background:#1c2163;color:#fff;border-color:#1c2163':'')+'">'+esc(p[0])+'<i class="pgOk" data-pgo="'+i+'" style="font-style:normal"></i></button>';}).join('')+'</div>'+
           '<div class="hint" style="text-align:center;margin:-4px 0 6px;font-size:12px">옆으로 밀어서 넘겨</div><div class="pgW" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none">'+P.map(function(p,i){return '<div class="pgP" data-pgp="'+i+'" style="flex:0 0 100%;min-width:0;scroll-snap-align:start;box-sizing:border-box;padding:0 2px">'+p[1]+'</div>';}).join('')+'</div>';}
