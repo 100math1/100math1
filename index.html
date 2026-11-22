@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v0.99 (11-22 비서): 세 화면(오늘 기록·내 현황·오답) 타일 제목 글씨 = 전부 같은 크기 · 제목 아래 설명 2줄(숫자는 줄마다) -->
 <!-- 학생폰 v0.98 (11-22 비서): 내 현황·오답·시험지 타일도 제목 가운데·크게 · 모든 타일 제목 글씨 = 안 삐져나오는 크기로 공통(제일 긴 제목 기준) -->
 <!-- 학생폰 v0.97 (11-22 비서): 고른 칸 한 번 더 누르면 취소 — 도착 · 하원 다 했어/덜 했어 · 남아서 한 것 · 틀린 이유 · 오답·시험지 거르기 칩 (DB stu_submit: null 보내면 그 칸 지움) -->
 <!-- 학생폰 v0.96 (11-22 비서): 이름 밑 빨간 「시험대비 모드 · 교재 · 며칠 남음」 띠 없앰 → 이름 옆 D-day 칸 두 줄(🔥 시험대비 모드 / 📝 기말 D-22) -->
@@ -133,7 +134,7 @@ input.w{width:100%;max-width:520px}
 <style id="sp87">/* v0.87 원장 11-19 18:59 「타일 제목 가운데 · 더 크게 · 아래 작은 글씨 설명」 */
 .hmtl .hmBody{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .hmtl .hmTt{flex:1;display:flex!important;align-items:center;justify-content:center;text-align:center;font-size:clamp(22px,8vw,34px)!important;line-height:1.12!important;font-weight:900;letter-spacing:-.5px;margin:2px 0;min-width:0;min-height:0;overflow:hidden;word-break:keep-all}
-.hmtl .hmBody small{text-align:center}
+.hmtl .hmBody small{text-align:center;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:2.6em;line-height:1.3;word-break:keep-all}
 .hmtl.ok .hmTt::after{content:none!important}.hmtl.ok .n::before{content:'✅ ';font-size:14px}
 </style>
 </head>
@@ -833,8 +834,16 @@ input.w{width:100%;max-width:520px}
     return h+'</div>';}
   /* v0.98 원장 11-22 15:39 「다른 쪽 타일도 제목 가운데·크게 · 모든 칸에서 글씨 안 삐져나오는 크기로 공통」 */
   function hmTtl(t){var M={'레벨·퀘스트':'레벨<br>퀘스트','내 공부 현황':'내 공부<br>현황','내 교재':'내<br>교재','학원 일정·공지':'학원일정<br>공지'};/* 원장 11-22 15:41 줄 나눔 그대로 */t=String(t||'');if(M[t])return M[t];return esc(t).replace(/\s*·\s*/,'<br>').replace(/^(\S+) (\S+)$/,'$1<br>$2');}
-  function hmTtFit(){var r=document.getElementById('hmRoot');if(!r)return;var L=[].slice.call(r.querySelectorAll('.hmtl .hmTt'));if(!L.length)return;var best=40;
-    L.forEach(function(el){var bx=el.parentNode,sz=40;el.style.setProperty('font-size',sz+'px','important');while(sz>14&&(el.scrollWidth>el.clientWidth+1||bx.scrollHeight>bx.clientHeight+1||el.scrollHeight>el.clientHeight+1)){sz-=1;el.style.setProperty('font-size',sz+'px','important');}if(sz<best)best=sz;});
+  /* 원장 11-22 15:45 「제목 아래 부연설명 한두 줄 — 지금 교재 오답 밑에 『고칠 것 53개 · 덜 한 숙제 6』이 한 줄에 몰려 보임」 → 칸마다 2줄: 지금 숫자가 있으면 숫자를 줄마다(· 로 나눔), 없으면 하는 일 + 한 줄 설명 */
+  var HMSUB={game:['등급 · 퀘스트 · 배지','공부하면 경험치가 쌓여'],rank:['우리 학원 순위','이번 주 · 이번 달'],goal:['이번 주 · 이번 달 목표','정하고 채워 가기'],stat:['시험지 · 테스트 · 숙제','내 기록 한눈에'],book:['지금 쓰는 교재','교재 바꾸기'],notice:['내 수업 시간 · 방학','보강 · 시험 일정'],
+    wbook:['틀린 문제 다시 풀기','덜 한 숙제도 여기'],exam:['기출 · 테스트 · 모의고사','틀린 번호 모아 보기'],solve:['기출 시험지 풀기','실전 타이머로'],req:['비슷한 문제 더 풀기','실수 연습 · 이해 연습'],note:['자주 틀리는 이유','자주 틀리는 단원'],doc:['수행평가 · 시험 범위','사진으로 올리기']};
+  function hmSub(q,dyn){var k=q[0];try{if(k==='book'&&WRQ.indexOf(q)>=0)k='wbook';}catch(e){}var d=HMSUB[k]||[q[3]||'',''];if(dyn){var p=String(dyn).split(/\s*·\s*/);if(p.length>=2)return esc(p[0])+'<br>'+esc(p.slice(1).join(' · '));return esc(dyn)+(d[1]?'<br>'+esc(d[1]):'');}return esc(d[0])+(d[1]?'<br>'+esc(d[1]):'');}
+  function hmTtAll(){var A=[];try{HMQS.forEach(function(q){A.push(q[2].replace(' · ','<br>').replace(/^(숙제|오늘|교재|수업) /,'$1<br>'));});}catch(e){}try{MEQ.forEach(function(q){A.push(hmTtl(q[2]));});}catch(e){}try{WRQ.forEach(function(q){A.push(hmTtl(q[2]));});}catch(e){}return A;}
+  /* 원장 11-22 15:44 「세 모드(오늘 기록·내 현황·오답) 전부 같은 크기」 — 세 화면 제목 전부를 같은 칸에 넣어 보고 제일 작게 맞는 크기 하나로 */
+  var HMTT={};function hmTtFit(){var r=document.getElementById('hmRoot');if(!r)return;var L=[].slice.call(r.querySelectorAll('.hmtl .hmTt'));if(!L.length)return;var t0=L[0].closest('.hmtl'),rc=t0.getBoundingClientRect();if(!rc.width||!rc.height)return;var key=Math.round(rc.width)+'x'+Math.round(rc.height),best=HMTT[key];
+    if(!best){var cl=t0.cloneNode(true);cl.style.cssText+=';position:fixed;left:-9999px;top:0;visibility:hidden;width:'+rc.width+'px;height:'+rc.height+'px;box-sizing:border-box';document.body.appendChild(cl);var el=cl.querySelector('.hmTt'),bx=el.parentNode;best=40;
+      hmTtAll().forEach(function(tx){el.innerHTML=tx;var sz=Math.min(best,40);el.style.setProperty('font-size',sz+'px','important');while(sz>14&&(el.scrollWidth>el.clientWidth+1||bx.scrollHeight>bx.clientHeight+1||el.scrollHeight>el.clientHeight+1)){sz-=1;el.style.setProperty('font-size',sz+'px','important');}if(sz<best)best=sz;});
+      cl.remove();HMTT[key]=best;}
     L.forEach(function(el){el.style.setProperty('font-size',best+'px','important');});}
   function hmFit(){var r=document.getElementById('hmRoot');if(!r)return;var top=r.getBoundingClientRect().top+(window.scrollY||0),hh=(window.innerHeight||640)-top-62;r.style.height=Math.max(400,hh)+'px';try{hmTtFit();setTimeout(hmTtFit,60);}catch(e){}}
   window.addEventListener('resize',function(){try{hmTtFit();}catch(e){}});
@@ -897,7 +906,7 @@ input.w{width:100%;max-width:520px}
     if(k==='game')return meGame();if(k==='rank')return meRank();if(k==='log')return meLog();if(k==='goal')return meGoal();if(k==='stat')return meStat();if(k==='book')return meBook();if(k==='notice'){noticeScr();hmT('📢 학원 일정·공지');var b=document.getElementById('hBack');if(b){b.style.display='inline-block';b.textContent='🏠 홈';b.onclick=function(){gGo('me');};}return;}meHome();}
   function meHome(){pgOff();setDoor('me');hmT('🎮 내 현황');NAVBACK=null;var b=document.getElementById('hBack');if(b){b.style.display='inline-block';b.textContent='🚪 현관';b.onclick=function(){gGo('');};}
     var nb=hmGear().filter(function(g){return g.book;}).length,sub={book:nb?nb+'권 · 교재 바꾸기':'교재 고르기'};if(GM&&GM.xp!=null){var T0=rkTier(+GM.xp||0);sub.game=T0.nm+' · 🔥 '+(+GM.streak||0)+'일 연속';}
-    out.classList.add('hmw');out.innerHTML='<div class="hm" id="hmRoot"><div class="hmtiles">'+MEQ.map(function(q,i){return '<button class="hmtl" data-me="'+q[0]+'" style="background:#fff"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span class="hmBody"><b class="hmTt">'+hmTtl(q[2])+'</b><small>'+esc(sub[q[0]]||q[3])+'</small></span></button>';}).join('')+'</div>'+
+    out.classList.add('hmw');out.innerHTML='<div class="hm" id="hmRoot"><div class="hmtiles">'+MEQ.map(function(q,i){return '<button class="hmtl" data-me="'+q[0]+'" style="background:#fff"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span class="hmBody"><b class="hmTt">'+hmTtl(q[2])+'</b><small>'+hmSub(q,sub[q[0]])+'</small></span></button>';}).join('')+'</div>'+
       '<button class="back" id="meSay" style="flex:none;font-size:14px;padding:9px;margin:0 56px">💬 쌤한테 한마디</button></div>';hmFit();
     out.querySelectorAll('[data-me]').forEach(function(x){x.onclick=function(){gGo('me_'+x.getAttribute('data-me'));};});document.getElementById('meSay').onclick=meSay;
     if(!GM)gLoad(true);
@@ -1748,9 +1757,9 @@ input.w{width:100%;max-width:520px}
   /* 칸 안에서 쓸데없는 것 숨기기 — 칸마다 한 가지 일만 */
   function wrModeFix(){if(!WRMODE)return;out.querySelectorAll('button.back').forEach(function(b){if(/^←\s*현관/.test((b.textContent||'').trim()))b.style.display='none';});hmT(WRMODE==='book'?'📕 교재 오답':WRMODE==='exam'?'📄 시험지 오답':'🧩 문제 요청');var x=document.getElementById('wExam');if(x&&x.parentNode)x.parentNode.style.display='none';var c=out.querySelector('[data-wf2]');if(c&&c.parentNode&&WRMODE==='book')c.parentNode.style.display='none';if(c&&WRMODE==='exam'){out.querySelectorAll('[data-wf2]').forEach(function(b){if(b.getAttribute('data-wf2')==='book')b.style.display='none';});c.parentNode.style.gridTemplateColumns='repeat(4,1fr)';}var wb=document.getElementById('wBack');if(wb){wb.style.display='none';var cd=wb.closest('.card');if(cd){cd.style.padding='8px 12px';var bg=cd.querySelector('.big');if(bg){bg.style.fontSize='17px';bg.style.whiteSpace='nowrap';}var hn=cd.querySelector('.hint[style*="margin-top:10px"]');if(hn)hn.style.display='none';if(hn&&hn.nextElementSibling)hn.nextElementSibling.style.display='none';}}if(WRMODE!=='req'){var pb=document.getElementById('prBox');if(pb)pb.style.display='none';}}
   function wrHome(){setDoor('wrong');hmT('📕 오답·시험지');NAVBACK=null;var b=document.getElementById('hBack');if(b){b.style.display='inline-block';b.textContent='🚪 현관';b.onclick=function(){gGo('');};}
-    var sub={},ex=STV&&STV.exam,band='';if(WR){var n=(WR.open||[]).filter(function(w){return !w.q;}).length,t=(WR.todo||[]).length;sub.book=n?'고칠 것 '+n+'개'+(t?' · 덜 한 숙제 '+t:''):'다 고침 👍'+(t?' · 덜 한 숙제 '+t:'');}if(EXH){var e=exWrongs().length;sub.exam=e?'틀린 것 '+e+'개':'틀린 것 없어';}if(REV){sub.rev=REV.rev&&REV.rev.length?'오늘 다시 볼 것 '+REV.rev.length+'개':'오늘은 없어';}
+    var sub={},ex=STV&&STV.exam,band='';if(WR){var n=(WR.open||[]).filter(function(w){return !w.q;}).length,t=(WR.todo||[]).length;sub.book=n?'고칠 것 '+n+'개'+(t?' · 덜 한 숙제 '+t+'개':''):'다 고침 👍'+(t?' · 덜 한 숙제 '+t+'개':'');}if(EXH){var e=exWrongs().length;sub.exam=e?'틀린 것 '+e+'개':'틀린 것 없어';}if(REV){sub.rev=REV.rev&&REV.rev.length?'오늘 다시 볼 것 '+REV.rev.length+'개':'오늘은 없어';}
     if(ex&&ex.dday!=null&&ex.dday>=0&&ex.dday<=28){var G=(MS&&MS.goals)||{},eg=+G.exam_ex||0,dn=(STV.exams||[]).filter(function(x){return !G.exam_ex_at||String(x.d).slice(0,10)>=G.exam_ex_at;}).length;band='<div style="flex:none;border-radius:12px;padding:7px 12px;margin:0 0 6px;background:'+(ex.dday<=14?'#fdeeee':'#eef2ff')+';font-size:14px;font-weight:700;color:'+(ex.dday<=14?'#c0392b':'#1c2163')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📝 '+(ex.math?'수학 시험':esc(ex.title||'시험'))+' D-'+ex.dday+(eg?' · 기출 목표 '+Math.min(dn,eg)+'/'+eg+'회':'')+'</div>';}
-    out.classList.add('hmw');out.innerHTML='<div class="hm" id="hmRoot">'+band+'<div id="shotBan" style="flex:none">'+shotBan()+'</div><div class="hmtiles">'+WRQ.map(function(q,i){return '<button class="hmtl" data-wr="'+q[0]+'" style="background:#fff"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span class="hmBody"><b class="hmTt">'+hmTtl(q[2])+'</b><small>'+esc(sub[q[0]]||q[3])+'</small></span></button>';}).join('')+'</div></div>';hmFit();
+    out.classList.add('hmw');out.innerHTML='<div class="hm" id="hmRoot">'+band+'<div id="shotBan" style="flex:none">'+shotBan()+'</div><div class="hmtiles">'+WRQ.map(function(q,i){return '<button class="hmtl" data-wr="'+q[0]+'" style="background:#fff"><span class="n">'+(i+1)+'</span><span class="i">'+q[1]+'</span><span class="hmBody"><b class="hmTt">'+hmTtl(q[2])+'</b><small>'+hmSub(q,sub[q[0]])+'</small></span></button>';}).join('')+'</div></div>';hmFit();
     out.querySelectorAll('[data-wr]').forEach(function(x){x.onclick=function(){gGo('wr_'+x.getAttribute('data-wr'));};});try{shotBind(document.getElementById('shotBan'));}catch(e){}
     var again=function(){if(QM==='wrong'&&document.getElementById('hmRoot'))wrHome();};
     if(!WR)SB.rpc('stu_wrongs',{p_code:CODE}).then(function(r){WR=(r.data&&r.data.open)?r.data:{open:[],done_recent:[]};again();});
