@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v1.02 (11-22 비서): 오늘 할 것 = 숙제 확인과 같은 꼴(카드 제목 한 줄 설명 → 탭 → 책 줄) -->
 <!-- 학생폰 v1.01 (11-22 비서): 출결 「다음 시간에 그대로 와?」 늘 보임(도착 안 눌러도) -->
 <!-- 학생폰 v1.00 (11-22 비서): 오늘 할 것 위 노란 「쌤하고 정해서 여기 적어요」 띠 뺌 -->
 <!-- 학생폰 v0.99 (11-22 비서): 세 화면(오늘 기록·내 현황·오답) 타일 제목 글씨 = 전부 같은 크기 · 제목 아래 설명 2줄(숫자는 줄마다) -->
@@ -1091,8 +1092,8 @@ input.w{width:100%;max-width:520px}
     var h='';/* v1.00 원장 11-22 16:09 「위 노란 공지 띠 빼 — 틀 깨지고 스크롤 생김」 */
     /* v0.93 원장 11-22 15:09 「왼쪽 = 지금까지 기록된 쪽(숫자) · 바로 오른쪽 = 적는 칸 · 그 오른쪽 = 없음 버튼 / 진도 줄엔 숙제 칸 없음(다 못 나가면 자동 숙제) / 유형서부터 = 숙제 칸 + 숙제 없음」 */
     h+='<style>.plR{padding:10px 0;border-bottom:1px solid #eef0f4}.plL{display:flex;gap:6px;align-items:stretch;margin-top:6px}.plN{flex:none;width:64px;border-radius:10px;background:#f1f3f8;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}.plN b{font-size:20px;color:#1c2163}.plN small{font-size:11px;color:#6a7086}.plL input{flex:1;min-width:0;padding:9px 10px;font-size:16px;margin:0}.plL input:disabled{background:#eef0f4;color:#9aa0b0}.plX{flex:none;padding:0 9px;font-size:13px;border-radius:10px;border:1.5px solid #c9cfe2;background:#fff;font-weight:800;color:#5a6170;white-space:nowrap}.plX.on{background:#5a6170;border-color:#5a6170;color:#fff}</style>';
-    if(LNS.length>1)h+='<div class="hmtrk" data-noswipe="1" style="margin:0 0 6px">'+LNS.map(function(x){return '<button data-plln="'+x[0]+'"'+(LN===x[0]?' class="on"':'')+'>'+x[1]+'</button>';}).join('')+'</div>';
-    h+='<div class="card" style="padding:8px 14px">'+(G.length?G.map(function(g){var cp=/^concept(@|$)/.test(String(g.k)),f=cp?'learn':'hw',it=IT.filter(function(i){return i.k===g.k;})[0]||{},no=PLD[g.k]?!!PLD[g.k].no:!!it.no;
+    /* v1.02 원장 11-22 16:10 「숙제 확인처럼 — 탭 위에 이 칸 설명 한 줄 · 모양 최대한 비슷하게」 */
+    h+='<div class="card" style="padding:10px 12px"><h2 style="margin:2px 0 6px;font-size:16px">🤝 오늘 어디까지 할까? <small>쌤하고 정해서 책마다 적어 줘</small></h2>'+(LNS.length>1?'<div class="hmtrk" data-noswipe="1" style="margin:0 0 4px">'+LNS.map(function(x){return '<button data-plln="'+x[0]+'"'+(LN===x[0]?' class="on"':'')+'>'+x[1]+'</button>';}).join('')+'</div>':'')+(G.length?G.map(function(g){var cp=/^concept(@|$)/.test(String(g.k)),f=cp?'learn':'hw',it=IT.filter(function(i){return i.k===g.k;})[0]||{},no=PLD[g.k]?!!PLD[g.k].no:!!it.no;
       return '<div class="plR"><div><b>'+esc(g.nm)+'</b> <span style="color:#555">'+esc(g.book)+'</span></div><div class="plL"><span class="plN"><small>지금</small><b>'+(g.pg!=null&&g.pg!==''?esc(g.pg):'—')+'</b><small>쪽까지</small></span><input class="t w" data-plk="'+esc(g.k)+'" data-plf="'+f+'"'+(cp?' inputmode="numeric"':'')+' value="'+esc(no?'':pre(g,f))+'" placeholder="'+(cp?'🗺 오늘 진도 몇 쪽까지':'📝 숙제 예: 30쪽까지')+'"'+(no?' disabled':'')+'><button class="plX'+(no?' on':'')+'" data-plno="'+esc(g.k)+'">'+(cp?'🚫 진도<br>없음':'🚫 숙제<br>없음')+'</button></div></div>';}).join('')+'<div class="hint" style="margin-top:6px;line-height:1.5;word-break:keep-all">🗺 진도는 정한 데까지 다 못 나가면 남은 쪽이 자동으로 숙제가 돼 — 진도 줄엔 숙제 칸 없어</div>':'<div class="hint">'+(LN==='ex'?'시험대비 교재가 아직 없어':'책이 아직 없어')+' — 쌤한테 말해 줘</div>')+
       '<input class="t w" id="plMemo" value="'+esc(PL.memo||'')+'" placeholder="쌤이 따로 한 말 (안 써도 돼)" style="margin-top:10px;padding:8px 10px;font-size:15px"></div>';
     h+='<button class="send" id="plSave">💾 적었어요</button><div class="hint" style="text-align:center;margin-top:8px">'+(PL.ok_at?'✅ '+hmHM(PL.ok_at)+'에 적었어 — 고치면 다시 「적었어요」':'오늘은 진도·숙제 없으면 비워 두고 눌러도 돼')+' · 다 했으면 왼쪽 위 🏠 홈</div><div style="height:24px"></div>';
