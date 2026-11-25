@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>백수학 오늘 기록</title>
+<!-- 학생폰 v1.23 (11-25 비서): 📕 오답방 — 시험대비 교재 오답이 진도 탭으로 가던 것 고침(책 이름 앞부분으로 시험대비 판단) -->
 <!-- 학생폰 v1.22 (11-23 비서): 기출 시험 범위 고르기 잠깐 숨김(시험지 전부 보임) -->
 <!-- 학생폰 v1.21 (11-23 비서): 기출 시험지 과정 칩 = 가로 한 줄 · 「중2-2 기말」 -->
 <!-- 학생폰 v1.20 (11-23 비서): 오답 탭도 과정 탭 전부(빈 탭 = 없음 한 줄) -->
@@ -843,7 +844,7 @@ html.fx #out{bottom:58px!important;padding-bottom:12px!important}/* v1.11 원장
   /* v1.19 원장 11-22 23:2x 「진도 여러 개인 애들은 화면마다 탭이 똑같이 — 기본값」: 과정 목록대로 탭 전부 */
   function pgAll(){var T=hmTracks(),o=(CTX&&CTX.exm)?['ex']:[];T.forEach(function(t,i){o.push('t'+i);});if(!T.length)o.push('t0');return o;}
   function pgOn(){return !!((CTX&&CTX.exm)||hmTracks().length>=2);}
-  function pgGrp(book){var b=String(book||''),X=CTX&&CTX.exm,n=function(x){return String(x||'').replace(/\s+/g,'');};if(X&&(n(b)===n(X.b1)||n(b)===n(X.b2)))return 'ex';var q=trkSplit(b);if(q){var T=hmTracks();for(var i=0;i<T.length;i++){var p=String(T[i].prog||'').trim();if((TRKT[p]||p)===q.t)return 't'+i;}}return 't0';}
+  function pgGrp(book){var b=String(book||''),X=CTX&&CTX.exm,n=function(x){return String(x||'').replace(/\s+/g,'');};/* v1.23 원장 11-25 16:25 「시험대비 오답이 진도 탭으로 다 가 있음」: 오답 책 이름 = 「수학만기출 2-2 기말」(브랜드+학기)인데 시험대비 교재는 「수학만기출」(브랜드만) → 앞부분이 같으면 시험대비로 */var nb=n(b),hit=function(k){k=n(k);return !!k&&(nb===k||nb.indexOf(k)===0);};if(X&&(hit(X.b1)||hit(X.b2)))return 'ex';var q=trkSplit(b);if(q){var T=hmTracks();for(var i=0;i<T.length;i++){var p=String(T[i].prog||'').trim();if((TRKT[p]||p)===q.t)return 't'+i;}}return 't0';}
   function pgTitle(g){if(g==='ex')return '📝 시험대비';var T=(CTX&&Array.isArray(CTX.rm_tracks))?CTX.rm_tracks:[],t=T[+g.slice(1)],p=t&&String(t.prog||'').trim();return '📘 '+(p?(TRKT[p]||p):'진도');}
   function pgSort(O){return O.slice().sort(function(a,b){return (a==='ex'?-1:+a.slice(1))-(b==='ex'?-1:+b.slice(1));});}
   function pgWrap(P){return '<div class="pgT" style="display:flex;gap:4px;margin:4px 0 6px">'+P.map(function(p,i){return '<button class="bkc pgB'+(i===0?' on':'')+'" data-pgb="'+i+'" style="flex:1;min-width:0;padding:7px 2px;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'+(i===0?';background:#1c2163;color:#fff;border-color:#1c2163':'')+'">'+esc(p[0])+'<i class="pgOk" data-pgo="'+i+'" style="font-style:normal"></i></button>';}).join('')+'</div>'+
